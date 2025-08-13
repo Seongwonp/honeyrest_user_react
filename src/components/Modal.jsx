@@ -1,6 +1,14 @@
+import { motion } from 'framer-motion';
+
 function Modal({ message, onClose }) {
     return (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <motion.div
+            className="fixed inset-0 flex items-center justify-center z-50"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+        >
             <div className="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
                 <p className="text-gray-800 text-lg mb-4">{message}</p>
                 <button
@@ -10,7 +18,7 @@ function Modal({ message, onClose }) {
                     확인
                 </button>
             </div>
-        </div>
+        </motion.div>
     );
 }
 

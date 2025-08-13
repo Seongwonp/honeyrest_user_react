@@ -16,23 +16,19 @@ function Home() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("전체");
 
-    const [banners, setBanners] = useState([]);
-    const [randomBanner, setRandomBanner] = useState(null);
+
+    const backgroundImages = [
+        "/src/assets/images/bg1.jpg",
+        "/src/assets/images/bg2.jpg",
+        "/src/assets/images/bg3.jpg",
+        "/src/assets/images/bg4.jpg",
+    ];
+    const [randomImage, setRandomImage] = useState("");
 
     useEffect(() => {
-        fetch("/api/banner/list")
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.success && data.data.length > 0) {
-                    setBanners(data.data);
-
-                    const index = Math.floor(Math.random() * data.data.length);
-                    setRandomBanner(data.data[index]);
-                }
-            });
+        const random = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+        setRandomImage(random);
     }, []);
-
-    console.log("랜덤 배너:", randomBanner);
 
     // 🎉 이벤트 슬라이더 이미지
     const eventImages = [
@@ -187,11 +183,7 @@ function Home() {
 
             <div
                 className="relative w-full h-[650px] bg-cover bg-center"
-                style={{
-                    backgroundImage: randomBanner
-                        ? `url(${randomBanner.imageUrl})`
-                        : "none",
-                }}
+                style={{backgroundImage: `url(${randomImage})`}}
             >
                 <div className="absolute top-12 w-full text-center z-10 flex justify-center gap-2">
                     <span

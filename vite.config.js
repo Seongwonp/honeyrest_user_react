@@ -4,4 +4,12 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
     plugins: [react(), tailwindcss()],
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost:8080', // Spring 서버 주소
+                changeOrigin: true,
+            },
+        },
+    },
 })
