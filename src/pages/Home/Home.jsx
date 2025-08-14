@@ -3,6 +3,7 @@ import { GoAlertFill } from "react-icons/go";
 import { AnimatePresence, motion } from "framer-motion";
 import Modal from "../../components/Modal";
 import { BsChevronDoubleDown } from "react-icons/bs";
+import 'weather-icons/css/weather-icons.css';
 
 // 분리된 컴포넌트들
 import HotPlacesSection from "./HotPlacesSection";
@@ -23,7 +24,6 @@ function Home() {
     const [selectedCategory, setSelectedCategory] = useState("전체");
     const [showScrollHint, setShowScrollHint] = useState(true);
 
-    const [banners, setBanners] = useState([]);
     const [randomBanner, setRandomBanner] = useState(null);
     const [events, setEvents] = useState([]);
     const today = new Date().toISOString().split("T")[0];
@@ -59,13 +59,11 @@ function Home() {
     }, []);
 
     useEffect(() => {
-        fetch("/api/banner/list")
+        fetch("/api/banner/random")
             .then((res) => res.json())
             .then((data) => {
-                if (data.success && data.data.length > 0) {
-                    setBanners(data.data);
-                    const index = Math.floor(Math.random() * data.data.length);
-                    setRandomBanner(data.data[index]);
+                if (data.success && data.data) {
+                    setRandomBanner(data.data);
                 }
             });
     }, []);
@@ -270,7 +268,7 @@ function Home() {
             </div>
 
             <div className="px-4 md:px-10 mt-10">
-                <div className="bg-gradient-to-r from-white to-blue-50 shadow-xl rounded-3xl p-8 w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+                <div className="bg-gradient-to-r from-white  rounded-3xl p-8 w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
 
                     <HotPlacesSection
                         hotPlaces={hotPlaces}
@@ -291,7 +289,7 @@ function Home() {
                     transition={{ duration: 0.5 }}
                     className="text-center text-gray-600 text-lg mt-10"
                 >
-                    <span className="block mb-2">👇 아래로 스크롤해서 이벤트와 추천 숙소를 확인해보세요!</span>
+                    <span className="block mb-5">👇 아래로 스크롤해서 이벤트와 추천 숙소를 확인해보세요!</span>
                     <BsChevronDoubleDown className="mx-auto text-yellow-300 animate-bounce text-3xl" />
                 </motion.div>
             )}
