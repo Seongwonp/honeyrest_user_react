@@ -70,7 +70,8 @@ function Signup() {
             const res = await axios.post("/api/auth/signup", formData);
 
             console.log("회원가입 성공:", res.data);
-            navigate("/verify-email");
+            localStorage.setItem('signupEmail', form.email);
+            navigate("/verify-email", { state: { email: form.email } });
 
         } catch (err) {
             setError(err.response?.data?.message || "회원가입 실패");

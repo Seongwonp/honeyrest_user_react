@@ -1,15 +1,28 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo-Photoroom.png';
-import {FaUserCircle, FaSignInAlt, FaSignOutAlt,
-    FaUserPlus, FaBars, FaTimes} from 'react-icons/fa';
-import { useState } from 'react';
+import {
+    FaUserCircle, FaSignInAlt, FaSignOutAlt,
+    FaUserPlus, FaBars, FaTimes
+} from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
-    const isLoggedIn = false; // TODO: 실제 로그인 상태로 바꿔야 함
+    const [userInfo, setUserInfo] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('userInfo');
+        if (storedUser) {
+            setUserInfo(JSON.parse(storedUser));
+        }
+    }, []);
+
+    const isLoggedIn = !!userInfo;
 
     const navItems = isLoggedIn
         ? [
-            { label: '마이페이지', path: '/mypage', icon: <FaUserCircle /> },
+            { label: '마이페이지', path: '/user/mypage', icon: <FaUserCircle /> },
             { label: '로그아웃', path: '/logout', icon: <FaSignOutAlt /> },
         ]
         : [
@@ -17,6 +30,14 @@ function Header() {
             { label: '회원가입', path: '/signup', icon: <FaUserPlus /> },
         ];
 
+    const handleNavClick = (item) => {
+        if (item.path === '/logout') {
+            const confirmed = window.confirm('로그아웃하시겠습니까?');
+            if (!confirmed) return;
+        }
+        setMenuOpen(false);
+        navigate(item.path);
+    };
 
     return (
         <header className="bg-white shadow-md sticky top-0 z-50">
@@ -30,15 +51,29 @@ function Header() {
                 {/* 데스크탑 네비게이션 */}
                 <nav className="hidden md:flex space-x-6 items-center">
                     {navItems.map((item) => (
-                        <Link
+                        <button
                             key={item.path}
-                            to={item.path}
+                            onClick={() => handleNavClick(item)}
                             className="flex items-center gap-1 text-[#4B5563] hover:text-[#C8E6C9] transition"
                         >
                             {item.icon}
                             {item.label}
-                        </Link>
+                        </button>
                     ))}
+
+                    {/* 프로필 정보 */}
+                    {isLoggedIn && (
+                        <div className="flex items-center gap-2 ml-4">
+                            <img
+                                src={userInfo.profileImage}
+                                alt="프로필"
+                                className="w-8 h-8 rounded-full object-cover border border-gray-300"
+                            />
+                            <span className="text-sm font-medium text-gray-800">
+                                {userInfo.name}님
+                            </span>
+                        </div>
+                    )}
                 </nav>
 
                 {/* 모바일 메뉴 버튼 */}
@@ -65,16 +100,30 @@ function Header() {
                     >
                         <FaTimes />
                     </button>
+
+                    {/* 프로필 정보 (모바일) */}
+                    {isLoggedIn && (
+                        <div className="flex items-center gap-3 px-4">
+                            <img
+                                src={userInfo.profileImage}
+                                alt="프로필"
+                                className="w-10 h-10 rounded-full object-cover border border-gray-300"
+                            />
+                            <span className="text-sm font-medium text-gray-800">
+                                {userInfo.name}님
+                            </span>
+                        </div>
+                    )}
+
                     {navItems.map((item) => (
-                        <Link
+                        <button
                             key={item.path}
-                            to={item.path}
+                            onClick={() => handleNavClick(item)}
                             className="flex items-center gap-2 text-[#4B5563] hover:bg-[#FFF9C4] px-4 py-2 rounded transition"
-                            onClick={() => setMenuOpen(false)}
                         >
                             {item.icon}
                             {item.label}
-                        </Link>
+                        </button>
                     ))}
                 </div>
             </div>

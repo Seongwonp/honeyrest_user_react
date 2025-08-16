@@ -4,24 +4,6 @@ function WeatherInfo({ city, displayName, coords }) {
     const [weather, setWeather] = useState(null);
     const [error, setError] = useState(null);
 
-    const conditionMap = {
-        Clear: "맑음",
-        Clouds: "흐림",
-        Rain: "비",
-        Snow: "눈",
-        Thunderstorm: "뇌우",
-        Drizzle: "이슬비",
-        Mist: "안개",
-        Smoke: "연기",
-        Haze: "실안개",
-        Dust: "먼지",
-        Fog: "안개",
-        Sand: "모래",
-        Ash: "재",
-        Squall: "돌풍",
-        Tornado: "토네이도",
-    };
-
     const iconClassMap = {
         "01d": "wi-day-sunny",
         "01n": "wi-night-clear",
@@ -35,13 +17,14 @@ function WeatherInfo({ city, displayName, coords }) {
         "13d": "wi-snow",
         "50d": "wi-fog",
     };
+
     const colorMap = {
-        Clear: "text-yellow-400",
-        Clouds: "text-gray-500",
-        Rain: "text-blue-500",
-        Snow: "text-blue-200",
-        Thunderstorm: "text-purple-600",
-        Fog: "text-gray-400",
+        "맑음": "text-yellow-400",
+        "흐림": "text-gray-500",
+        "비": "text-blue-500",
+        "눈": "text-blue-200",
+        "뇌우": "text-purple-600",
+        "안개": "text-gray-400",
     };
 
     useEffect(() => {
@@ -87,9 +70,8 @@ function WeatherInfo({ city, displayName, coords }) {
         );
     }
 
-    const translatedCondition = conditionMap[weather.condition] || weather.condition;
     const iconClass = iconClassMap[weather.icon] || "wi-na";
-    const iconColor = colorMap[weather.condition] || "text-gray-600";
+    const iconColor = colorMap[weather.description] || "text-gray-600";
 
     return (
         <div className="bg-white shadow-md rounded-lg p-4 w-full max-w-sm mx-auto text-gray-800">
@@ -101,13 +83,13 @@ function WeatherInfo({ city, displayName, coords }) {
                             ? `${weather.name} 날씨`
                             : "현재 위치 날씨"}
                 </h3>
-                <i className={`wi ${iconClass} ${iconColor} text-5xl`} title={translatedCondition} />
+                <i className={`wi ${iconClass} ${iconColor} text-5xl`} title={weather.description} />
             </div>
             <div className="text-xl font-semibold">
                 {weather.temp}°C
             </div>
             <div className="text-sm text-gray-600">
-                상태: {translatedCondition}
+                상태: {weather.description}
             </div>
         </div>
     );
