@@ -22,6 +22,14 @@ function AccommodationListPage() {
     const userId = storedUser.userId;
     const sort = searchParams.get("sort") || "priceAsc";
     const page = Number(searchParams.get("page")) || 0;
+    const sortOptions = [
+        { value: "priceAsc", label: "가격 낮은순" },
+        { value: "priceDesc", label: "가격 높은순" },
+        { value: "ratingDesc", label: "평점 높은순" },
+        { value: "latest", label: "최신순" },
+        { value: "random", label: "랜덤" }
+    ];
+
 
     const selectedCategories = useMemo(() => searchParams.getAll("selectedCategories"), [searchParams]);
     const selectedTags = useMemo(() => searchParams.getAll("selectedTags"), [searchParams]);
@@ -43,10 +51,13 @@ function AccommodationListPage() {
                     selectedTags,
                     maxPrice,
                 },
-                paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" }) // ✅ 핵심
+                paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
             });
-            setResults(res.data.content);
-            setTotalPages(res.data.totalPages);
+
+            const data = res.data;
+            setResults(data.content);
+            setTotalPages(data.totalPages);
+            // setPage(data.page); ← 이건 필요 없어요, 이미 URL에서 page를 관리 중이니까!
         } catch (err) {
             console.error("❌ 숙소 검색 실패:", err);
         } finally {
@@ -78,7 +89,30 @@ function AccommodationListPage() {
     return (
         <div className="p-6">
             <ListSearchBox />
-
+            <div className="flex justify-end mb-4">
+                <select
+                    value={sort}
+                    onChange={(e) => {
+                        const params = new URLSearchParams(searchParams);
+                        params.set("sort", e.target.value);
+                        params.set("page", "0"); // 정렬 바꾸면 페이지 초기화
+                        navigate({ search: params.toString() }, { replace: true });
+                    }}
+                    className="border px-3 py-2 rounded text-sm"
+                >
+                    {sortOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <p className="text-sm text-gray-500 mt-4">
+                총 {results.length}개 숙소 / 페이지 {page + 1} / {totalPages}
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+                정렬 기준: {sortOptions.find(opt => opt.value === sort)?.label}
+            </p>
             {loading ? (
                 <div className="text-center text-gray-500 mt-12">⏳ 로딩 중...</div>
             ) : results.length === 0 ? (
@@ -102,6 +136,9 @@ function AccommodationListPage() {
                                 index={index}
                                 toggleWish={toggleWish}
                                 isLoggedIn={!!userId}
+                                checkIn={checkIn}
+                                checkOut={checkOut}
+                                userId={userId}
                             />
                         ))}
                     </motion.div>

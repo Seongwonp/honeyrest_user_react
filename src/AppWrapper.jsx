@@ -25,6 +25,7 @@ import {attachErrorInterceptor} from './api/axios.js';
 import PublicRoute from './routes/PublicRoute.jsx';
 import PrivateRoute from './routes/PrivateRoute.jsx';
 import Accommodation from "./pages/Accommodations/Accommodation/Accommodation.jsx";
+import AccommodationDetailWrapper from "./pages/Accommodations/Accommodation/AccommodationDetailWrapper.jsx";
 
 function AppWrapper() {
     const navigate = useNavigate();
@@ -86,10 +87,7 @@ function AppWrapper() {
                         path="/accommodations"
                         element={<AccommodationLayout />}
                     />
-                    <Route
-                        path="/accommodation"
-                        element={<Accommodation/>}
-                    />
+                    <Route path="/accommodations/:id" element={<AccommodationDetailWrapper />} />
                 </Route>
             </Routes>
             <ToastContainer position="top-right" autoClose={3000}/>
