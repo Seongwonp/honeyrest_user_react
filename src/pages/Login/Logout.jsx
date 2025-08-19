@@ -6,11 +6,34 @@ function Logout() {
     const [showMessage, setShowMessage] = useState(true);
 
     useEffect(() => {
-        // 토큰 및 사용자 정보 제거
+        const rawUser =
+            localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
+        const userInfo = rawUser ? JSON.parse(rawUser) : {};
+        const provider = userInfo?.provider;
+
+        // 내부 세션 제거
         localStorage.removeItem('accessToken');
         localStorage.removeItem('userInfo');
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('userInfo');
 
-        // 1.5초 후 로그인 페이지로 이동
+        // 소셜 로그아웃 처리
+        if (provider === 'kakao') {
+            const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
+            const LOGOUT_REDIRECT_URI = 'http://localhost:5173/login';
+            window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
+            return;
+        }
+
+        if (provider === 'google') {
+            setTimeout(() => {
+                setShowMessage(false);
+                navigate('/login');
+            }, 1500);
+            return;
+        }
+
+        // 일반 로그아웃 처리
         const timer = setTimeout(() => {
             setShowMessage(false);
             navigate('/login');

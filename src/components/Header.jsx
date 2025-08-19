@@ -1,5 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/images/logo-Photoroom.png';
+import defaultProfile from '../assets/images/default-profile.png';
 import {
     FaUserCircle, FaSignInAlt, FaSignOutAlt,
     FaUserPlus, FaBars, FaTimes
@@ -10,13 +11,13 @@ function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('userInfo');
-        if (storedUser) {
-            setUserInfo(JSON.parse(storedUser));
-        }
-    }, []);
+        const storedUser =
+            localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
+        setUserInfo(storedUser ? JSON.parse(storedUser) : null);
+    }, [location.pathname]);
 
     const isLoggedIn = !!userInfo;
 
@@ -65,9 +66,9 @@ function Header() {
                     {isLoggedIn && (
                         <div className="flex items-center gap-2 ml-4">
                             <img
-                                src={userInfo.profileImage}
+                                src={userInfo.profileImage?.trim() ? userInfo.profileImage : defaultProfile}
                                 alt="프로필"
-                                className="w-8 h-8 rounded-full object-cover border border-gray-300"
+                                className="w-8 h-8 rounded-full object-cover"
                             />
                             <span className="text-sm font-medium text-gray-800">
                                 {userInfo.name}님
@@ -105,9 +106,9 @@ function Header() {
                     {isLoggedIn && (
                         <div className="flex items-center gap-3 px-4">
                             <img
-                                src={userInfo.profileImage}
+                                src={userInfo.profileImage?.trim() ? userInfo.profileImage : defaultProfile}
                                 alt="프로필"
-                                className="w-10 h-10 rounded-full object-cover border border-gray-300"
+                                className="w-8 h-8 rounded-full object-cover"
                             />
                             <span className="text-sm font-medium text-gray-800">
                                 {userInfo.name}님

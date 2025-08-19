@@ -9,13 +9,17 @@ function SearchBox({
                        setCheckOut,
                        guests,
                        setGuests,
-                       handleSearch,
                        today,
                        getTomorrow,
+                       handleSearch
                    }) {
     return (
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <div
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault(); // 기본 제출 막기
+                    handleSearch();     // 검색 실행
+                }}
                 className="bg-white rounded-xl shadow-md p-8 w-full max-w-4xl mx-auto"
                 data-aos="fade-up"
                 data-aos-delay="1100"
@@ -49,6 +53,7 @@ function SearchBox({
                     />
                     <div className="flex items-center border rounded-md px-2 py-2 w-full justify-between">
                         <button
+                            type="button"
                             onClick={() => setGuests((prev) => Math.max(1, prev - 1))}
                             className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-md font-bold"
                         >
@@ -58,6 +63,7 @@ function SearchBox({
               {guests >= 10 ? "10+명" : `${guests}명`}
             </span>
                         <button
+                            type="button"
                             onClick={() => setGuests((prev) => Math.min(10, prev + 1))}
                             className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-md font-bold"
                         >
@@ -67,13 +73,13 @@ function SearchBox({
                 </div>
 
                 <button
-                    onClick={handleSearch}
+                    type="submit"
                     className="mt-6 w-full bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 rounded-md transition flex items-center justify-center gap-2"
                 >
                     <HiOutlineSearch className="text-xl icon-shake" />
                     검색하기
                 </button>
-            </div>
+            </form>
         </div>
     );
 }
