@@ -10,7 +10,7 @@ import HotPlacesSection from "./HotPlacesSection";
 import EventSlider from "./EventSlider";
 import PlaceList from "./PlaceList/PlaceList";
 import DomesticSpots from "./DomesticSpotsList/DomesticSpots";
-import SearchBox from "./SearchBox.jsx";
+import SearchBox from "./searchBox/SearchBox.jsx";
 import WeatherWidget from "./Weather/WeatherWidget.jsx";
 
 function Home() {
@@ -178,6 +178,8 @@ function Home() {
                         isDropdownOpen={isDropdownOpen}
                         setIsDropdownOpen={setIsDropdownOpen}
                         verticalSliderSettings={verticalSliderSettings}
+                        navigate={navigate}
+                        userInfo={userInfo}
                     />
                     <WeatherWidget coords={coords} locationError={locationError} />
                 </div>

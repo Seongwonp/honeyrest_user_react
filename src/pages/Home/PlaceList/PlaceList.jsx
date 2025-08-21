@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import { FaStar } from "react-icons/fa";
 import axios from "axios";
 import CategorySelector from "./CategorySelector";
 
@@ -49,11 +50,14 @@ function PlaceList() {
                             <h3 className="text-lg font-semibold text-[#4B5563]">{place.title}</h3>
                             <p className="text-sm text-gray-500">{place.location}</p>
                             <div className="flex justify-between items-center mt-3">
-                                <span className="text-yellow-600 font-bold">
+                                <span className="flex items-center text-yellow-600 font-bold">
                                     ₩{new Intl.NumberFormat("ko-KR").format(place.price)}
                                     <span className="text-xs text-gray-500 ml-1">/ 1박</span>
                                 </span>
-                                <span className="text-sm text-gray-700">⭐ {place.rating}</span>
+                                <span className="flex items-center text-sm text-gray-700">
+                                    <FaStar className="mr-1 text-yellow-500" />
+                                    {place.rating}
+                                </span>
                             </div>
                         </div>
                     </div>

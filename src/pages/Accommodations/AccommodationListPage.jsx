@@ -29,6 +29,9 @@ function AccommodationListPage() {
         { value: "latest", label: "최신순" },
         { value: "random", label: "랜덤" }
     ];
+    useEffect(() => {
+        console.log("✅ 숙소 리스트 결과:", results);
+    }, [results]);
 
 
     const selectedCategories = useMemo(() => searchParams.getAll("selectedCategories"), [searchParams]);

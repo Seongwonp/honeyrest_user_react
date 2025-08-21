@@ -1,0 +1,296 @@
+import {useEffect, useState, useRef} from "react";
+import {useLocation} from "react-router-dom";
+import Slider from "react-slick";
+import axios from "axios";
+import {AiOutlineHeart, AiFillHeart} from "react-icons/ai";
+import {FaStar, FaUserFriends} from "react-icons/fa";
+import {motion} from "framer-motion";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+
+
+function Accommodation({ accommodationId, sectionRefs }) {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+
+    const userId = searchParams.get("userId") || localStorage.getItem("userId");
+    const checkIn = searchParams.get("checkIn");
+    const checkOut = searchParams.get("checkOut");
+
+    const [data, setData] = useState(null);
+    const [isWished, setIsWished] = useState(false);
+    const [activeSection, setActiveSection] = useState(null);
+
+    useEffect(() => {
+        axios
+            .get(`/api/accommodations/${accommodationId}`, {
+                params: {userId, checkIn, checkOut},
+            })
+            .then((res) => {
+                setData(res.data);
+                setIsWished(res.data.wished);
+            });
+    }, [accommodationId, userId, checkIn, checkOut]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setActiveSection(entry.target.id);
+                    }
+                });
+            },
+            {threshold: 0.3}
+        );
+
+        Object.values(sectionRefs).forEach((ref) => {
+            if (ref.current) observer.observe(ref.current);
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
+    const handleWishToggle = () => {
+        if (!userId) return alert("로그인이 필요합니다");
+
+        const url = isWished ? `/api/wishlist/${accommodationId}` : `/api/wishlist`;
+        const method = isWished ? "delete" : "post";
+
+        axios({method, url, data: {userId, accommodationId}}).then(() =>
+            setIsWished(!isWished)
+        );
+    };
+
+
+
+    const sliderSettings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 3000,
+    };
+
+    if (!data) return <div className="text-center py-20">로딩 중...</div>;
+
+    return (
+        <div className="max-w-screen-xl mx-auto px-4 py-10">
+            <div className="flex gap-8">
+                <div className="flex-1 space-y-12">
+                    {/* 이미지 슬라이더 */}
+                    <section>
+                        <Slider {...sliderSettings}>
+                            {data.images.map((src, i) => (
+                                <div key={i}>
+                                    <img
+                                        src={src}
+                                        alt={`숙소 이미지 ${i + 1}`}
+                                        className="w-full h-150 object-cover rounded-md"
+                                    />
+                                </div>
+                            ))}
+                        </Slider>
+                    </section>
+
+                    {/* 헤더 */}
+                    <header className="relative flex justify-between items-start">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-800">{data.name}</h1>
+                            <p className="text-sm text-gray-500 mt-1">
+                                {data.category} · {data.address}
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-xl font-semibold text-yellow-600">
+                                {data.price.toLocaleString()}원~
+                            </p>
+
+                            <motion.div
+                                onClick={handleWishToggle}
+                                disabled={!userId}
+                                whileTap={{scale: 0.9}}
+                                className={`mt-2 inline-flex items-center gap-2 cursor-pointer ${
+                                    !userId
+                                        ? "text-gray-300 cursor-not-allowed"
+                                        : "text-red-500 hover:scale-105 transition"
+                                }`}
+                                title={!userId ? "로그인 후 찜하기 가능" : isWished ? "찜 취소" : "찜하기"}
+                            >
+                                {isWished ? (
+                                    <AiFillHeart className="text-2xl"/>
+                                ) : (
+                                    <AiOutlineHeart className="text-2xl"/>
+                                )}
+                                <span className="text-sm font-medium">
+              {isWished ? "찜 취소" : "찜하기"}
+            </span>
+                            </motion.div>
+                        </div>
+                    </header>
+
+                    {/* 태그 + 위치 */}
+                    <section className="flex justify-between items-center">
+                        <div className="flex gap-2 text-sm text-gray-600">
+                            {data.tags.map((tag, i) => (
+                                <span key={i} className="px-2 py-1 bg-gray-100 rounded">
+              {tag.name}
+            </span>
+                            ))}
+                        </div>
+                        <div className="text-sm text-gray-500">📍 {data.address}</div>
+                    </section>
+
+                    {/* 객실 선택 */}
+                    <section
+                        id="rooms"
+                        ref={(el) => (sectionRefs.current["rooms"] = el)}
+                        data-id="rooms"
+                    >
+                        <h2 className="text-lg font-bold mb-2">객실 선택</h2>
+                        <div className="space-y-4">
+                            {data.rooms.map((room, i) => (
+                                <div
+                                    key={i}
+                                    className={`border p-4 rounded transition ${
+                                        room.available
+                                            ? "hover:shadow-md"
+                                            : "opacity-50 grayscale brightness-90 pointer-events-none"
+                                    }`}
+                                >
+                                    {room.images && room.images.length > 0 && (
+                                        <img
+                                            src={
+                                                room.images.find((img) => img.includes("s_")) || room.images[0]
+                                            }
+                                            alt={`${room.name} 이미지`}
+                                            className="h-32 w-full object-cover rounded mb-2"
+                                        />
+                                    )}
+
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-700 font-semibold">{room.name}</span>
+                                        {room.available ? (
+                                            <span className="text-yellow-600 font-semibold">
+              {room.price.toLocaleString()}원
+            </span>
+                                        ) : (
+                                            <span className="text-sm text-red-500 font-semibold">
+              예약 마감
+            </span>
+                                        )}
+                                    </div>
+
+                                    {room.description && (
+                                        <p className="text-sm text-gray-500 mt-1">{room.description}</p>
+                                    )}
+
+                                    {room.standardOccupancy && room.maxOccupancy && (
+                                        <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                                            <FaUserFriends className="text-gray-400" />
+                                            기준 {room.standardOccupancy}명 / 최대 {room.maxOccupancy}명
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* 숙소 소개 */}
+                    <section
+                        id="intro"
+                        ref={(el) => (sectionRefs.current["intro"] = el)}
+                        data-id="intro"
+                    >
+                        <h2 className="text-lg font-bold mb-2">숙소 소개</h2>
+                        <p className="text-sm text-gray-700">{data.intro}</p>
+                    </section>
+
+                    {/* 서비스 및 시설 */}
+                    <section
+                        id="facilities"
+                        ref={(el) => (sectionRefs.current["facilities"] = el)}
+                        data-id="facilities"
+                    >
+                        <h2 className="text-lg font-bold mb-2">서비스 및 시설</h2>
+                        <ul className="list-disc list-inside text-sm text-gray-600">
+                            {data.facilities.map((f, i) => (
+                                <li key={i}>{f}</li>
+                            ))}
+                        </ul>
+                    </section>
+
+                    {/* 숙소 이용 정보 */}
+                    <section
+                        id="usage"
+                        ref={(el) => (sectionRefs.current["usage"] = el)}
+                        data-id="usage"
+                    >
+                        <h2 className="text-lg font-bold mb-2">숙소 이용 정보</h2>
+                        <p className="text-sm text-gray-600">{data.usage}</p>
+                    </section>
+
+                    {/* 위치 */}
+                    <section
+                        id="location"
+                        ref={(el) => (sectionRefs.current["location"] = el)}
+                        data-id="location"
+                    >
+                        <h2 className="text-lg font-bold mb-2">위치</h2>
+                        <div className="text-sm text-gray-600">
+                            지도 API 연결 예정 (lat: {data.location.latitude}, lng: {data.location.longitude})
+                        </div>
+                    </section>
+
+                    {/* 리뷰 */}
+                    <section
+                        id="reviews"
+                        ref={(el) => (sectionRefs.current["reviews"] = el)}
+                        data-id="reviews"
+                    >
+                        <h2 className="text-lg font-bold mb-2">리뷰</h2>
+                        <div className="space-y-2">
+                            {data.reviews.length === 0 ? (
+                                <p className="text-sm text-gray-500">아직 리뷰가 없습니다.</p>
+                            ) : (
+                                data.reviews.map((r, i) => (
+                                    <div key={i} className="border p-3 rounded text-sm text-gray-700 space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <strong>{r.userName}</strong>
+                                            <div className="flex items-center gap-1 text-yellow-500">
+                                                <FaStar />
+                                                <span>{r.rating}</span>
+                                            </div>
+                                        </div>
+                                        <p>{r.content}</p>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </section>
+
+                    {/* 비슷한 숙소 */}
+                    {data.similar && (
+                        <section
+                            id="similar"
+                            ref={(el) => (sectionRefs.current["similar"] = el)}
+                            data-id="similar"
+                        >
+                            <h2 className="text-lg font-bold mb-2">비슷한 숙소</h2>
+                            <ul className="list-disc list-inside text-sm text-gray-600">
+                                {data.similar.map((name, i) => (
+                                    <li key={i}>{name}</li>
+                                ))}
+                            </ul>
+                        </section>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Accommodation;

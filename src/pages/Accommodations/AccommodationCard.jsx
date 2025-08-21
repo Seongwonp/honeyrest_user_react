@@ -3,6 +3,7 @@ import {FaStar} from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 function AccommodationCard({ item, index, toggleWish, isLoggedIn, userId, checkIn, checkOut }) {
+    console.log("AccommodationCard 렌더링됨:", item);
     return (
         <div
             className={`bg-white rounded-xl shadow-md overflow-hidden transition border border-gray-200 relative ${

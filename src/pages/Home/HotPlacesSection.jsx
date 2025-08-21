@@ -1,7 +1,26 @@
 import Slider from "react-slick";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
-function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, verticalSliderSettings }) {
+function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, verticalSliderSettings, navigate, userInfo }) {
+    const handlePlaceClick = (placeName) => {
+        const today = new Date().toISOString().split("T")[0];
+        const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+
+        const params = new URLSearchParams({
+            location: placeName,
+            checkIn: today,
+            checkOut: tomorrow,
+            guests: "2",
+            page: "0",
+        });
+
+        if (userInfo?.userId) {
+            params.set("userId", userInfo.userId);
+        }
+
+        navigate(`/accommodations?${params.toString()}`);
+    };
+
     return (
         <div className="w-full bg-white rounded-xl shadow-md p-6 relative">
             <div className="flex items-center gap-4">
@@ -12,7 +31,11 @@ function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, vertic
                 <div className="flex-1 max-h-10 overflow-hidden">
                     <Slider {...verticalSliderSettings}>
                         {hotPlaces.map((place, idx) => (
-                            <div key={idx} className="bg-gray-50 rounded-md px-3 py-1 text-sm text-gray-700 hover:bg-yellow-50 transition text-center">
+                            <div
+                                key={idx}
+                                className="bg-gray-50 rounded-md px-3 py-1 text-sm text-gray-700 hover:bg-yellow-50 transition text-center cursor-pointer"
+                                onClick={() => handlePlaceClick(place)}
+                            >
                                 {place}
                             </div>
                         ))}
@@ -29,11 +52,15 @@ function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, vertic
 
             {isDropdownOpen && (
                 <div className="absolute top-full left-0 w-full z-10 mt-2">
-                    <ul className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto bg-white border rounded-md shadow-sm p-2">
+                    <ul className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-white rounded-xl shadow-lg p-3 border border-gray-200">
                         {hotPlaces.map((place, idx) => (
-                            <li key={idx} className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded hover:bg-yellow-100 transition">
-                                <span className="text-xs font-bold text-gray-500">{idx + 1}</span>
-                                <span className="text-sm text-gray-800">{place}</span>
+                            <li
+                                key={idx}
+                                className="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-lg hover:bg-yellow-50 transition transform hover:scale-105 cursor-pointer shadow-sm"
+                                onClick={() => handlePlaceClick(place)}
+                            >
+                                <span className="text-sm font-semibold text-gray-500">{idx + 1}</span>
+                                <span className="text-sm font-medium text-gray-800">{place}</span>
                             </li>
                         ))}
                     </ul>

@@ -25,15 +25,19 @@ function DomesticSpotsList({ userInfo, navigate }) {
         const today = new Date().toISOString().split("T")[0];
         const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
 
-        navigate("/accommodations", {
-            state: {
-                location: regionName,
-                checkIn: today,
-                checkOut: tomorrow,
-                guests: 2,
-                userId: userInfo?.userId || null,
-            },
+        const params = new URLSearchParams({
+            location: regionName,
+            checkIn: today,
+            checkOut: tomorrow,
+            guests: "2",
+            page: "0",
         });
+
+        if (userInfo?.userId) {
+            params.set("userId", userInfo.userId);
+        }
+
+        navigate(`/accommodations?${params.toString()}`);
     };
 
     const topRegions = allRegions.filter(r => r.level === 1 && r.popular);

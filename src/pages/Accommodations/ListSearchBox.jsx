@@ -23,15 +23,15 @@ function ListSearchBox() {
     };
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow-md mb-6">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md mb-6">
             <h2 className="text-lg font-bold text-gray-700 mb-4">숙소 검색</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="지역 입력"
-                    className="border px-4 py-2 rounded-md text-sm focus:ring-2 focus:ring-yellow-400"
+                    className="border px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-yellow-400 w-full"
                 />
                 <input
                     type="date"
@@ -43,19 +43,19 @@ function ListSearchBox() {
                         setCheckOut(nextDay.toISOString().split("T")[0]);
                     }}
                     min={getToday()}
-                    className="border px-4 py-2 rounded-md text-sm"
+                    className="border px-3 py-2 rounded-md text-sm w-full"
                 />
                 <input
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
                     min={checkIn}
-                    className="border px-4 py-2 rounded-md text-sm"
+                    className="border px-3 py-2 rounded-md text-sm w-full"
                 />
                 <select
                     value={guests}
                     onChange={(e) => setGuests(Number(e.target.value))}
-                    className="border px-4 py-2 rounded-md text-sm"
+                    className="border px-3 py-2 rounded-md text-sm w-full"
                 >
                     {[...Array(10)].map((_, i) => (
                         <option key={i} value={i + 1}>
@@ -67,7 +67,7 @@ function ListSearchBox() {
             <div className="flex justify-center mt-6">
                 <button
                     onClick={updateParams}
-                    className="flex items-center gap-2 bg-yellow-500 text-white px-8 py-3 rounded-md text-base font-semibold hover:bg-yellow-600 transition"
+                    className="flex items-center gap-2 bg-yellow-500 text-white px-8 py-3 rounded-md text-base font-semibold hover:bg-yellow-600 transition w-full sm:w-auto justify-center"
                 >
                     <HiOutlineSearch className="text-xl" />
                     검색하기
