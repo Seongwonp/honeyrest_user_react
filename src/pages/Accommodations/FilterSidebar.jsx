@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { MdAttachMoney, MdRefresh } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
 import { motion, AnimatePresence } from "framer-motion";
+import * as RiIcons from "react-icons/ri";
+import * as MdIcons from "react-icons/md";
+import * as FaIcons from "react-icons/fa";
 
 function FilterSidebar({ onFilterChange }) {
     const [categories, setCategories] = useState([]);
@@ -190,19 +193,23 @@ function FilterSidebar({ onFilterChange }) {
                         <div key={category} className="mb-6">
                             <h3 className="font-semibold mb-2">{category}</h3>
                             <div className="flex flex-wrap gap-2 text-sm">
-                                {visibleTags.map((tag) => (
-                                    <button
-                                        key={tag.tagId}
-                                        onClick={() => toggleTag(tag.name)}
-                                        className={`px-2 py-1 rounded border ${
-                                            selectedTags.includes(tag.name)
-                                                ? "bg-yellow-100 border-yellow-400 text-yellow-700"
-                                                : "border-gray-300 text-gray-600"
-                                        }`}
-                                    >
-                                        #{tag.name}
-                                    </button>
-                                ))}
+                                {visibleTags.map((tag) => {
+                                    const IconComponent = RiIcons[tag.iconName] || MdIcons[tag.iconName] || FaIcons[tag.iconName] || null;
+                                    return (
+                                        <button
+                                            key={tag.tagId}
+                                            onClick={() => toggleTag(tag.name)}
+                                            className={`px-2 py-1 rounded border ${
+                                                selectedTags.includes(tag.name)
+                                                    ? "bg-yellow-100 border-yellow-400 text-yellow-700"
+                                                    : "border-gray-300 text-gray-600"
+                                            } flex items-center gap-1`}
+                                        >
+                                            {IconComponent && <IconComponent className="text-yellow-500" />}
+                                            {tag.name}
+                                        </button>
+                                    );
+                                })}
                             </div>
                             {tagList.length > 10 && (
                                 <button

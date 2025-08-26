@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo-Photoroom.png';
 import defaultProfile from '../assets/images/default-profile.png';
 import {
@@ -6,20 +6,18 @@ import {
     FaUserPlus, FaBars, FaTimes
 } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [userInfo, setUserInfo] = useState(null);
     const navigate = useNavigate();
-    const location = useLocation();
+    const { user } = useAuth();
+
+    const isLoggedIn = !!user;
 
     useEffect(() => {
-        const storedUser =
-            localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
-        setUserInfo(storedUser ? JSON.parse(storedUser) : null);
-    }, [location.pathname]);
-
-    const isLoggedIn = !!userInfo;
+        console.log('userInfo in Header:', user);
+    }, [user]);
 
     const navItems = isLoggedIn
         ? [
@@ -66,13 +64,13 @@ function Header() {
                     {isLoggedIn && (
                         <div className="flex items-center gap-2 ml-4">
                             <img
-                                src={userInfo.profileImage?.trim() ? userInfo.profileImage : defaultProfile}
+                                src={user.profileImage?.trim() ? user.profileImage : defaultProfile}
                                 alt="프로필"
                                 className="w-8 h-8 rounded-full object-cover"
                             />
                             <span className="text-sm font-medium text-gray-800">
-                                {userInfo.name}님
-                            </span>
+                {user.name}님
+              </span>
                         </div>
                     )}
                 </nav>
@@ -106,13 +104,13 @@ function Header() {
                     {isLoggedIn && (
                         <div className="flex items-center gap-3 px-4">
                             <img
-                                src={userInfo.profileImage?.trim() ? userInfo.profileImage : defaultProfile}
+                                src={user.profileImage?.trim() ? user.profileImage : defaultProfile}
                                 alt="프로필"
                                 className="w-8 h-8 rounded-full object-cover"
                             />
                             <span className="text-sm font-medium text-gray-800">
-                                {userInfo.name}님
-                            </span>
+                {user.name}님
+              </span>
                         </div>
                     )}
 

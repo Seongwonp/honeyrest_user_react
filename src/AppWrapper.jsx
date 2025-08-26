@@ -8,6 +8,7 @@ import './App.css';
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+
 import Layout from './components/Layout';
 import Home from './pages/Home/Home';
 import Login from './pages/Login/Login';
@@ -26,6 +27,12 @@ import PublicRoute from './routes/PublicRoute.jsx';
 import PrivateRoute from './routes/PrivateRoute.jsx';
 import Accommodation from "./pages/Accommodations/Accommodation/Accommodation.jsx";
 import AccommodationDetailWrapper from "./pages/Accommodations/Accommodation/AccommodationDetailWrapper.jsx";
+import RoomDetail from "./pages/Accommodations/Accommodation/Room/RoomDetail.jsx";
+import Reservation from "@/pages/Reservation/Reservation.jsx";
+import PaymentProcess from "@/pages/Payment/PaymentProcess.jsx";
+import PaymentSuccess from "@/pages/Payment/PaymentSuccess.jsx";
+import PaymentFail from "@/pages/Payment/PaymentFail.jsx";
+import ReservationComplete from "@/pages/Reservation/ReservationComplete.jsx";
 
 function AppWrapper() {
     const navigate = useNavigate();
@@ -72,6 +79,11 @@ function AppWrapper() {
                 {/* 에러 페이지 */}
                 {ErrorPages()}
 
+                {/* 결제 관련 */}
+                <Route path="/payment/process" element={<PaymentProcess/>}/>
+                <Route path="/payment/success" element={<PaymentSuccess />} />
+                <Route path="/payment/fail" element={<PaymentFail />} />
+                <Route path="/reservation/complete" element={<ReservationComplete/>}/>
 
                 <Route element={<Layout/>}>
                     <Route path="/" element={<Home/>}/>
@@ -88,6 +100,10 @@ function AppWrapper() {
                         element={<AccommodationLayout />}
                     />
                     <Route path="/accommodations/:id" element={<AccommodationDetailWrapper />} />
+                    <Route path="/room/:roomId" element={<RoomDetail />} />
+                    <Route path="/reserve" element={<Reservation />} />
+
+
                 </Route>
             </Routes>
             <ToastContainer position="top-right" autoClose={3000}/>

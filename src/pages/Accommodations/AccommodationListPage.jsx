@@ -5,10 +5,13 @@ import axios from "axios";
 import AccommodationCard from "./AccommodationCard";
 import { motion, AnimatePresence } from "framer-motion";
 import ListSearchBox from "./ListSearchBox.jsx";
+import { useAuth } from "@/hooks/useAuth"; // ✅ 추가: 전역 로그인 정보 가져오기
 
 function AccommodationListPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { user } = useAuth(); // ✅ 추가: useAuth 훅 사용
+    const userId = user?.userId; // ✅ 수정: 기존 storedUser.userId 대신
 
     const [results, setResults] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
@@ -18,10 +21,9 @@ function AccommodationListPage() {
     const checkIn = searchParams.get("checkIn") || getToday();
     const checkOut = searchParams.get("checkOut") || getTomorrow(checkIn);
     const guests = Number(searchParams.get("guests")) || 2;
-    const storedUser = JSON.parse(localStorage.getItem("userInfo") || "{}");
-    const userId = storedUser.userId;
     const sort = searchParams.get("sort") || "priceAsc";
     const page = Number(searchParams.get("page")) || 0;
+
     const sortOptions = [
         { value: "priceAsc", label: "가격 낮은순" },
         { value: "priceDesc", label: "가격 높은순" },
@@ -29,10 +31,10 @@ function AccommodationListPage() {
         { value: "latest", label: "최신순" },
         { value: "random", label: "랜덤" }
     ];
+
     useEffect(() => {
         console.log("✅ 숙소 리스트 결과:", results);
     }, [results]);
-
 
     const selectedCategories = useMemo(() => searchParams.getAll("selectedCategories"), [searchParams]);
     const selectedTags = useMemo(() => searchParams.getAll("selectedTags"), [searchParams]);
@@ -47,7 +49,7 @@ function AccommodationListPage() {
                     checkIn,
                     checkOut,
                     guests,
-                    userId,
+                    userId, // ✅ 수정: 전역 userId 사용
                     sort,
                     page,
                     selectedCategories,
@@ -60,7 +62,6 @@ function AccommodationListPage() {
             const data = res.data;
             setResults(data.content);
             setTotalPages(data.totalPages);
-            // setPage(data.page); ← 이건 필요 없어요, 이미 URL에서 page를 관리 중이니까!
         } catch (err) {
             console.error("❌ 숙소 검색 실패:", err);
         } finally {
@@ -98,7 +99,7 @@ function AccommodationListPage() {
                     onChange={(e) => {
                         const params = new URLSearchParams(searchParams);
                         params.set("sort", e.target.value);
-                        params.set("page", "0"); // 정렬 바꾸면 페이지 초기화
+                        params.set("page", "0");
                         navigate({ search: params.toString() }, { replace: true });
                     }}
                     className="border px-3 py-2 rounded text-sm"
@@ -138,10 +139,11 @@ function AccommodationListPage() {
                                 item={item}
                                 index={index}
                                 toggleWish={toggleWish}
-                                isLoggedIn={!!userId}
+                                isLoggedIn={!!userId} // 수정: 전역 userId 기반
                                 checkIn={checkIn}
                                 checkOut={checkOut}
-                                userId={userId}
+                                userId={userId} // 수정: 전역 userId 기반
+                                guests={guests}
                             />
                         ))}
                     </motion.div>

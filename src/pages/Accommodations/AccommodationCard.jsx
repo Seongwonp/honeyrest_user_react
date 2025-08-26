@@ -1,8 +1,11 @@
+import * as FaIcons from "react-icons/fa";
+import * as RiIcons from "react-icons/ri";
+import * as MdIcons from "react-icons/md";
 import {AiFillHeart, AiOutlineHeart} from "react-icons/ai";
 import {FaStar} from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-function AccommodationCard({ item, index, toggleWish, isLoggedIn, userId, checkIn, checkOut }) {
+function AccommodationCard({ item, index, toggleWish, isLoggedIn, userId, checkIn, checkOut, guests }) {
     console.log("AccommodationCard 렌더링됨:", item);
     return (
         <div
@@ -10,7 +13,7 @@ function AccommodationCard({ item, index, toggleWish, isLoggedIn, userId, checkI
                 item.available === false ? "opacity-50 pointer-events-none" : "hover:shadow-lg"
             }`}>
             <Link
-                to={`/accommodations/${item.id}?checkIn=${checkIn}&checkOut=${checkOut}&userId=${userId}`}
+                to={`/accommodations/${item.id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&userId=${userId}`}
             >
                 <div className="flex flex-col md:flex-row gap-4 p-4 cursor-pointer">
                     <img
@@ -44,20 +47,28 @@ function AccommodationCard({ item, index, toggleWish, isLoggedIn, userId, checkI
                         </div>
                         {item.tags && item.tags.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-2 text-xs">
-                                {item.tags.map((tag, i) => (
-                                    <span
-                                        key={tag.mapId || `tag-${i}`}
-                                        className={`px-2 py-1 rounded-full font-medium border ${
-                                            tag.tagCategory === "취향"
-                                                ? "bg-yellow-100 text-yellow-800 border-yellow-300"
-                                                : tag.tagCategory === "시설"
-                                                    ? "bg-blue-100 text-blue-800 border-blue-300"
-                                                    : "bg-gray-100 text-gray-700 border-gray-300"
-                                        }`}
-                                    >
-                                        #{tag.tagName}
-                                    </span>
-                                ))}
+                                {item.tags.map((tag, i) => {
+                                    const IconComponent =
+                                        FaIcons[tag.iconName] ||
+                                        RiIcons[tag.iconName] ||
+                                        MdIcons[tag.iconName] ||
+                                        null;
+                                    return (
+                                        <span
+                                            key={tag.mapId || `tag-${i}`}
+                                            className={`px-2 py-1 rounded-full font-medium border ${
+                                                tag.tagCategory === "취향"
+                                                    ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                                                    : tag.tagCategory === "시설"
+                                                        ? "bg-blue-100 text-blue-800 border-blue-200"
+                                                        : "bg-gray-100 text-gray-700 border-gray-200"
+                                            }`}
+                                        >
+                                            {IconComponent && <IconComponent className="inline mr-1" />}
+                                            {tag.tagName}
+                                        </span>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

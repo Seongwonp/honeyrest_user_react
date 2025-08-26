@@ -25,7 +25,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
     const userId = searchParams.get("userId") || storedUser?.userId || null;
     const checkIn = searchParams.get("checkIn");
     const checkOut = searchParams.get("checkOut");
-    const guests = searchParams.get("guests");
+
     const [data, setData] = useState(null);
     const [isWished, setIsWished] = useState(false);
     const [activeSection, setActiveSection] = useState(null);
@@ -34,9 +34,6 @@ function Accommodation({ accommodationId, sectionRefs }) {
         const params = { checkIn, checkOut };
         if (userId && userId !== "undefined") {
             params.userId = userId;
-        }
-        if (guests) {
-            params.guests = guests;
         }
         console.log("파람",params);
         axios
@@ -294,7 +291,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                 onClick={() => {
                                     if (isAvailable) {
                                         navigate(
-                                            `/room/${room.roomId}?userId=${userId}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`
+                                            `/room/${room.roomId}?userId=${userId}&checkIn=${checkIn}&checkOut=${checkOut}`
                                         );
                                     }
                                 }}
