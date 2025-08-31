@@ -52,7 +52,10 @@ export default function PaymentProcess() {
     }, [widgets]);
 
     const handlePayment = async () => {
-        const orderId = "HR-" + crypto.randomUUID();
+        const baseCode = "HR-" + crypto.randomUUID().slice(0, 8).toUpperCase();
+        const orderId = state.userId
+            ? baseCode
+            : `${baseCode}-${state.guestPassword}`;
 
         // ✅ 예약 정보 sessionStorage에 저장
         sessionStorage.setItem("reservationInfo", JSON.stringify({
@@ -60,6 +63,7 @@ export default function PaymentProcess() {
             guestName: state.guestName,
             guestPhone: state.guestPhone,
             accommodationId: state.accommodationId,
+            reservationCode: orderId,
             roomId: state.roomId,
             checkIn: state.checkIn,
             checkOut: state.checkOut,

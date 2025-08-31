@@ -1,35 +1,37 @@
-// src/hooks/useAuth.js
 import { useState, useEffect } from 'react';
 
 export const useAuth = () => {
     const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        const loadUser = () => {
-            try {
-                const raw =
-                    localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
-                console.log('raw userInfo:', raw); // 🔍 저장된 문자열 확인
+    const loadUser = () => {
+        try {
+            const raw =
+                localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
 
-                const parsed = JSON.parse(raw);
-                console.log('parsed userInfo:', parsed); // 🔍 파싱된 객체 확인
+            if (!raw || raw === 'undefined') {
+                setUser(null);
+                return;
+            }
 
-                if (parsed && parsed.userId) {
-                    setUser(parsed);
-                } else {
-                    setUser(null);
-                }
-            } catch (err) {
-                console.error('userInfo 파싱 실패:', err);
+            const parsed = JSON.parse(raw);
+            if (parsed?.userId) {
+                setUser(parsed);
+            } else {
                 setUser(null);
             }
-        };
+        } catch (err) {
+            console.error('userInfo 파싱 실패:', err);
+            setUser(null);
+        }
+    };
 
+    useEffect(() => {
         loadUser();
-
         window.addEventListener('storage', loadUser);
         return () => window.removeEventListener('storage', loadUser);
     }, []);
 
-    return { user };
+    const isLoggedIn = !!user?.userId;
+
+    return { user, isLoggedIn, loadUser };
 };

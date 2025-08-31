@@ -33,6 +33,11 @@ export default function ReservationComplete() {
         paymentMethod, isEmailSent
     } = state;
 
+    const formatPrice = (value) => {
+        const safe = typeof value === "number" ? value : parseFloat(value ?? 0);
+        return safe.toLocaleString() + "원";
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#f5f5f5]">
             <div className="max-w-3xl w-full px-6 py-16 space-y-12 bg-white rounded-xl shadow-md ring-1 ring-[#e5e5e5]">
@@ -93,26 +98,28 @@ export default function ReservationComplete() {
                             </div>
                             <div className="flex justify-between">
                                 <span className="font-medium">원가</span>
-                                <span>{originalPrice.toLocaleString()}원</span>
+                                <span>{formatPrice(originalPrice)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="font-medium">할인 금액</span>
-                                <span className="text-red-500">-{discountAmount.toLocaleString()}원</span>
+                                <span className="text-red-500">-{formatPrice(discountAmount)}</span>
                             </div>
                             <div className="flex justify-between mt-4 border-t pt-4">
                                 <span className="font-bold text-lg">최종 결제 금액</span>
-                                <span className="font-bold text-lg text-[#fbbf24]">{finalPrice.toLocaleString()}원</span>
+                                <span className="font-bold text-lg text-[#fbbf24]">{formatPrice(finalPrice)}</span>
                             </div>
-                            <div className="mt-4 text-center">
-                                <a
-                                    href={receiptUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-block px-4 py-2 bg-[#fbbf24] hover:bg-[#f59e0b] text-black font-semibold rounded transition"
-                                >
-                                    영수증 보기
-                                </a>
-                            </div>
+                            {receiptUrl && (
+                                <div className="mt-4 text-center">
+                                    <a
+                                        href={receiptUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-block px-4 py-2 bg-[#fbbf24] hover:bg-[#f59e0b] text-black font-semibold rounded transition"
+                                    >
+                                        영수증 보기
+                                    </a>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

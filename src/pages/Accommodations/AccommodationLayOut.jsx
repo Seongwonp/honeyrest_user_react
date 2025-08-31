@@ -4,23 +4,35 @@ import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { MdFilterList } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import MapSearchModal from "@/pages/Accommodations/Map/MapSearchModal.jsx";
 
 function AccommodationLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [mapSearchOpen, setMapSearchOpen] = useState(false); //여기로 이동
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
     const handleFilterChange = (newFilters) => {
         const params = new URLSearchParams(searchParams);
-
         params.set("maxPrice", newFilters.maxPrice);
         params.delete("selectedCategories");
         newFilters.categories.forEach(cat => params.append("selectedCategories", cat));
         params.delete("selectedTags");
         newFilters.tags.forEach(tag => params.append("selectedTags", tag));
-        params.set("page", "0"); // 필터 변경 시 페이지 초기화
-
+        params.set("page", "0");
         navigate({ search: params.toString() }, { replace: true });
+    };
+
+    const handleOpenMapSearch = () => setMapSearchOpen(true);
+    const handleCloseMapSearch = () => setMapSearchOpen(false);
+
+    const handleMapSearch = (location) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("lat", location.lat);
+        params.set("lng", location.lng);
+        params.set("page", "0");
+        navigate({ search: params.toString() }, { replace: true });
+        setMapSearchOpen(false);
     };
 
     return (
@@ -40,7 +52,10 @@ function AccommodationLayout() {
                 {/* 사이드바 */}
                 {sidebarOpen && (
                     <aside className="md:w-72 w-full md:sticky md:top-4 p-6 bg-white rounded-xl shadow-md mb-6 md:mb-0 md:mr-6 h-fit">
-                        <FilterSidebar onFilterChange={handleFilterChange} />
+                        <FilterSidebar
+                            onFilterChange={handleFilterChange}
+                            openMapSearch={handleOpenMapSearch}
+                        />
                     </aside>
                 )}
 
@@ -49,8 +64,15 @@ function AccommodationLayout() {
                     <AccommodationListPage />
                 </main>
             </div>
+
+            {/* 지도 검색 모달 */}
+            {mapSearchOpen && (
+                <MapSearchModal
+                    onClose={handleCloseMapSearch}
+                    onSearch={handleMapSearch}
+                />
+            )}
         </div>
     );
 }
-
 export default AccommodationLayout;

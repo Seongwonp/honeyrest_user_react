@@ -4,22 +4,22 @@ import * as MdIcons from "react-icons/md";
 import {AiFillHeart, AiOutlineHeart} from "react-icons/ai";
 import {FaStar} from "react-icons/fa";
 import { Link } from "react-router-dom";
+import WishToggleButton from "@/components/WishToggleButton.jsx";
 
-function AccommodationCard({ item, index, toggleWish, isLoggedIn, userId, checkIn, checkOut, guests }) {
-    console.log("AccommodationCard 렌더링됨:", item);
+function AccommodationCard({ item, userId, checkIn, checkOut, guests }) {
     return (
         <div
             className={`bg-white rounded-xl shadow-md overflow-hidden transition border border-gray-200 relative ${
                 item.available === false ? "opacity-50 pointer-events-none" : "hover:shadow-lg"
             }`}>
             <Link
-                to={`/accommodations/${item.id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&userId=${userId}`}
+                to={`/accommodations/${item.id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`}
             >
                 <div className="flex flex-col md:flex-row gap-4 p-4 cursor-pointer">
                     <img
                         src={item.image}
                         alt={item.title}
-                        className={`w-full md:w-48 h-32 object-cover rounded-md ${
+                        className={`w-full md:w-48 h-40 sm:h-32 object-cover rounded-md ${
                             item.available === false ? "grayscale brightness-75" : ""
                         }`}
                     />
@@ -76,18 +76,14 @@ function AccommodationCard({ item, index, toggleWish, isLoggedIn, userId, checkI
             </Link>
 
             {/* 찜 버튼 */}
-            <button
-                onClick={() => toggleWish(item.id, index)}
-                disabled={!isLoggedIn}
-                className={`absolute top-4 right-4 text-xl ${
-                    !isLoggedIn
-                        ? "text-gray-300 cursor-not-allowed"
-                        : "text-red-500 hover:scale-110 transition"
-                }`}
-                title={!isLoggedIn ? "로그인 후 찜하기 가능" : "찜하기"}
-            >
-                {item.isWishlisted ? <AiFillHeart /> : <AiOutlineHeart />}
-            </button>
+            <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10">
+                <WishToggleButton
+                    accommodationId={item.id}
+                    initialLiked={item.isWishlisted}
+                    userId={userId}
+                    className="text-red-500 text-xl hover:scale-110 transition"
+                />
+            </div>
         </div>
     );
 }

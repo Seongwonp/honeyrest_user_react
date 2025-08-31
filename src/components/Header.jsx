@@ -3,7 +3,7 @@ import logo from '../assets/images/logo-Photoroom.png';
 import defaultProfile from '../assets/images/default-profile.png';
 import {
     FaUserCircle, FaSignInAlt, FaSignOutAlt,
-    FaUserPlus, FaBars, FaTimes
+    FaUserPlus, FaBars, FaTimes, FaClipboardList
 } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,20 +11,15 @@ import { useAuth } from '@/hooks/useAuth';
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
-    const { user } = useAuth();
-
-    const isLoggedIn = !!user;
-
-    useEffect(() => {
-        console.log('userInfo in Header:', user);
-    }, [user]);
+    const { user, isLoggedIn, loadUser } = useAuth();
 
     const navItems = isLoggedIn
         ? [
-            { label: '마이페이지', path: '/user/mypage', icon: <FaUserCircle /> },
+            { label: '마이페이지', path: '/user/mypage/profile', icon: <FaUserCircle /> },
             { label: '로그아웃', path: '/logout', icon: <FaSignOutAlt /> },
         ]
         : [
+            { label: '예약조회', path: '/reservation/lookup', icon: <FaClipboardList /> },
             { label: '로그인', path: '/login', icon: <FaSignInAlt /> },
             { label: '회원가입', path: '/signup', icon: <FaUserPlus /> },
         ];
@@ -33,7 +28,12 @@ function Header() {
         if (item.path === '/logout') {
             const confirmed = window.confirm('로그아웃하시겠습니까?');
             if (!confirmed) return;
+
+            setMenuOpen(false);
+            navigate('/logout');
+            return;
         }
+
         setMenuOpen(false);
         navigate(item.path);
     };
@@ -79,6 +79,7 @@ function Header() {
                 <div className="md:hidden">
                     <button
                         onClick={() => setMenuOpen(true)}
+                        aria-label="메뉴 열기"
                         className="text-[#4B5563] hover:text-[#C8E6C9] transition text-xl"
                     >
                         <FaBars />
@@ -95,6 +96,7 @@ function Header() {
                 <div className="flex flex-col p-4 space-y-4">
                     <button
                         onClick={() => setMenuOpen(false)}
+                        aria-label="메뉴 닫기"
                         className="self-end text-[#4B5563] hover:text-red-500 text-xl"
                     >
                         <FaTimes />

@@ -1,15 +1,13 @@
-// src/pages/mypage/MyPageMain.jsx
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Outlet, useLocation } from "react-router-dom";
 import MyPageNav from "./MyPageNav.jsx";
+import MyPageEasterEgg from "./MyPageEasterEgg.jsx"; // 이스터에그 컴포넌트
 
 function MyPageMain() {
-    // 더미 사용자 정보
-    const [user] = useState({
-        name: "홍길동",
-        email: "hong@example.com",
-        profileImage: "/default-profile.png",
-    });
+    const { user } = useAuth();
+    const location = useLocation();
+
+    const isRoot = location.pathname === "/user/mypage" || location.pathname === "/user/mypage/";
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -18,6 +16,7 @@ function MyPageMain() {
                 <MyPageNav />
                 <div className="mt-8">
                     <Outlet context={{ user }} />
+                    {isRoot && <MyPageEasterEgg />}
                 </div>
             </div>
         </div>

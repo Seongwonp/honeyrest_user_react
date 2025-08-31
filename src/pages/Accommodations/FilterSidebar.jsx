@@ -6,7 +6,7 @@ import * as RiIcons from "react-icons/ri";
 import * as MdIcons from "react-icons/md";
 import * as FaIcons from "react-icons/fa";
 
-function FilterSidebar({ onFilterChange }) {
+function FilterSidebar({ onFilterChange, openMapSearch }) {
     const [categories, setCategories] = useState([]);
     const [tags, setTags] = useState([]);
     const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
@@ -34,32 +34,36 @@ function FilterSidebar({ onFilterChange }) {
             .catch(err => console.error("❌ 필터 옵션 불러오기 실패:", err));
     }, []);
 
-    useEffect(() => {
+    const applyFilters = (updated = {}) => {
         onFilterChange({
-            categories: selectedCategories,
-            maxPrice: selectedPrice,
-            tags: selectedTags,
+            categories: updated.categories ?? selectedCategories,
+            tags: updated.tags ?? selectedTags,
+            maxPrice: updated.maxPrice ?? selectedPrice,
         });
-    }, [selectedCategories, selectedPrice, selectedTags]);
+    };
 
     const handleCategoryChange = (e) => {
         const value = e.target.value;
-        setSelectedCategories(prev =>
-            e.target.checked ? [...prev, value] : prev.filter(v => v !== value)
-        );
-    };
+        const updated = e.target.checked
+            ? [...selectedCategories, value]
+            : selectedCategories.filter(v => v !== value);
 
+        setSelectedCategories(updated);
+        applyFilters({ categories: updated });
+    };
 
     const confirmPrice = () => {
         setSelectedPrice(tempPrice);
+        applyFilters({ maxPrice: tempPrice });
     };
 
     const toggleTag = (tagName) => {
-        setSelectedTags(prev =>
-            prev.includes(tagName)
-                ? prev.filter(t => t !== tagName)
-                : [...prev, tagName]
-        );
+        const updated = selectedTags.includes(tagName)
+            ? selectedTags.filter(t => t !== tagName)
+            : [...selectedTags, tagName];
+
+        setSelectedTags(updated);
+        applyFilters({ tags: updated });
     };
 
     const toggleGroup = (category) => {
@@ -74,6 +78,7 @@ function FilterSidebar({ onFilterChange }) {
         setSelectedTags([]);
         setSelectedPrice(priceRange.max);
         setTempPrice(priceRange.max);
+        applyFilters({ categories: [], tags: [], maxPrice: priceRange.max });
     };
 
     const groupedTags = tags.reduce((acc, tag) => {
@@ -84,7 +89,16 @@ function FilterSidebar({ onFilterChange }) {
 
     return (
         <div>
-            {/* 헤더 */}
+            <div className="mb-6">
+                <h3 className="font-semibold mb-2">위치 기반 검색</h3>
+                <button
+                    onClick={openMapSearch}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                >
+                    📍 지도에서 숙소 찾기
+                </button>
+            </div>
+
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-bold">필터</h2>
                 <button
@@ -96,7 +110,6 @@ function FilterSidebar({ onFilterChange }) {
                 </button>
             </div>
 
-            {/* 선택된 필터 요약 */}
             <AnimatePresence>
                 {(selectedCategories.length > 0 || selectedTags.length > 0 || selectedPrice < priceRange.max) && (
                     <motion.div
@@ -110,37 +123,45 @@ function FilterSidebar({ onFilterChange }) {
                         <div className="flex flex-wrap gap-2">
                             {selectedCategories.map((cat) => (
                                 <span key={cat} className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                        {cat}
-                                    <button onClick={() => setSelectedCategories(prev => prev.filter(v => v !== cat))}>
-                            <RxCross2 className="text-blue-600 hover:text-blue-800" />
-                        </button>
-                    </span>
+                                    {cat}
+                                    <button onClick={() => {
+                                        const updated = selectedCategories.filter(v => v !== cat);
+                                        setSelectedCategories(updated);
+                                        applyFilters({ categories: updated });
+                                    }}>
+                                        <RxCross2 className="text-blue-600 hover:text-blue-800" />
+                                    </button>
+                                </span>
                             ))}
                             {selectedTags.map((tag) => (
                                 <span key={tag} className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
-                        #{tag}
-                                    <button onClick={() => setSelectedTags(prev => prev.filter(t => t !== tag))}>
-                            <RxCross2 className="text-yellow-600 hover:text-yellow-800" />
-                        </button>
-                    </span>
+                                    #{tag}
+                                    <button onClick={() => {
+                                        const updated = selectedTags.filter(t => t !== tag);
+                                        setSelectedTags(updated);
+                                        applyFilters({ tags: updated });
+                                    }}>
+                                        <RxCross2 className="text-yellow-600 hover:text-yellow-800" />
+                                    </button>
+                                </span>
                             ))}
                             {selectedPrice < priceRange.max && (
                                 <span className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                        최대 {selectedPrice.toLocaleString()}원
-                        <button onClick={() => {
-                            setSelectedPrice(priceRange.max);
-                            setTempPrice(priceRange.max);
-                        }}>
-                            <RxCross2 className="text-green-600 hover:text-green-800" />
-                        </button>
-                    </span>
+                                    최대 {selectedPrice.toLocaleString()}원
+                                    <button onClick={() => {
+                                        setSelectedPrice(priceRange.max);
+                                        setTempPrice(priceRange.max);
+                                        applyFilters({ maxPrice: priceRange.max });
+                                    }}>
+                                        <RxCross2 className="text-green-600 hover:text-green-800" />
+                                    </button>
+                                </span>
                             )}
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* 숙소 유형 */}
             <div className="mb-6">
                 <h3 className="font-semibold mb-2">숙소 유형</h3>
                 <div className="flex flex-col gap-2 text-sm">
@@ -158,7 +179,6 @@ function FilterSidebar({ onFilterChange }) {
                 </div>
             </div>
 
-            {/* 가격 범위 */}
             <div className="mb-6">
                 <h3 className="font-semibold mb-2 flex items-center gap-1">
                     <MdAttachMoney className="text-yellow-500" />
@@ -178,12 +198,11 @@ function FilterSidebar({ onFilterChange }) {
                 <p className="text-sm mt-2 text-gray-700 text-center">
                     {priceRange.min.toLocaleString()}원 ~{" "}
                     <span className="font-semibold text-yellow-600">
-            {tempPrice.toLocaleString()}원
-        </span>
+                        {tempPrice.toLocaleString()}원
+                    </span>
                 </p>
             </div>
 
-            {/* 태그 필터 */}
             <div className="overflow-y-auto max-h-120 pr-1 mb-6">
                 {Object.entries(groupedTags).map(([category, tagList]) => {
                     const isExpanded = expandedGroups[category];
@@ -198,7 +217,14 @@ function FilterSidebar({ onFilterChange }) {
                                     return (
                                         <button
                                             key={tag.tagId}
-                                            onClick={() => toggleTag(tag.name)}
+                                            onClick={() => {
+                                                const updated = selectedTags.includes(tag.name)
+                                                    ? selectedTags.filter(t => t !== tag.name)
+                                                    : [...selectedTags, tag.name];
+
+                                                setSelectedTags(updated);
+                                                applyFilters({ tags: updated });
+                                            }}
                                             className={`px-2 py-1 rounded border ${
                                                 selectedTags.includes(tag.name)
                                                     ? "bg-yellow-100 border-yellow-400 text-yellow-700"

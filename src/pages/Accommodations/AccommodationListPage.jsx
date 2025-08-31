@@ -5,13 +5,14 @@ import axios from "axios";
 import AccommodationCard from "./AccommodationCard";
 import { motion, AnimatePresence } from "framer-motion";
 import ListSearchBox from "./ListSearchBox.jsx";
-import { useAuth } from "@/hooks/useAuth"; // ✅ 추가: 전역 로그인 정보 가져오기
+import { useAuth } from "@/hooks/useAuth"; // ✅ 전역 로그인 정보 가져오기
 
 function AccommodationListPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { user } = useAuth(); // ✅ 추가: useAuth 훅 사용
-    const userId = user?.userId; // ✅ 수정: 기존 storedUser.userId 대신
+    const { user } = useAuth(); // ✅ useAuth 훅 사용
+    const userId = user?.userId || null; // ✅ 안전하게 추출
+    const isLoggedIn = !!userId; // ✅ 명확한 로그인 상태
 
     const [results, setResults] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
@@ -32,10 +33,6 @@ function AccommodationListPage() {
         { value: "random", label: "랜덤" }
     ];
 
-    useEffect(() => {
-        console.log("✅ 숙소 리스트 결과:", results);
-    }, [results]);
-
     const selectedCategories = useMemo(() => searchParams.getAll("selectedCategories"), [searchParams]);
     const selectedTags = useMemo(() => searchParams.getAll("selectedTags"), [searchParams]);
     const maxPrice = Number(searchParams.get("maxPrice")) || 1000000;
@@ -49,7 +46,7 @@ function AccommodationListPage() {
                     checkIn,
                     checkOut,
                     guests,
-                    userId, // ✅ 수정: 전역 userId 사용
+                    ...(userId && { userId }), // 로그인된 경우에만 포함
                     sort,
                     page,
                     selectedCategories,
@@ -137,12 +134,9 @@ function AccommodationListPage() {
                             <AccommodationCard
                                 key={item.id && item.id !== "" ? `accommodation-${item.id}` : `accommodation-${index}`}
                                 item={item}
-                                index={index}
-                                toggleWish={toggleWish}
-                                isLoggedIn={!!userId} // 수정: 전역 userId 기반
                                 checkIn={checkIn}
                                 checkOut={checkOut}
-                                userId={userId} // 수정: 전역 userId 기반
+                                userId={userId}
                                 guests={guests}
                             />
                         ))}

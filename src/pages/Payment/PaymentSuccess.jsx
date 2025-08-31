@@ -13,11 +13,12 @@ export default function PaymentSuccess() {
             const orderId = searchParams.get("orderId");
             const amount = searchParams.get("amount");
             const reservationInfo = JSON.parse(sessionStorage.getItem("reservationInfo"));
-
+            reservationInfo.reservationCode = orderId;
             console.log("🔍 paymentKey:", paymentKey);
             console.log("🔍 orderId:", orderId);
             console.log("🔍 amount:", amount);
             console.log("🔍 reservationInfo:", reservationInfo);
+            console.log("reservationCode:", reservationInfo.reservationCode);
 
 
             if (!paymentKey || !orderId || !amount || !reservationInfo) {

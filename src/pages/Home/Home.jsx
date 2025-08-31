@@ -12,6 +12,8 @@ import PlaceList from "./PlaceList/PlaceList";
 import DomesticSpots from "./DomesticSpotsList/DomesticSpots";
 import SearchBox from "./searchBox/SearchBox.jsx";
 import WeatherWidget from "./Weather/WeatherWidget.jsx";
+import HotSpots from "@/pages/Home/HotSpots/HotSpots.jsx";
+import BannerSection from "@/pages/Home/BannerSection.jsx";
 
 function Home() {
     const navigate = useNavigate();
@@ -132,45 +134,22 @@ function Home() {
     return (
         <div className="bg-white min-h-screen">
             {/* 배너 영역 */}
-            <div className="relative w-full h-[650px] overflow-hidden">
-                {randomBanner?.imageUrl ? (
-                    <img
-                        src={randomBanner.imageUrl}
-                        alt={randomBanner.title || "배너 이미지"}
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <p className="text-gray-500">배너를 불러오는 중...</p>
-                    </div>
-                )}
+            <BannerSection
+                randomBanner={randomBanner}
+                location={location}
+                setLocation={setLocation}
+                checkIn={checkIn}
+                setCheckIn={setCheckIn}
+                checkOut={checkOut}
+                setCheckOut={setCheckOut}
+                guests={guests}
+                setGuests={setGuests}
+                handleSearch={handleSearch}
+                today={today}
+                getTomorrow={getTomorrow}
+            />
 
-                {/* 배너 텍스트 */}
-                <div className="absolute top-12 w-full text-center z-10 flex justify-center gap-2">
-                    <span className="text-white text-2xl sm:text-4xl font-semibold drop-shadow-lg" data-aos="fade-right" data-aos-delay="100">
-                        편안한 휴식을 위해,
-                    </span>
-                    <span className="text-white text-2xl sm:text-4xl font-semibold drop-shadow-lg" data-aos="fade-left" data-aos-delay="600">
-                        지금 떠나볼까요? 🌿
-                    </span>
-                </div>
-
-                {/* 검색창 */}
-                <SearchBox
-                    location={location}
-                    setLocation={setLocation}
-                    checkIn={checkIn}
-                    setCheckIn={setCheckIn}
-                    checkOut={checkOut}
-                    setCheckOut={setCheckOut}
-                    guests={guests}
-                    setGuests={setGuests}
-                    handleSearch={handleSearch}
-                    today={today}
-                    getTomorrow={getTomorrow}
-                />
-            </div>
-
+            {/* 핫플레이스 + 날씨 */}
             <div className="px-4 md:px-10 mt-10">
                 <div className="bg-gradient-to-r from-white rounded-3xl p-8 w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
                     <HotPlacesSection
@@ -185,6 +164,7 @@ function Home() {
                 </div>
             </div>
 
+            {/* 스크롤 힌트 */}
             {showScrollHint && (
                 <motion.div
                     initial={{ opacity: 0 }}
@@ -198,9 +178,19 @@ function Home() {
                 </motion.div>
             )}
 
+            {/* 🔥 인기 여행지 */}
+            <HotSpots userInfo={userInfo} navigate={navigate} />
+
+            {/* 🎉 이벤트 슬라이더 */}
             <EventSlider events={events} sliderSettings={sliderSettings} />
+
+            {/* 🏡 추천 숙소 리스트 */}
             <PlaceList />
+
+            {/* 📍 국내 여행지 펼침형 */}
             <DomesticSpots userInfo={userInfo} navigate={navigate} />
+
+            {/* 모달 */}
             <AnimatePresence>
                 {showModal && (
                     <>

@@ -25,7 +25,6 @@ import {attachErrorInterceptor} from './api/axios.js';
 
 import PublicRoute from './routes/PublicRoute.jsx';
 import PrivateRoute from './routes/PrivateRoute.jsx';
-import Accommodation from "./pages/Accommodations/Accommodation/Accommodation.jsx";
 import AccommodationDetailWrapper from "./pages/Accommodations/Accommodation/AccommodationDetailWrapper.jsx";
 import RoomDetail from "./pages/Accommodations/Accommodation/Room/RoomDetail.jsx";
 import Reservation from "@/pages/Reservation/Reservation.jsx";
@@ -33,6 +32,16 @@ import PaymentProcess from "@/pages/Payment/PaymentProcess.jsx";
 import PaymentSuccess from "@/pages/Payment/PaymentSuccess.jsx";
 import PaymentFail from "@/pages/Payment/PaymentFail.jsx";
 import ReservationComplete from "@/pages/Reservation/ReservationComplete.jsx";
+import GuestEntryChoice from "@/pages/Reservation/guest/GuestEntryChoice.jsx";
+import ReserveGuestForm from "@/pages/Reservation/guest/ReserveGuestForm.jsx";
+import ReserveGuestLookUp from "@/pages/Reservation/guest/ReserveGuestLookUp.jsx";
+import ReservationList from "@/pages/myPage/ReservationList.jsx";
+import ReservationDetail from "@/pages/myPage/ReservationDetail.jsx";
+import Profile from "@/pages/myPage/Profile.jsx";
+import ReviewList from "@/pages/myPage/ReviewList.jsx";
+import ReviewWrite from "@/pages/Review/ReviewWrite.jsx";
+import MyWishList from "@/pages/myPage/MyWishList.jsx";
+import VerifyEmailChange from "@/pages/myPage/VerifyEmailChange.jsx";
 
 function AppWrapper() {
     const navigate = useNavigate();
@@ -85,16 +94,29 @@ function AppWrapper() {
                 <Route path="/payment/fail" element={<PaymentFail />} />
                 <Route path="/reservation/complete" element={<ReservationComplete/>}/>
 
+
+                <Route path="/reserve/guest" element={<GuestEntryChoice/>}/>
+
                 <Route element={<Layout/>}>
                     <Route path="/" element={<Home/>}/>
+
+                    {/* 마이페이지 */}
                     <Route
                         path="/user/mypage"
-                        element={
-                            <PrivateRoute>
-                                <MyPageMain/>
-                            </PrivateRoute>
-                        }
-                    />
+                        element={<PrivateRoute><MyPageMain /></PrivateRoute>}
+                    >
+                        <Route path="profile" element={<Profile />} />
+                        <Route path="reservations" element={<ReservationList />} />
+                        <Route path="reservations/:reservationId" element={<ReservationDetail />} />
+                        <Route path="reviews" element={<ReviewList />} />
+                        <Route path="reviews/write/:reservationId" element={<ReviewWrite />} />
+                        <Route path="wishList" element={<MyWishList />}/>
+
+                    </Route>
+
+                    <Route path="/verify-email-change" element={<VerifyEmailChange />} />
+
+
                     <Route
                         path="/accommodations"
                         element={<AccommodationLayout />}
@@ -102,6 +124,8 @@ function AppWrapper() {
                     <Route path="/accommodations/:id" element={<AccommodationDetailWrapper />} />
                     <Route path="/room/:roomId" element={<RoomDetail />} />
                     <Route path="/reserve" element={<Reservation />} />
+                    <Route path="/reserve/guest/form" element={<ReserveGuestForm/>}/>
+                    <Route path="/reservation/lookup" element={<ReserveGuestLookUp/>}/>
 
 
                 </Route>

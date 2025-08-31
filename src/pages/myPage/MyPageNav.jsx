@@ -6,7 +6,7 @@ function MyPageNav() {
         { label: "내 정보", path: "profile" },
         { label: "예약 내역", path: "reservations" },
         { label: "작성한 후기", path: "reviews" },
-        { label: "비밀번호 변경", path: "password" },
+        { label: "찜 목록", path: "wishList" },
     ];
 
     return (

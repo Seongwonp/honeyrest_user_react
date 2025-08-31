@@ -8,13 +8,15 @@ import dayjs from "dayjs";
 import axios from "axios";
 import RoomImageViewer from "./RoomImageViewer";
 import ReviewSlider from "./ReviewSlider";
+import { useAuth } from "@/hooks/useAuth"; // 추가
 
 export default function RoomDetail() {
     const navigate = useNavigate();
     const { roomId } = useParams();
     const [searchParams] = useSearchParams();
+    const { user } = useAuth(); // 안전한 인증 정보
+    const userId = user?.userId || null; // URL에서 제거 내부 상태로 관리
 
-    const userId = searchParams.get("userId");
     const checkIn = searchParams.get("checkIn");
     const checkOut = searchParams.get("checkOut");
     const guests = Number(searchParams.get("guests")) || 2;
@@ -178,18 +180,31 @@ export default function RoomDetail() {
                             type="button"
                             onClick={async (e) => {
                                 e.preventDefault();
+
+                                const isLoggedIn = !!userId;
+
                                 try {
                                     const response = await axios.get("/api/reserve/form-info", {
                                         params: {
                                             roomId: roomDetail.roomId,
-                                            userId,
                                             checkIn,
                                             checkOut,
-                                            guests
+                                            guests,
+                                            ...(isLoggedIn && { userId }) // 로그인된 경우에만 포함
                                         }
                                     });
-                                    navigate("/reserve", {
-                                        state: response.data
+
+                                    const targetPath = isLoggedIn ? "/reserve" : "/reserve/guest";
+
+                                    navigate(targetPath, {
+                                        state: {
+                                            ...response.data,
+                                            roomId: roomDetail.roomId,
+                                            checkIn,
+                                            checkOut,
+                                            guests,
+                                            totalPrice
+                                        }
                                     });
                                 } catch (err) {
                                     console.error("예약 정보 불러오기 실패:", err);

@@ -11,15 +11,15 @@ function DomesticSpotsList({ userInfo, navigate }) {
             return;
         }
 
-        fetch("/api/region")
+        fetch("/api/region/all") // 수정된 API 경로
             .then((res) => res.json())
             .then((data) => {
                 const list = Array.isArray(data) ? data : data.data;
                 setAllRegions(list || []);
                 setRegionCache(list || []);
             })
-            .catch((err) => console.error("❌ 지역 전체 불러오기 실패:", err));
-    }, []);
+            .catch((err) => console.error("❌ 전체 지역 불러오기 실패:", err));
+    }, [regionCache]);
 
     const handleClick = (regionName) => {
         const today = new Date().toISOString().split("T")[0];
@@ -40,10 +40,10 @@ function DomesticSpotsList({ userInfo, navigate }) {
         navigate(`/accommodations?${params.toString()}`);
     };
 
-    const topRegions = allRegions.filter(r => r.level === 1 && r.popular);
+    const topRegions = allRegions.filter(r => r.level === 1);
 
     const cityMap = allRegions.reduce((acc, city) => {
-        if (city.level === 2 && city.popular && city.parentId) {
+        if (city.level === 2 && city.parentId) {
             if (!acc[city.parentId]) acc[city.parentId] = [];
             acc[city.parentId].push(city);
         }

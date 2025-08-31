@@ -37,12 +37,6 @@ function DateRangeModal({ isOpen, onClose, onSelect }) {
     useEffect(() => {
     }, [visibleMonth]);
 
-    useEffect(() => {
-        console.log("선택된 범위:", {
-            start: format(selection.startDate, "yyyy-MM-dd"),
-            end: format(selection.endDate, "yyyy-MM-dd")
-        });
-    }, [selection]);
 
     useEffect(() => {
         const monthsInRange = new Set();
