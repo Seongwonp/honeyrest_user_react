@@ -17,22 +17,33 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// 응답 인터셉터: 에러 핸들링 + 자동 로그아웃
+// 응답 인터셉터: 에러 핸들링 + 자동 재발급 + 로그아웃
 export const attachErrorInterceptor = (navigate) => {
     api.interceptors.response.use(
         res => res,
-        err => {
+        async err => {
             const skipRedirect = err.config?.skipRedirect;
             const status = err.response?.status;
 
             if (status === 401) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('userInfo');
-                sessionStorage.removeItem('accessToken');
-                sessionStorage.removeItem('userInfo');
-                toast.error('세션이 만료되었습니다. 다시 로그인해주세요.');
-                navigate('/login');
-                return Promise.reject(err);
+                try {
+                    const res = await api.post('/api/auth/refresh'); // 쿠키 기반 호출
+                    const newAccessToken = res.data;
+
+                    const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
+                    storage.setItem('accessToken', newAccessToken);
+
+                    err.config.headers.Authorization = `Bearer ${newAccessToken}`;
+                    console.log('[API] 🔄 AccessToken 재발급 성공 → 요청 재시도');
+                    return api(err.config);
+                } catch (refreshErr) {
+                    console.error('[API] ❌ 토큰 재발급 실패:', refreshErr);
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    toast.error('세션이 만료되었습니다. 다시 로그인해주세요.');
+                    navigate('/login');
+                    return Promise.reject(refreshErr);
+                }
             }
 
             if (!skipRedirect) {

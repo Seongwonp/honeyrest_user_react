@@ -16,7 +16,7 @@ function Login() {
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
     const { request, isLoading } = useApiRequest();
-    const { loadUser } = useAuth();
+    const { loadUser, syncUserFromServer } = useAuth();
 
     const location = useLocation();
     const redirectTo = location.state?.redirectTo || "/";
@@ -39,12 +39,33 @@ function Login() {
                     label: 'login',
                     errorMessage: '이메일 또는 비밀번호가 올바르지 않습니다.',
                     onSuccess: (res) => {
-                        const { accessToken, user } = res;
-                        const userWithProvider = { ...user, provider: 'local' };
+                        console.log('[Login] ✅ 로그인 응답 전체:', res);
+
+                        const { accessToken, refreshToken, user } = res;
+
+                        if (!user || !user.userId) {
+                            console.error('[Login] ❌ 응답에 user 정보 없음:', user);
+                            return;
+                        }
+
+                        const userWithProvider = {
+                            userId: user.userId,
+                            email: user.email,
+                            name: user.name,
+                            phone: user.phone,
+                            profileImage: user.profileImage,
+                            role: user.role,
+                            isVerified: user.isVerified,
+                            provider: 'local'
+                        };
+
                         const storage = autoLogin ? localStorage : sessionStorage;
                         storage.setItem('accessToken', accessToken);
+                        storage.setItem('refreshToken', refreshToken);
                         storage.setItem('userInfo', JSON.stringify(userWithProvider));
-                        loadUser();
+
+                        console.log('[Login] ✅ 저장 완료 → syncUserFromServer() 호출');
+                        syncUserFromServer();
 
                         Swal.fire({
                             title: `${user.name}님 환영합니다!`,
@@ -53,6 +74,7 @@ function Login() {
                             confirmButtonText: '확인',
                             confirmButtonColor: '#FDD835',
                         }).then(() => {
+                            console.log('[Login] 🚀 페이지 이동:', redirectTo);
                             navigate(redirectTo, {
                                 state: reservationInfo || undefined
                             });

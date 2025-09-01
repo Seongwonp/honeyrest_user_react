@@ -1,16 +1,16 @@
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 function PrivateRoute({ children }) {
-    const rawUser =
-        localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
-    const token =
-        localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    const { isLoggedIn, isLoadingUser } = useAuth();
 
-    const userInfo = rawUser ? JSON.parse(rawUser) : null;
+    if (isLoadingUser) {
+        console.log('[PrivateRoute] ⏳ 유저 정보 로딩 중...');
+        return null; // 또는 로딩 스피너
+    }
 
-    const isAuthenticated = userInfo?.userId && token;
-
-    return isAuthenticated ? children : <Navigate to="/error/401" replace />;
+    console.log('[PrivateRoute] 🔐 로그인 상태:', isLoggedIn);
+    return isLoggedIn ? children : <Navigate to="/error/401" replace />;
 }
 
 export default PrivateRoute;

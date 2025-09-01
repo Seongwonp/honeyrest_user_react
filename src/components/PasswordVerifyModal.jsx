@@ -20,7 +20,7 @@ export default function PasswordVerifyModal({ onSuccess, onClose }) {
                     errorMessage: "비밀번호가 일치하지 않습니다.",
                     skipRedirect: true, // 🔥 리다이렉트 막기
                     onSuccess: () => {
-                        onSuccess();
+                        onSuccess(true);
                         onClose();
                     }
                 }

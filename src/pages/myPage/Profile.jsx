@@ -9,24 +9,23 @@ import {
     FaEnvelope,
     FaCamera,
     FaEdit,
-    FaSave
+    FaSave,
+    FaLock
 } from "react-icons/fa";
+import PasswordChangeModal from "@/pages/myPage/PasswordChangeModal.jsx";
 
 export default function Profile() {
-    const { user, loadUser } = useAuth();
+    const { user, loadUser, syncUserFromServer } = useAuth();
     const { request, isLoading } = useApiRequest();
 
-    const isSocialLogin =
-        user?.provider === "kakao" || user?.provider === "google";
+    const isSocialLogin = user?.provider === "kakao" || user?.provider === "google";
 
     const [isEditing, setIsEditing] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [isVerified, setIsVerified] = useState(false);
+    const [showPasswordChange, setShowPasswordChange] = useState(false);
     const [originalEmail, setOriginalEmail] = useState("");
-    const [form, setForm] = useState({
-        name: "",
-        phone: "",
-        email: ""
-    });
+    const [form, setForm] = useState({ name: "", phone: "", email: "" });
 
     useEffect(() => {
         if (user) {
@@ -39,6 +38,12 @@ export default function Profile() {
         }
     }, [user]);
 
+    useEffect(() => {
+        if (isVerified) {
+            setIsEditing(true);
+        }
+    }, [isVerified]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
@@ -46,42 +51,78 @@ export default function Profile() {
 
     const handleSubmit = async () => {
         try {
-            if (form.email !== originalEmail) {
+            const isEmailChanged = form.email !== originalEmail;
+
+            if (isEmailChanged) {
                 await request(
                     {
                         method: "POST",
                         url: "/api/user/request-email-change",
-                        data: { newEmail: form.email }
+                        data: {
+                            newEmail: form.email,
+                            isPasswordVerified: isVerified
+                        }
                     },
                     {
                         label: "emailChangeRequest",
-                        successMessage: "입력하신 이메일로 인증 메일을 보냈습니다!",
-                        onSuccess: () => {
-                            setIsEditing(false);
-                            loadUser();
-                        }
+                        successMessage: "입력하신 이메일로 인증 메일을 보냈습니다!"
                     }
                 );
-                return;
             }
 
             await request(
                 {
                     method: "PUT",
                     url: "/api/user/profile",
-                    data: form
+                    data: {
+                        name: form.name,
+                        phone: form.phone,
+                        email: form.email,
+                        isPasswordVerified: isVerified
+                    }
                 },
                 {
                     label: "profileUpdate",
-                    successMessage: "회원 정보가 수정되었습니다!",
+                    successMessage: isEmailChanged ? undefined : "회원 정보가 수정되었습니다!",
                     onSuccess: () => {
-                        loadUser();
                         setIsEditing(false);
+                        setIsVerified(false);
+                        syncUserFromServer();
                     }
                 }
             );
         } catch (err) {
             console.error("프로필 수정 실패:", err);
+            toast.error("회원 정보 수정 중 오류가 발생했습니다.");
+        }
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("profileImage", file);
+
+        try {
+            await request(
+                {
+                    method: "POST",
+                    url: "/api/user/profile-image",
+                    data: formData,
+                    headers: { "Content-Type": "multipart/form-data" }
+                },
+                {
+                    label: "profileImageUpload",
+                    successMessage: "프로필 이미지가 변경되었습니다!",
+                    onSuccess: () => {
+                        syncUserFromServer();
+                    }
+                }
+            );
+        } catch (err) {
+            console.error("프로필 이미지 업로드 실패:", err);
+            toast.error("이미지 업로드에 실패했습니다.");
         }
     };
 
@@ -98,16 +139,32 @@ export default function Profile() {
                         className="w-20 h-20 rounded-full object-cover border"
                     />
                     {!isSocialLogin && (
-                        <button className="absolute bottom-0 right-0 bg-white p-1 rounded-full shadow hover:bg-gray-100">
-                            <FaCamera className="text-gray-600 text-sm" />
-                        </button>
+                        <>
+                            <button
+                                onClick={() => document.getElementById("profileImageInput").click()}
+                                className="absolute bottom-0 right-0 bg-white p-1 rounded-full shadow hover:bg-gray-100"
+                            >
+                                <FaCamera className="text-gray-600 text-sm" />
+                            </button>
+                            <input
+                                type="file"
+                                id="profileImageInput"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
+                            />
+                        </>
                     )}
                 </div>
                 <div>
                     <h3 className="text-xl font-semibold text-gray-800">{user?.name}</h3>
                     <p className="text-sm text-gray-500">{user?.email}</p>
                     <p className="text-xs text-gray-400">
-                        로그인 방식: {user?.provider === "local" ? "일반 회원" : user?.provider.toUpperCase()}
+                        로그인 방식: {user?.provider === "local"
+                        ? "일반 회원"
+                        : user?.provider
+                            ? user.provider.toUpperCase()
+                            : "알 수 없음"}
                     </p>
                 </div>
             </div>
@@ -149,6 +206,12 @@ export default function Profile() {
 
                 {/* 버튼 영역 */}
                 <div className="flex justify-end gap-3 pt-4">
+                    <button
+                        onClick={() => setShowPasswordChange(true)}
+                        className="flex items-center gap-2 px-4 py-2 rounded font-semibold bg-red-500 hover:bg-red-600 text-white"
+                    >
+                        <FaLock/>비밀번호 변경
+                    </button>
                     {!isSocialLogin && (
                         isEditing ? (
                             <button
@@ -181,8 +244,22 @@ export default function Profile() {
             {/* 비밀번호 인증 모달 */}
             {showPasswordModal && (
                 <PasswordVerifyModal
-                    onSuccess={() => setIsEditing(true)}
+                    onSuccess={(verified) => {
+                        setIsVerified(verified);
+                        setShowPasswordModal(false);
+                    }}
                     onClose={() => setShowPasswordModal(false)}
+                />
+            )}
+
+            {showPasswordChange && (
+                <PasswordChangeModal
+                    isOpen={showPasswordChange}
+                    onClose={() => setShowPasswordChange(false)}
+                    onSuccess={() => {
+                        toast.success("비밀번호가 변경되었습니다!");
+                        setShowPasswordChange(false);
+                    }}
                 />
             )}
         </div>

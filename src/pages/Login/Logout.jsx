@@ -1,54 +1,59 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-toastify';
+import api from '@/api/axios';
 
 function Logout() {
     const navigate = useNavigate();
+    const { logout } = useAuth();
     const [showMessage, setShowMessage] = useState(true);
-    const { loadUser } = useAuth();
+    const hasLoggedOut = useRef(false);
 
     useEffect(() => {
+        const performLogout = async () => {
+            if (hasLoggedOut.current) return;
+            hasLoggedOut.current = true;
 
-        const rawUser =
-            localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
-        const userInfo = rawUser ? JSON.parse(rawUser) : {};
-        const provider = userInfo?.provider;
+            const rawUser =
+                localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
+            const userInfo = rawUser ? JSON.parse(rawUser) : {};
+            const provider = userInfo?.provider;
 
-        // 내부 세션 제거
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('userInfo');
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('userInfo');
+            try {
+                await api.post('/api/auth/logout');
+                console.log('[Logout] ✅ 서버 로그아웃 완료');
+            } catch (err) {
+                console.error('[Logout] ❌ 서버 로그아웃 실패:', err);
+            }
 
-        // 토스트 중복 방지: 조건부 실행
-        toast.dismiss(); // 기존 토스트 제거
-        toast.success('로그아웃되었습니다 👋', {
-            position: 'top-center',
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-        });
+            logout(); // ✅ 클라이언트 상태 초기화
 
-        // 소셜 로그아웃 처리
-        if (provider === 'kakao') {
-            const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
-            const LOGOUT_REDIRECT_URI = 'http://localhost:5173/login';
-            window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
-            return;
-        }
+            toast.dismiss();
+            toast.success('로그아웃되었습니다 👋', {
+                position: 'top-center',
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+            });
 
-        //  2초 후 상태 초기화 + 메인 이동
-        const timer = setTimeout(() => {
-            loadUser();
-            setShowMessage(false);
-            navigate('/');
-        }, 2000);
+            if (provider === 'kakao') {
+                const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
+                const LOGOUT_REDIRECT_URI = 'http://localhost:5173/login';
+                window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
+                return;
+            }
 
-        return () => clearTimeout(timer);
-    }, [navigate, loadUser]);
+            setTimeout(() => {
+                setShowMessage(false);
+                navigate('/');
+            }, 2000);
+        };
+
+        performLogout();
+    }, [navigate, logout]);
 
     return (
         showMessage && (

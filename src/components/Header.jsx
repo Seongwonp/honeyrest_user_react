@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
-    const { user, isLoggedIn, loadUser } = useAuth();
+    const { user, isLoggedIn, isChanged } = useAuth();
 
     const navItems = isLoggedIn
         ? [
