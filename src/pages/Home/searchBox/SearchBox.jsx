@@ -34,7 +34,7 @@ function SearchBox({
                     e.preventDefault();
                     handleSearch();
                 }}
-                className="w-full max-w-4xl mx-auto px-4 py-6 bg-white/90 backdrop-blur-md rounded-2xl shadow-lg space-y-6"
+                className="w-full max-w-6xl mx-auto px-4 py-6 bg-white/90 backdrop-blur-md rounded-2xl shadow-lg space-y-6 text-center"
                 data-aos="fade-up"
                 data-aos-delay="1100"
             >
@@ -61,7 +61,7 @@ function SearchBox({
                     {/* 날짜 선택 */}
                     <div
                         onClick={() => setShowCalendar(true)}
-                        className="flex-1 border rounded-lg px-4 py-3 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition"
+                        className="flex-2 border rounded-lg px-4 py-3 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition"
                     >
                         <div className="flex items-center mb-1">
                             <FiCalendar className="text-2xl text-yellow-400 mr-3" />

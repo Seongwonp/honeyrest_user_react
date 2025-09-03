@@ -116,21 +116,35 @@ export default function ReviewList() {
             )}
 
             {totalPages > 1 && (
-                <div className="flex flex-wrap justify-center items-center gap-3 mt-8">
+                <div className="flex flex-wrap justify-center items-center gap-2 mt-8">
                     <button
                         onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
                         disabled={page === 0}
-                        className="px-4 py-2 text-sm bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50"
+                        className="px-2 sm:px-4 py-1 sm:py-2 text-sm bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50 transition"
+                        aria-label="이전 페이지"
                     >
                         이전
                     </button>
-                    <span className="text-sm text-gray-600">
-                        {page + 1} / {totalPages}
-                    </span>
+                    <div className="flex flex-wrap gap-1 sm:gap-2 mx-2">
+                        {Array.from({ length: totalPages }, (_, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => setPage(idx)}
+                                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded border text-sm focus:outline-none transition
+                                    ${page === idx
+                                        ? "bg-blue-600 text-white border-blue-600 font-semibold"
+                                        : "bg-white text-gray-700 border-gray-200 hover:bg-blue-50"}`}
+                                aria-current={page === idx ? "page" : undefined}
+                            >
+                                {idx + 1}
+                            </button>
+                        ))}
+                    </div>
                     <button
                         onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
                         disabled={page + 1 >= totalPages}
-                        className="px-4 py-2 text-sm bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50"
+                        className="px-2 sm:px-4 py-1 sm:py-2 text-sm bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50 transition"
+                        aria-label="다음 페이지"
                     >
                         다음
                     </button>

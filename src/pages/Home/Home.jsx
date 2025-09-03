@@ -7,13 +7,14 @@ import { BsChevronDoubleDown } from "react-icons/bs";
 import 'weather-icons/css/weather-icons.css';
 
 import HotPlacesSection from "./HotPlacesSection";
-import EventSlider from "./EventSlider";
+import EventSlider from "./Event/EventSlider";
 import PlaceList from "./PlaceList/PlaceList";
 import DomesticSpots from "./DomesticSpotsList/DomesticSpots";
 import SearchBox from "./searchBox/SearchBox.jsx";
 import WeatherWidget from "./Weather/WeatherWidget.jsx";
 import HotSpots from "@/pages/Home/HotSpots/HotSpots.jsx";
 import BannerSection from "@/pages/Home/BannerSection.jsx";
+import IntroModal from "@/components/IntroModal.jsx";
 
 function Home() {
     const navigate = useNavigate();
@@ -129,10 +130,13 @@ function Home() {
         speed: 500,
     };
 
-    const hotPlaces = ["부산", "경주", "남해", "강릉", "여수", "제주", "속초"];
 
     return (
         <div className="bg-white min-h-screen">
+            {/* 인트로 모달 */}
+            <IntroModal />
+
+
             {/* 배너 영역 */}
             <BannerSection
                 randomBanner={randomBanner}
@@ -153,7 +157,6 @@ function Home() {
             <div className="px-4 md:px-10 mt-10">
                 <div className="bg-gradient-to-r from-white rounded-3xl p-8 w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
                     <HotPlacesSection
-                        hotPlaces={hotPlaces}
                         isDropdownOpen={isDropdownOpen}
                         setIsDropdownOpen={setIsDropdownOpen}
                         verticalSliderSettings={verticalSliderSettings}

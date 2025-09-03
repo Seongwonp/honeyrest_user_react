@@ -27,7 +27,7 @@ function Logout() {
                 console.error('[Logout] ❌ 서버 로그아웃 실패:', err);
             }
 
-            logout(); // ✅ 클라이언트 상태 초기화
+            logout(); // 클라이언트 상태 초기화
 
             toast.dismiss();
             toast.success('로그아웃되었습니다 👋', {

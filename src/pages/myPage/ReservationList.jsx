@@ -33,6 +33,37 @@ export default function ReservationList() {
         setPageInfo((prev) => ({ ...prev, page: nextPage }));
     };
 
+
+    function getStatusLabel(status) {
+        switch (status) {
+            case "CONFIRMED":
+                return "예약 완료";
+            case "CANCEL_REQUEST":
+                return "환불 처리 중";
+            case "CANCELLED":
+                return "예약 취소됨";
+            case "REJECTED":
+                return "취소 거절됨";
+            default:
+                return status;
+        }
+    }
+
+    function getStatusColor(status) {
+        switch (status) {
+            case "CONFIRMED":
+                return "text-green-600";
+            case "CANCEL_REQUEST":
+                return "text-yellow-500";
+            case "CANCELLED":
+                return "text-red-500";
+            case "REJECTED":
+                return "text-gray-500";
+            default:
+                return "text-gray-500";
+        }
+    }
+
     return (
         <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-800">📋 나의 예약 내역</h2>
@@ -71,21 +102,9 @@ export default function ReservationList() {
                                     </p>
                                     <p className="text-sm text-gray-500">
                                         상태:{" "}
-                                        <span
-                                            className={`font-semibold ${
-                                                res.status === "CONFIRMED"
-                                                    ? "text-green-600"
-                                                    : res.status === "CANCELLED"
-                                                        ? "text-red-500"
-                                                        : "text-gray-500"
-                                            }`}
-                                        >
-                      {res.status === "CONFIRMED"
-                          ? "예약 완료"
-                          : res.status === "CANCELLED"
-                              ? "예약 취소됨"
-                              : res.status}
-                    </span>
+                                        <span className={`font-semibold ${getStatusColor(res.status)}`}>
+        {getStatusLabel(res.status)}
+    </span>
                                     </p>
                                 </div>
                                 <div className="text-right text-[#FF9F00] font-bold text-lg whitespace-nowrap">

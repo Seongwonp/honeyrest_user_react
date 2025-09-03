@@ -42,6 +42,18 @@ import ReviewList from "@/pages/myPage/ReviewList.jsx";
 import ReviewWrite from "@/pages/Review/ReviewWrite.jsx";
 import MyWishList from "@/pages/myPage/MyWishList.jsx";
 import VerifyEmailChange from "@/pages/myPage/VerifyEmailChange.jsx";
+import CancelRequestPage from "@/pages/myPage/CancelRequestModal.jsx";
+import PasswordChange from "@/pages/Login/PasswordChange.jsx";
+import ResetPassword from "@/pages/Login/ResetPassword.jsx";
+import InquiryEditModal from "@/pages/myPage/Inquiry/InquiryEditModal.jsx";
+import InquiryList from "@/pages/myPage/Inquiry/InquiryList.jsx";
+import CouponList from "@/pages/myPage/Coupon/CouponList.jsx";
+import Inquiry from "@/pages/myPage/Inquiry/Inquiry.jsx";
+import IntroModal from "@/components/IntroModal.jsx";
+
+function InquiryDetail() {
+    return null;
+}
 
 function AppWrapper() {
     const navigate = useNavigate();
@@ -68,6 +80,22 @@ function AppWrapper() {
                     element={
                         <PublicRoute>
                             <Signup/>
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/reset-password"
+                    element={
+                        <PublicRoute>
+                            <ResetPassword />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/reset-password/change"
+                    element={
+                        <PublicRoute>
+                            <PasswordChange />
                         </PublicRoute>
                     }
                 />
@@ -112,9 +140,17 @@ function AppWrapper() {
                         <Route path="reviews/write/:reservationId" element={<ReviewWrite />} />
                         <Route path="wishList" element={<MyWishList />}/>
 
+                        {/* 마이페이지 1:1 문의 관련 */}
+                        <Route path="inquiries" element={<InquiryList />} />
+                        <Route path="inquiries/:inquiryId" element={<Inquiry />} />
+                        <Route path="inquiries/edit/:inquiryId" element={<InquiryEditModal />} />
+
+                        {/* 쿠폰 페이지 */}
+                        <Route path="coupons" element={<CouponList />} />
                     </Route>
 
                     <Route path="/verify-email-change" element={<VerifyEmailChange />} />
+                    <Route path="/user/reservations/:reservationId/cancel-request" element={<CancelRequestPage/>}/>
 
 
                     <Route

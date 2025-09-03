@@ -7,10 +7,11 @@ import {
     AiOutlineHeart,
     AiOutlineArrowLeft,
     AiOutlineLeft,
-    AiOutlineRight,
+    AiOutlineRight, AiOutlineArrowRight,
 } from "react-icons/ai";
 import {
-    FaMapMarkerAlt,
+    FaCalendarAlt, FaEnvelope,
+    FaMapMarkerAlt, FaPhoneAlt,
     FaStar,
     FaThumbsDown,
     FaThumbsUp,
@@ -24,6 +25,9 @@ import "slick-carousel/slick/slick-theme.css";
 import WishToggleButton from "@/components/WishToggleButton.jsx";
 import { useAuth } from "@/hooks/useAuth";
 import GoogleMapView from "@/pages/Accommodations/Accommodation/GoogleMapView.jsx";
+import DateRangeModal from "@/pages/Home/searchBox/DateRangeModal.jsx";
+import {FiCalendar} from "react-icons/fi";
+import InquiryModal from "@/components/InquiryModal.jsx";
 
 function Accommodation({ accommodationId, sectionRefs }) {
     const navigate = useNavigate();
@@ -33,19 +37,45 @@ function Accommodation({ accommodationId, sectionRefs }) {
     const { user } = useAuth();
     const userId = user?.userId;
 
-    const checkIn = searchParams.get("checkIn");
-    const checkOut = searchParams.get("checkOut");
-    const guests = searchParams.get("guests");
+    // Utility to format date as yyyy-mm-dd
+    function formatDate(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // Compute default checkIn/checkOut/guests
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const defaultCheckIn = searchParams.get("checkIn") || formatDate(today);
+    const defaultCheckOut = searchParams.get("checkOut") || formatDate(tomorrow);
+    const defaultGuests = searchParams.get("guests") || 2;
+
+    const [checkIn, setCheckIn] = useState(defaultCheckIn);
+    const [checkOut, setCheckOut] = useState(defaultCheckOut);
+    const [guests, setGuests] = useState(defaultGuests);
 
     const [data, setData] = useState(null);
     const [isWished, setIsWished] = useState(false);
     const [activeSection, setActiveSection] = useState(null);
     const [reviewStates, setReviewStates] = useState([]);
+    // 변경 모달(날짜/인원 변경) & 날짜 선택 모달 분리
+    const [showChangeModal, setShowChangeModal] = useState(false);
+    const [showDateRangeModal, setShowDateRangeModal] = useState(false);
+    const [tempCheckIn, setTempCheckIn] = useState(checkIn);
+    const [tempCheckOut, setTempCheckOut] = useState(checkOut);
+    const [tempGuests, setTempGuests] = useState(guests);
+    const [showInquiryModal, setShowInquiryModal] = useState(false);
+    const isReady = tempCheckIn && tempCheckOut && tempGuests;
 
 
     useEffect(() => {
-        const params = { checkIn, checkOut };
-        if (guests) params.guests = guests;
+        if (!checkIn || !checkOut || !guests) return;
+
+        const params = { checkIn, checkOut, guests };
         if (userId) params.userId = userId;
 
         axios
@@ -108,7 +138,6 @@ function Accommodation({ accommodationId, sectionRefs }) {
         };
     }, [data]);
 
-
     useEffect(() => {
         if (data?.reviews) {
             const initialStates = data.reviews.map((r) => ({
@@ -120,55 +149,47 @@ function Accommodation({ accommodationId, sectionRefs }) {
         }
     }, [data]);
 
-    const SlickPrevArrow = (props) => {
-        const { className, style, onClick } = props;
-        return (
-            <button
-                className={`${className} z-10 left-1`}
-                style={{
-                    ...style,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: "rgba(255,255,255,0.7)",
-                    borderRadius: "9999px",
-                    width: 36,
-                    height: 36,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
-                }}
-                onClick={onClick}
-                aria-label="이전 이미지"
-                type="button"
-            >
-                <AiOutlineLeft className="text-xl text-gray-700" />
-            </button>
-        );
-    };
+    const SlickPrevArrow = ({ currentSlide, slideCount, ...rest }) => (
+        <button
+            type="button"
+            className={`${rest.className ?? ""} z-10 left-1`}
+            style={{
+                ...(rest.style ?? {}),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(255,255,255,0.7)",
+                borderRadius: "9999px",
+                width: 36,
+                height: 36,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
+            }}
+            onClick={rest.onClick}
+        >
+            <AiOutlineLeft className="text-xl text-gray-700" />
+        </button>
+    );
 
-    const SlickNextArrow = (props) => {
-        const { className, style, onClick } = props;
-        return (
-            <button
-                className={`${className} z-10 right-1`}
-                style={{
-                    ...style,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: "rgba(255,255,255,0.7)",
-                    borderRadius: "9999px",
-                    width: 36,
-                    height: 36,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
-                }}
-                onClick={onClick}
-                aria-label="다음 이미지"
-                type="button"
-            >
-                <AiOutlineRight className="text-xl text-gray-700" />
-            </button>
-        );
-    };
+    const SlickNextArrow = ({ currentSlide, slideCount, ...rest }) => (
+        <button
+            type="button"
+            className={`${rest.className ?? ""} z-10 right-1`}
+            style={{
+                ...(rest.style ?? {}),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(255,255,255,0.7)",
+                borderRadius: "9999px",
+                width: 36,
+                height: 36,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
+            }}
+            onClick={rest.onClick}
+        >
+            <AiOutlineRight className="text-xl text-gray-700" />
+        </button>
+    );
 
     const sliderSettings = {
         dots: true,
@@ -184,10 +205,139 @@ function Accommodation({ accommodationId, sectionRefs }) {
         nextArrow: <SlickNextArrow />,
     };
 
+    // Remove the "숙박 정보를 입력해주세요" step; always show accommodation with default values.
     if (!data) return <div className="text-center py-20">로딩 중...</div>;
 
+    // Display currently selected check-in/check-out/guests and 변경하기 button at the top
     return (
         <div className="w-full sm:max-w-6xl mx-auto bg-white rounded-lg shadow p-4 sm:p-6 md:p-8 lg:p-10 space-y-8 sm:space-y-10 md:space-y-12 px-2 sm:px-4 md:px-6 overflow-y-auto">
+            {/* 예약 정보 및 변경하기 버튼 */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <div className="flex items-center gap-3 text-base font-medium text-gray-700">
+                    <span>
+                        <FaCalendarAlt className="inline mr-1 text-yellow-500" />
+                        체크인: <span className="font-semibold">{checkIn}</span>
+                    </span>
+                    <span>
+                        <FaCalendarAlt className="inline mr-1 text-yellow-500" />
+                        체크아웃: <span className="font-semibold">{checkOut}</span>
+                    </span>
+                    <span>
+                        <FaUserFriends className="inline mr-1 text-yellow-500" />
+                        인원: <span className="font-semibold">{guests}명</span>
+                    </span>
+                </div>
+                <button
+                    onClick={() => {
+                        setTempCheckIn(checkIn);
+                        setTempCheckOut(checkOut);
+                        setTempGuests(guests);
+                        setShowChangeModal(true);
+                    }}
+                    className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition text-base font-semibold"
+                >
+                    변경하기
+                </button>
+            </div>
+            {/* 변경 모달 */}
+            {showChangeModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 relative min-w-[320px]">
+                        {/* 날짜 선택 영역 */}
+                        <div className="mb-6">
+                            <label className="text-base text-gray-700 flex items-center gap-2 mb-2">
+                                <FiCalendar className="text-yellow-500" />
+                                날짜
+                            </label>
+                            <button
+                                className="w-full px-4 py-2 border border-gray-200 rounded hover:bg-gray-100 flex justify-between items-center"
+                                onClick={() => setShowDateRangeModal(true)}
+                                type="button"
+                            >
+                                <span>
+                                    {tempCheckIn && tempCheckOut
+                                        ? `${tempCheckIn} ~ ${tempCheckOut}`
+                                        : "날짜 선택"}
+                                </span>
+                                <FaCalendarAlt className="ml-2 text-yellow-500" />
+                            </button>
+                        </div>
+                        {/* 인원 수 선택 */}
+                        <div className="flex items-center justify-center mt-4 gap-4">
+                            <label className="text-base text-gray-700 flex items-center gap-2">
+                                <FaUserFriends className="text-yellow-500" />
+                                인원
+                            </label>
+                            <button
+                                onClick={() => setTempGuests((prev) => Math.max(1, parseInt(prev) - 1))}
+                                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                                type="button"
+                            >
+                                −
+                            </button>
+                            <span className="text-base font-semibold">{tempGuests}명</span>
+                            <button
+                                onClick={() => setTempGuests((prev) => Math.min(10, parseInt(prev) + 1))}
+                                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                                type="button"
+                            >
+                                ＋
+                            </button>
+                        </div>
+                        {/* 적용 버튼 */}
+                        <div className="flex justify-end mt-8">
+                            <button
+                                onClick={() => {
+                                    setCheckIn(tempCheckIn);
+                                    setCheckOut(tempCheckOut);
+                                    setGuests(tempGuests);
+                                    setShowChangeModal(false);
+                                }}
+                                className="px-5 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition text-base font-semibold"
+                                disabled={!tempCheckIn || !tempCheckOut || !tempGuests}
+                                type="button"
+                            >
+                                적용
+                            </button>
+                        </div>
+                        {/* 닫기 버튼 */}
+                        <button
+                            onClick={() => setShowChangeModal(false)}
+                            className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-lg font-bold"
+                            aria-label="닫기"
+                            type="button"
+                        >
+                            ×
+                        </button>
+                    </div>
+                    {/* 날짜 선택 모달 중첩 */}
+                    {showDateRangeModal && (
+                        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/60">
+                            <div className="bg-white rounded-lg shadow-lg p-4 relative min-w-[320px]">
+                                <DateRangeModal
+                                    isOpen={showDateRangeModal}
+                                    onClose={() => setShowDateRangeModal(false)}
+                                    onSelect={({ checkIn: newCheckIn, checkOut: newCheckOut }) => {
+                                        setTempCheckIn(newCheckIn);
+                                        setTempCheckOut(newCheckOut);
+                                        setShowDateRangeModal(false);
+                                    }}
+                                    checkIn={tempCheckIn}
+                                    checkOut={tempCheckOut}
+                                />
+                                <button
+                                    onClick={() => setShowDateRangeModal(false)}
+                                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-lg font-bold"
+                                    aria-label="닫기"
+                                    type="button"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
             {/* 뒤로가기 */}
             <div className="mb-4">
                 <button
@@ -417,6 +567,54 @@ function Accommodation({ accommodationId, sectionRefs }) {
                 </div>
             </section>
 
+            {data.company && (
+                <section
+                    id="company"
+                    ref={(el) => (sectionRefs.current["company"] = el)}
+                    data-id="company"
+                    className="w-full mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6"
+                >
+                    <h2 className="text-lg font-bold mb-3">숙소 제공 회사</h2>
+                    <div className="text-sm text-gray-700 space-y-1">
+                        <p><strong>회사명:</strong> {data.company.name}</p>
+                        <p><strong>대표자:</strong> {data.company.ownerName}</p>
+                        <p><strong>전화:</strong> {data.company.phone}</p>
+                        <p><strong>이메일:</strong> {data.company.email}</p>
+                        <p><strong>주소:</strong> {data.company.address}</p>
+                    </div>
+
+                    {/* 문의하기 버튼들 */}
+                    <div className="mt-4 flex gap-2 flex-wrap">
+                        <a
+                            href={`tel:${data.company.phone}`}
+                            className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+                        >
+                            <FaPhoneAlt /> {data.company.phone}
+                        </a>
+
+                        <button
+                            onClick={() => setShowInquiryModal(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                        >
+                            <FaEnvelope /> 1:1 문의
+                        </button>
+                    </div>
+
+                    {/* 1:1 문의 모달 */}
+                    {showInquiryModal && (
+                        <InquiryModal
+                            onClose={() => setShowInquiryModal(false)}
+                            accommodationId={accommodationId}
+                            userId={user?.userId}
+                        />
+                    )}
+                </section>
+            )}
+
+
+
+
+
             {/* 리뷰 */}
             <section
                 id="reviews"
@@ -527,3 +725,5 @@ function Accommodation({ accommodationId, sectionRefs }) {
 }
 
 export default Accommodation;
+// Refresh accommodation data after 변경하기 (when checkIn/checkOut/guests change)
+// Already handled by useEffect([accommodationId, checkIn, checkOut, guests, userId])

@@ -52,7 +52,7 @@ function BannerSection({
 
             {/* 검색창 */}
             <div className="absolute top-[28%] sm:top-[42%] md:top-[38%] w-full px-4 z-30">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-6xl mx-auto">
                     <SearchBox
                         location={location}
                         setLocation={setLocation}

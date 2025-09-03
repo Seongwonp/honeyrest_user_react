@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from '@/api/axios';
 
 export const useAuth = () => {
     const [user, setUser] = useState(null);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+    // 🔑 무한루프 방지용 ref
+    const isSyncingRef = useRef(false);
 
     const loadUser = () => {
         console.log('[useAuth] 🔄 loadUser() 호출됨');
@@ -49,6 +52,9 @@ export const useAuth = () => {
     };
 
     const syncUserFromServer = async () => {
+        if (isSyncingRef.current) return; // 🔒 이미 동기화 중이면 바로 return
+        isSyncingRef.current = true;
+
         console.log('[useAuth] 🌐 서버에서 유저 정보 동기화 시작');
 
         try {
@@ -69,6 +75,8 @@ export const useAuth = () => {
         } catch (err) {
             console.error('[useAuth] ❌ 서버 요청 실패:', err);
             setUser(null);
+        } finally {
+            isSyncingRef.current = false; // 🔓 동기화 완료
         }
     };
 
@@ -84,5 +92,5 @@ export const useAuth = () => {
     }, []);
 
     const isLoggedIn = !!user?.userId;
-    return { user, isLoggedIn ,isLoadingUser ,loadUser, syncUserFromServer, logout };
+    return { user, isLoggedIn, isLoadingUser, loadUser, syncUserFromServer, logout };
 };

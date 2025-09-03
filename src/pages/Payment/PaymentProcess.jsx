@@ -6,10 +6,11 @@ export default function PaymentProcess() {
     const { state } = useLocation();
     const [widgets, setWidgets] = useState(null);
     const [ready, setReady] = useState(false);
-    const [amount, setAmount] = useState({
+
+    const amount = {
         currency: "KRW",
         value: state?.finalPrice || 0,
-    });
+    };
 
     useEffect(() => {
         async function initWidgets() {
@@ -57,11 +58,12 @@ export default function PaymentProcess() {
             ? baseCode
             : `${baseCode}-${state.guestPassword}`;
 
-        // ✅ 예약 정보 sessionStorage에 저장
+        // ✅ 예약 정보 저장
         sessionStorage.setItem("reservationInfo", JSON.stringify({
             userId: state.userId,
             guestName: state.guestName,
             guestPhone: state.guestPhone,
+            guestEmail: state.guestEmail || "guest@example.com",
             accommodationId: state.accommodationId,
             reservationCode: orderId,
             roomId: state.roomId,
@@ -69,11 +71,16 @@ export default function PaymentProcess() {
             checkOut: state.checkOut,
             guests: state.guests,
             couponId: state.couponId,
+            couponName: state.couponName,
+            discountAmount: state.discountAmount,
+            originalPrice: state.originalPrice,
+            usedPoint: state.usedPoint || 0,
+            finalPrice: state.finalPrice,
             isEmailSend: state.isEmailSend,
             specialRequest: state.specialRequest,
-            originalPrice: state.originalPrice,
-            discountAmount: state.discountAmount,
-            couponName: state.couponName,
+            paymentMethod: state.paymentMethod,
+            accommodationName: state.accommodationName,
+            roomName: state.roomName,
         }));
 
         try {
@@ -102,18 +109,24 @@ export default function PaymentProcess() {
                     <Info label="체크인" value={state?.checkIn} />
                     <Info label="체크아웃" value={state?.checkOut} />
                     <Info label="인원" value={`${state?.guests}명`} />
-                    <Info label="유저" value={`${state?.userId}`}/>
                     <Info label="예약자" value={state?.guestName} />
                     <Info label="전화번호" value={state?.guestPhone} />
                     <Info label="이메일" value={state?.guestEmail || "미입력"} />
+                    <Info label="유저 ID" value={state?.userId || "비회원"} />
+                    <Info label="쿠폰" value={state?.couponName || "미사용"} />
                     <Info label="쿠폰 적용" value={state?.couponId ? "사용됨" : "미사용"} />
                     <Info label="원가" value={state?.originalPrice ? `${state.originalPrice.toLocaleString()}원` : "-"} />
                     <Info label="할인 금액" value={state?.discountAmount ? `-${state.discountAmount.toLocaleString()}원` : "0원"} />
-                    <Info label="쿠폰" value={state?.couponName || "미사용"} />
+                    <Info label="사용한 포인트" value={state?.usedPoint ? `-${state.usedPoint.toLocaleString()}P` : "0P"} />
                 </div>
 
                 <div className="text-right text-lg font-semibold text-blue-600">
                     최종 결제 금액: {amount.value.toLocaleString()}원
+                    {state?.usedPoint > 0 && (
+                        <div className="text-sm text-gray-500 mt-1">
+                            포인트 사용: -{state.usedPoint.toLocaleString()}P
+                        </div>
+                    )}
                 </div>
             </div>
 

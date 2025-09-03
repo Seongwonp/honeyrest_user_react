@@ -13,7 +13,7 @@ import {
     FaCreditCard,
     FaMobileAlt,
     FaMoneyCheckAlt,
-    FaArrowLeft,
+    FaArrowLeft, FaCoins,
 } from "react-icons/fa";
 
 export default function Reservation() {
@@ -57,14 +57,16 @@ export default function Reservation() {
         accommodationAddress,
         roomName,
         cancellationPolicy,
-        availableCoupons = []
+        availableCoupons = [],
+        availablePoints = 0
     } = state;
 
     const [form, setForm] = useState({
         guestName: userName || "",
         guestPhone: userPhone || "",
         specialRequest: "",
-        couponId: ""
+        couponId: "",
+        usedPoint:0
     });
 
     const [selectedCoupon, setSelectedCoupon] = useState(null);
@@ -72,37 +74,45 @@ export default function Reservation() {
     const [finalPrice, setFinalPrice] = useState(originalPrice);
 
     useEffect(() => {
-        if (!form.couponId) {
-            setSelectedCoupon(null);
-            setDiscountAmount(0);
-            setFinalPrice(originalPrice);
+        let discount = 0;
+        if (form.couponId) {
+            const coupon = availableCoupons.find(c => String(c.couponId) === String(form.couponId));
+            if (coupon) {
+                setSelectedCoupon(coupon);
+                if (coupon.discountType === "PERCENT") {
+                    discount = originalPrice * (coupon.discountValue / 100);
+                    if (coupon.maxOrderAmount && discount > coupon.maxOrderAmount) {
+                        discount = coupon.maxOrderAmount;
+                    }
+                } else {
+                    discount = coupon.discountValue;
+                }
+            }
+        }
+
+        const pointDiscount = Math.min(form.usedPoint || 0, availablePoints);
+        const totalDiscount = Math.floor(discount) + pointDiscount;
+        const final = Math.max(originalPrice - totalDiscount, 0);
+
+        setDiscountAmount(Math.floor(discount));
+        setFinalPrice(final);
+    }, [form.couponId, form.usedPoint, originalPrice, availableCoupons, availablePoints]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        // 포인트 입력일 경우 제한 처리
+        if (name === "usedPoint") {
+            let point = parseInt(value, 10);
+            if (isNaN(point)) point = 0;
+            if (point < 0) point = 0;
+            if (point > availablePoints) point = availablePoints;
+
+            setForm((prev) => ({ ...prev, usedPoint: point }));
             return;
         }
 
-        const coupon = availableCoupons.find(c => String(c.couponId) === String(form.couponId));
-        if (!coupon) return;
-
-        setSelectedCoupon(coupon);
-
-        let discount = 0;
-        if (coupon.discountType === "PERCENT") {
-            discount = originalPrice * (coupon.discountValue / 100);
-            if (coupon.maxOrderAmount && discount > coupon.maxOrderAmount) {
-                discount = coupon.maxOrderAmount;
-            }
-        } else {
-            discount = coupon.discountValue;
-        }
-
-        if (discount > originalPrice) discount = originalPrice;
-
-        setDiscountAmount(Math.floor(discount));
-        setFinalPrice(originalPrice - Math.floor(discount));
-    }, [form.couponId, originalPrice, availableCoupons]);
-
-    const handleChange = (e) => {
-        const {name, value} = e.target;
-        setForm((prev) => ({...prev, [name]: value}));
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handlePayment = () => {
@@ -128,6 +138,7 @@ export default function Reservation() {
             discountAmount: discountAmount,     // 추가
             couponName: selectedCoupon?.name || null, // 추가
             couponId: form.couponId || null,
+            usedPoint: form.usedPoint || 0,
             userId,
             isEmailSend: agreements.email,
             paymentMethod,
@@ -160,13 +171,14 @@ export default function Reservation() {
                 <h2 className="text-2xl font-bold">예약 정보 입력 및 결제</h2>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
                 {/* 좌측 영역 */}
                 <div className="lg:col-span-2 space-y-8">
 
                     {/* 예약자 이름 */}
                     <div className="bg-white shadow rounded-lg p-6">
                         <label className="font-semibold mb-1 flex items-center gap-2">
-                            <FaUserAlt className="text-gray-500"/>
+                            <FaUserAlt className="text-gray-500" />
                             예약자 이름 <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -183,7 +195,7 @@ export default function Reservation() {
                     {/* 전화번호 */}
                     <div className="bg-white shadow rounded-lg p-6">
                         <label className="font-semibold mb-1 flex items-center gap-2">
-                            <FaPhoneAlt className="text-gray-500"/>
+                            <FaPhoneAlt className="text-gray-500" />
                             전화번호 <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -203,7 +215,7 @@ export default function Reservation() {
                     {/* 특별 요청사항 */}
                     <div className="bg-white shadow rounded-lg p-6">
                         <label className="font-semibold mb-1 flex items-center gap-2">
-                            <FaStickyNote className="text-gray-500"/> 특별 요청사항
+                            <FaStickyNote className="text-gray-500" /> 특별 요청사항
                         </label>
                         <textarea
                             name="specialRequest"
@@ -217,7 +229,7 @@ export default function Reservation() {
                     {/* 쿠폰 선택 */}
                     <div className="bg-white shadow rounded-lg p-6">
                         <label className="font-semibold mb-1 flex items-center gap-2">
-                            <FaTicketAlt className="text-gray-500"/> 쿠폰 선택 (선택)
+                            <FaTicketAlt className="text-gray-500" /> 쿠폰 선택 (선택)
                         </label>
                         {availableCoupons.length > 0 ? (
                             <select
@@ -240,10 +252,36 @@ export default function Reservation() {
                         )}
                     </div>
 
+                    {/* 포인트 사용 */}
+                    {availablePoints !== null && (
+                        <div className="bg-white shadow rounded-lg p-6">
+                            <label className="font-semibold mb-1 flex items-center gap-2">
+                                <FaCoins className="text-yellow-500" />
+                                포인트 사용 <span className="text-gray-400 text-sm">(선택)</span>
+                            </label>
+                            <div className="text-sm text-gray-500 mb-2">
+                                사용 가능한 포인트: <span className="font-semibold text-yellow-500">{availablePoints.toLocaleString()}P</span>
+                            </div>
+                            <input
+                                type="number"
+                                name="usedPoint"
+                                value={form.usedPoint}
+                                onChange={handleChange}
+                                className="w-full border px-3 py-2 rounded"
+                                placeholder="사용할 포인트 입력"
+                                min={0}
+                                max={availablePoints}
+                            />
+                            <div className="text-xs text-gray-400 mt-1">
+                                ※ 최대 {availablePoints.toLocaleString()}P까지 사용 가능
+                            </div>
+                        </div>
+                    )}
+
                     {/* 취소 정책 */}
                     <div className="bg-white shadow rounded-lg p-6">
                         <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                            <FaShieldAlt className="text-gray-500"/> 취소 정책
+                            <FaShieldAlt className="text-gray-500" /> 취소 정책
                         </h3>
                         <ul className="list-disc list-inside text-sm text-gray-600">
                             {cancellationPolicy.map((policy, idx) => (
@@ -276,8 +314,7 @@ export default function Reservation() {
 
                         {paymentMethod && (
                             <p className="mt-3 text-sm text-gray-600 flex items-center gap-2">
-                                선택된 결제
-                                방식: <strong>{paymentOptions.find(opt => opt.value === paymentMethod)?.label}</strong>
+                                선택된 결제 방식: <strong>{paymentOptions.find(opt => opt.value === paymentMethod)?.label}</strong>
                             </p>
                         )}
                     </div>
@@ -468,6 +505,12 @@ export default function Reservation() {
                                 <div className="flex justify-between text-yellow-500">
                                     <span>{selectedCoupon.name}</span>
                                     <span>-{discountAmount.toLocaleString()}원</span>
+                                </div>
+                            )}
+                            {availablePoints && form.usedPoint > 0 && (
+                                <div className="flex justify-between text-blue-500">
+                                    <span>포인트 사용</span>
+                                    <span>-{form.usedPoint.toLocaleString()}원</span>
                                 </div>
                             )}
                             <div className="border-t pt-2 mt-2 flex justify-between font-bold text-lg">

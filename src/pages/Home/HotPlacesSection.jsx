@@ -1,7 +1,20 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Slider from "react-slick";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, verticalSliderSettings, navigate, userInfo }) {
+    const [hotList, setHotList] = useState([]);
+
+    useEffect(() => {
+        axios.get("/api/region/hot?topN=8")
+            .then(res => {
+                setHotList(res.data);
+            })
+            .catch(err => {
+                console.error("핫 여행지 불러오기 실패:", err);
+            });
+    }, []);
     const handlePlaceClick = (placeName) => {
         const today = new Date().toISOString().split("T")[0];
         const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
@@ -30,13 +43,13 @@ function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, vertic
 
                 <div className="flex-1 max-h-10 overflow-hidden">
                     <Slider {...verticalSliderSettings}>
-                        {hotPlaces.map((place, idx) => (
+                        {hotList.map((place, idx) => (
                             <div
                                 key={idx}
                                 className="bg-gray-50 rounded-md px-3 py-1 text-sm text-gray-700 hover:bg-yellow-50 transition text-center cursor-pointer"
-                                onClick={() => handlePlaceClick(place)}
+                                onClick={() => handlePlaceClick(place.name)}
                             >
-                                {place}
+                                {place.name}
                             </div>
                         ))}
                     </Slider>
@@ -53,14 +66,15 @@ function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, vertic
             {isDropdownOpen && (
                 <div className="absolute top-full left-0 w-full z-10 mt-2">
                     <ul className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-white rounded-xl shadow-lg p-3 border border-gray-200">
-                        {hotPlaces.map((place, idx) => (
+                        {hotList.map((place, idx) => (
                             <li
                                 key={idx}
                                 className="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-lg hover:bg-yellow-50 transition transform hover:scale-105 cursor-pointer shadow-sm"
-                                onClick={() => handlePlaceClick(place)}
+                                onClick={() => handlePlaceClick(place.name)}
                             >
                                 <span className="text-sm font-semibold text-gray-500">{idx + 1}</span>
-                                <span className="text-sm font-medium text-gray-800">{place}</span>
+                                <span className="text-sm font-medium text-gray-800">{place.name}</span>
+                                <span className="text-xs text-gray-400">{place.searchCount}회</span>
                             </li>
                         ))}
                     </ul>

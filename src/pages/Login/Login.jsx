@@ -168,8 +168,17 @@ function Login() {
                             className="text-yellow-600 hover:underline cursor-pointer"
                             onClick={() => navigate("/signup")}
                         >
-              회원가입
-            </span>
+        회원가입
+    </span>
+                    </p>
+
+                    <p className="text-sm text-center text-gray-500 mt-2">
+    <span
+        className="text-blue-600 hover:underline cursor-pointer"
+        onClick={() => navigate("/reset-password")}
+    >
+        비밀번호를 잊으셨나요?
+    </span>
                     </p>
                 </div>
             </div>
