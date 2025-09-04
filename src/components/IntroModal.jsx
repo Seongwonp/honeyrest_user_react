@@ -28,8 +28,19 @@ function IntroModal() {
     if (!showModal) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-            <div className="w-full max-w-[95vw] sm:max-w-4xl bg-black rounded-xl overflow-hidden shadow-2xl flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={handleClose}>
+            {/* 배경 검정은 바로 나타나도록 */}
+            <div className="absolute inset-0 bg-black/70"></div>
+
+            {/* 모달 콘텐츠만 애니메이션 적용 */}
+            <motion.div
+                className="relative w-full max-w-[95vw] sm:max-w-4xl bg-black rounded-xl overflow-hidden shadow-2xl flex flex-col z-10"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                onClick={(e) => e.stopPropagation()}
+            >
 
                 {/* 🎥 영상 영역 */}
                 <div className="relative w-full h-[75vh] sm:h-[500px]">
@@ -77,7 +88,7 @@ function IntroModal() {
                         하루 동안 보지 않기
                     </label>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 }

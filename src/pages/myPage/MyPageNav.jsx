@@ -9,6 +9,7 @@ function MyPageNav() {
         { label: "찜 목록", path: "wishList" },
         { label: "내 문의 내역", path: "inquiries" },
         { label: "쿠폰 목록", path: "coupons" },
+        { label: "포인트 내역", path: "points" },
     ];
 
     return (

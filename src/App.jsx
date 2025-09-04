@@ -33,7 +33,6 @@ function GlobalGuard() {
                 const newAccessToken = res.data;
                 const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
                 storage.setItem('accessToken', newAccessToken);
-                toast.success('로그인되었습니다!');
                 syncUserFromServer();
             })
             .catch(err => {

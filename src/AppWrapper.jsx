@@ -50,6 +50,8 @@ import InquiryList from "@/pages/myPage/Inquiry/InquiryList.jsx";
 import CouponList from "@/pages/myPage/Coupon/CouponList.jsx";
 import Inquiry from "@/pages/myPage/Inquiry/Inquiry.jsx";
 import IntroModal from "@/components/IntroModal.jsx";
+import PointHistory from "@/pages/myPage/Point/PointHistory.jsx";
+import EventDetail from "@/pages/Home/Event/EventDetail.jsx";
 
 function InquiryDetail() {
     return null;
@@ -147,6 +149,8 @@ function AppWrapper() {
 
                         {/* 쿠폰 페이지 */}
                         <Route path="coupons" element={<CouponList />} />
+
+                        <Route path="points" element={<PointHistory/>}/>
                     </Route>
 
                     <Route path="/verify-email-change" element={<VerifyEmailChange />} />
@@ -163,7 +167,7 @@ function AppWrapper() {
                     <Route path="/reserve/guest/form" element={<ReserveGuestForm/>}/>
                     <Route path="/reservation/lookup" element={<ReserveGuestLookUp/>}/>
 
-
+                    <Route path="/events/:id" element={<EventDetail />} />
                 </Route>
             </Routes>
             <ToastContainer position="top-right" autoClose={3000}/>

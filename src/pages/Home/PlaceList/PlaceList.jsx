@@ -39,28 +39,33 @@ function PlaceList() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {places.map((place, idx) => (
-                    <div
+                    <a
+                        href={`/accommodations/${place.id}`}
+                        className="block"
                         key={idx}
-                        className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition"
-                        data-aos="fade-up"
-                        data-aos-delay={idx * 100}
                     >
-                        <img src={place.image} alt={place.title} className="w-full h-48 object-cover"/>
-                        <div className="p-4">
-                            <h3 className="text-lg font-semibold text-[#4B5563]">{place.title}</h3>
-                            <p className="text-sm text-gray-500">{place.location}</p>
-                            <div className="flex justify-between items-center mt-3">
-                                <span className="flex items-center text-yellow-600 font-bold">
-                                    ₩{new Intl.NumberFormat("ko-KR").format(place.price)}
-                                    <span className="text-xs text-gray-500 ml-1">/ 1박</span>
-                                </span>
-                                <span className="flex items-center text-sm text-gray-700">
-                                    <FaStar className="mr-1 text-yellow-500" />
-                                    {place.rating}
-                                </span>
+                        <div
+                            className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition"
+                            data-aos="fade-up"
+                            data-aos-delay={idx * 100}
+                        >
+                            <img src={place.image} alt={place.title} className="w-full h-48 object-cover"/>
+                            <div className="p-4">
+                                <h3 className="text-lg font-semibold text-[#4B5563]">{place.title}</h3>
+                                <p className="text-sm text-gray-500">{place.location}</p>
+                                <div className="flex justify-between items-center mt-3">
+                                    <span className="flex items-center text-yellow-600 font-bold">
+                                        ₩{new Intl.NumberFormat("ko-KR").format(place.price)}
+                                        <span className="text-xs text-gray-500 ml-1">/ 1박</span>
+                                    </span>
+                                    <span className="flex items-center text-sm text-gray-700">
+                                        <FaStar className="mr-1 text-yellow-500" />
+                                        {place.rating}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 ))}
             </div>
         </div>

@@ -155,15 +155,28 @@ function Home() {
 
             {/* 핫플레이스 + 날씨 */}
             <div className="px-4 md:px-10 mt-10">
-                <div className="bg-gradient-to-r from-white rounded-3xl p-8 w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-                    <HotPlacesSection
-                        isDropdownOpen={isDropdownOpen}
-                        setIsDropdownOpen={setIsDropdownOpen}
-                        verticalSliderSettings={verticalSliderSettings}
-                        navigate={navigate}
-                        userInfo={userInfo}
-                    />
-                    <WeatherWidget coords={coords} locationError={locationError} />
+                <div className="bg-gradient-to-r from-white rounded-3xl p-8 w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center">
+                    <div className="rounded-2xl overflow-hidden shadow-lg col-span-1 md:col-span-2 h-[400px] md:h-[500px]">
+                        <video
+                            src="/src/assets/videos/video2.mp4"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full  rounded-2xl"
+                            style={{ aspectRatio: "16/9" }}
+                        />
+                    </div>
+                    <div className="md:col-span-1 flex flex-col gap-3 scale-90">
+                        <HotPlacesSection
+                            isDropdownOpen={isDropdownOpen}
+                            setIsDropdownOpen={setIsDropdownOpen}
+                            verticalSliderSettings={verticalSliderSettings}
+                            navigate={navigate}
+                            userInfo={userInfo}
+                        />
+                        <WeatherWidget coords={coords} locationError={locationError} />
+                    </div>
                 </div>
             </div>
 

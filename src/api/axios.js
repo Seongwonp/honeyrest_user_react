@@ -49,7 +49,6 @@ export const attachErrorInterceptor = (navigate) => {
                     getStorage().setItem('accessToken', newAccessToken);
 
                     err.config.headers.Authorization = `Bearer ${newAccessToken}`;
-                    console.log('[API] 🔄 AccessToken 재발급 성공 → 요청 재시도');
                     isRefreshing = false;
                     return api(err.config);
                 } catch (refreshErr) {
