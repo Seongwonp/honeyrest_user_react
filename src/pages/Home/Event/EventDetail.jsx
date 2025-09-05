@@ -37,7 +37,7 @@ function EventDetail() {
             </div>
 
             <div className="mt-6 text-sm text-gray-500 italic">
-                {event.startDate} ~ {event.endDate}
+                {event.startDate.split("T")[0]} ~ {event.endDate.split("T")[0]}
             </div>
 
             {event.targetUrl && (

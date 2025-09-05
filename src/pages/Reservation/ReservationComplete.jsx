@@ -65,7 +65,6 @@ export default function ReservationComplete() {
                         <Info icon={<FaUsers />} label="인원" value={`${guests}명`} />
                         <Info icon={<FaUser />} label="예약자" value={guestName} />
                         <Info icon={<FaPhone />} label="전화번호" value={guestPhone} />
-                        <Info icon={<FaEnvelope />} label="이메일" value={guestEmail || "미입력"} />
                         <Info icon={<FaTicketAlt />} label="쿠폰" value={couponName || "없음"} />
                         <div className="flex items-center space-x-2 text-[#374151] text-sm">
                             <FaEnvelope className="text-[#fbbf24]" />

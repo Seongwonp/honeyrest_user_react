@@ -8,7 +8,7 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'http://localhost:8080', // Spring 서버 주소
+                target: 'http://175.45.195.90:8080', // Spring 서버 주소
                 changeOrigin: true,
             },
         },
