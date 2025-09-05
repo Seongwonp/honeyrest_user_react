@@ -20,7 +20,7 @@ import Logout from './pages/Login/Logout.jsx';
 import KakaoCallback from './pages/Login/kakao/KakaoCallback.jsx';
 import GoogleCallback from './pages/Login/google/GoogleCallback.jsx';
 import MyPageMain from './pages/myPage/MyPageMain.jsx';
-import AccommodationLayout from './pages/Accommodations/AccommodationLayout.jsx';
+import AccommodationLayout from './pages/Accommodations/AccommodationLayOut.jsx';
 import {attachErrorInterceptor} from './api/axios.js';
 
 import PublicRoute from './routes/PublicRoute.jsx';
