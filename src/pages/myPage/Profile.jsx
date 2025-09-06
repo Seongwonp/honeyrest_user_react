@@ -124,12 +124,17 @@ export default function Profile() {
         setShowPasswordModal(true);
     };
 
-    const onPasswordVerifiedForDeletion = async (verified) => {
+    const onPasswordVerified = async (verified) => {
         setShowPasswordModal(false);
         setIsVerified(verified);
-        if (verified && pendingAccountDeletion) {
-            setPendingAccountDeletion(false);
-            await handleAccountDeletion();
+        if (verified) {
+            if (pendingAccountDeletion) {
+                setPendingAccountDeletion(false);
+                await handleAccountDeletion();
+            } else {
+                // 일반 회원 정보 수정 활성화
+                setIsEditing(true);
+            }
         }
     };
 
@@ -279,14 +284,7 @@ export default function Profile() {
             {/* 모달들 */}
             {showPasswordModal && (
                 <PasswordVerifyModal
-                    onSuccess={(verified) => {
-                        if (pendingAccountDeletion) {
-                            onPasswordVerifiedForDeletion(verified);
-                        } else {
-                            setIsVerified(verified);
-                            setShowPasswordModal(false);
-                        }
-                    }}
+                    onSuccess={onPasswordVerified}
                     onClose={() => {
                         setShowPasswordModal(false);
                         setPendingAccountDeletion(false);
