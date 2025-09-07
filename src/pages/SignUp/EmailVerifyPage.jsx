@@ -5,7 +5,7 @@ import axios from 'axios';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { FaExclamationCircle } from 'react-icons/fa';
-import verifyIcon from '../../assets/images/verified.gif';
+import verifyIcon from '/public/images/verified.gif';
 
 const EmailVerifyPage = () => {
     const [searchParams] = useSearchParams();
