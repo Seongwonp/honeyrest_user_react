@@ -4,7 +4,7 @@ import {
     FaClipboardList, FaCreditCard, FaEnvelope, FaTicketAlt, FaUser,
     FaPhone, FaCalendarAlt, FaDoorOpen, FaUsers
 } from "react-icons/fa";
-import verifiedGif from "/src/assets/images/verified.gif";
+import verifiedGif from "/public/images/verified.gif";
 
 export default function ReservationComplete() {
     const { state } = useLocation();

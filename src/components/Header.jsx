@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/images/logo-Photoroom.png';
-import defaultProfile from '../assets/images/default-profile.png';
+import logo from '/public/images/logo-Photoroom.png';
+import defaultProfile from '/public/images/default-profile.png';
 import {
     FaUserCircle, FaSignInAlt, FaSignOutAlt,
     FaUserPlus, FaBars, FaTimes, FaClipboardList

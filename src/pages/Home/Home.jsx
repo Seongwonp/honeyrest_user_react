@@ -158,7 +158,7 @@ function Home() {
                 <div className="bg-gradient-to-r from-white rounded-3xl p-8 w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center">
                     <div className="rounded-2xl overflow-hidden shadow-lg col-span-1 md:col-span-2 h-[400px] md:h-[500px]">
                         <video
-                            src="/src/assets/videos/video2.mp4"
+                            src="/public/videos/video2.mp4"
                             autoPlay
                             loop
                             muted
