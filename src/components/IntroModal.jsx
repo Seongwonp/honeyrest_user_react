@@ -45,7 +45,7 @@ function IntroModal() {
                 {/* 🎥 영상 영역 */}
                 <div className="relative w-full h-[75vh] sm:h-[500px]">
                     <video
-                        src="/public/videos/intro.mp4"
+                        src="/videos/intro.mp4"
                         autoPlay
                         muted={muted}
                         loop
