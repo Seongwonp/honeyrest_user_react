@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import logo from '/src/assets/images/logo-Photoroom.png';
+import logo from '/public/images/logo-Photoroom.png';
 import Header from "../../components/Header.jsx";
 import { FaUserPlus } from 'react-icons/fa';
 import { FiChevronDown } from 'react-icons/fi';
