@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import Swal from 'sweetalert2';
-import logo from '/src/assets/images/logo-Photoroom.png';
+import logo from '/public/images/logo-Photoroom.png';
 import { FaLock } from 'react-icons/fa';
 import Header from "../../components/Header.jsx";
 import KakaoLoginButton from "./kakao/KaKaoLoginButton.jsx";
