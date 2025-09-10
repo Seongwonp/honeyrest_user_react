@@ -159,7 +159,7 @@ export default function Profile() {
                 <div className="flex flex-col items-center md:items-start md:w-1/3">
                     <div className="relative">
                         <img
-                            src={user?.profileImage || "/default-profile.png"}
+                            src={user?.profileImage || "/images/default-profile.png"}
                             alt="프로필"
                             className="w-24 h-24 rounded-full object-cover border-2 border-yellow-400 shadow-md"
                         />

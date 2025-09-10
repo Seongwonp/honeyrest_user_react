@@ -35,7 +35,7 @@ function Header() {
 
     const handleAdminClick = () => {
         setMenuOpen(false);
-        window.open('#', '_blank'); // 배포 후 URL 교체
+        window.open('http://localhost:8082/', '_blank'); // 배포 후 URL 교체
     };
 
     const renderNavButtons = (isMobile = false) => (

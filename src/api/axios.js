@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const baseURL = import.meta.env.VITE_BACKEND_URL; // 백엔드 주소
+
 const api = axios.create({
-    baseURL: 'http://175.45.195.90:8080',
+    baseURL,
     withCredentials: true,
 });
 

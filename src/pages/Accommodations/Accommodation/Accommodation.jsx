@@ -463,11 +463,6 @@ function Accommodation({ accommodationId, sectionRefs }) {
                       </span>
                                         )}
                                     </div>
-
-                                    {room.description && (
-                                        <p className="text-base text-gray-500 mt-1">{room.description}</p>
-                                    )}
-
                                     {room.standardOccupancy && room.maxOccupancy && (
                                         <p className="text-base text-gray-500 mt-1 flex items-center gap-1">
                                             <FaUserFriends className="text-gray-400" />
@@ -488,7 +483,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                 className="w-full"
             >
                 <h2 className="text-lg font-bold mb-2">숙소 소개</h2>
-                {data.intro.split("/").map((line, idx) => (
+                {data.intro.split("\n\n").map((line, idx) => (
                     <p key={idx} className="text-base text-gray-700 mt-3">{line}</p>
                 ))}
             </section>

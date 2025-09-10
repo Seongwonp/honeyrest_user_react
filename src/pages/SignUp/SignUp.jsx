@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import logo from '/public/images/logo-Photoroom.png';
+import logo from '/images/logo-Photoroom.png';
 import Header from "../../components/Header.jsx";
 import { FaUserPlus } from 'react-icons/fa';
 import { FiChevronDown } from 'react-icons/fi';
+
+const getPasswordStrength = (password) => {
+    let score = 0;
+    if (!password) return 0;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    return score; // 0 ~ 4
+};
+
+const strengthLabels = ["매우 약함", "약함", "보통", "강함", "매우 강함"];
+const strengthColors = ["bg-gray-300", "bg-red-500", "bg-yellow-500", "bg-green-500", "bg-blue-600"];
 
 const termsList = [
     {
@@ -196,6 +209,56 @@ function Signup() {
 
                             <label className="block text-sm font-medium text-gray-700">비밀번호<span className="text-red-500">*</span></label>
                             <input name="password" type="password" placeholder="비밀번호" value={form.password} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-md" />
+                            {/* Password requirements */}
+                            <div className="mt-2 mb-1 text-xs text-gray-500">
+                              <ul className="list-disc pl-5 space-y-0.5">
+                                <li>8자 이상 20자 이하로 입력해주세요.</li>
+                                <li>영문 대소문자, 숫자, 특수문자 중 2가지 이상 조합이 권장됩니다.</li>
+                                <li>보안을 위해 가능한 한 긴 비밀번호를 사용하는 것이 좋습니다.</li>
+                              </ul>
+                            </div>
+                            <br/>
+                            {form.password && (
+                                <div className="space-y-1 text-sm text-gray-600 mt-2">
+                                    <div>
+                                        비밀번호 강도:{' '}
+                                        <span className={
+                                            getPasswordStrength(form.password) === 4 ? 'text-green-600' :
+                                            getPasswordStrength(form.password) === 3 ? 'text-lime-500' :
+                                            getPasswordStrength(form.password) === 2 ? 'text-yellow-500' :
+                                            getPasswordStrength(form.password) === 1 ? 'text-orange-500' :
+                                            'text-red-500'
+                                        }>
+                                            {strengthLabels[getPasswordStrength(form.password)]}
+                                        </span>
+                                    </div>
+                                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full transition-all duration-300 ${
+                                                getPasswordStrength(form.password) === 1
+                                                    ? 'bg-red-500 w-1/5'
+                                                    : getPasswordStrength(form.password) === 2
+                                                        ? 'bg-orange-500 w-2/5'
+                                                        : getPasswordStrength(form.password) === 3
+                                                            ? 'bg-yellow-500 w-3/5'
+                                                            : getPasswordStrength(form.password) === 4
+                                                                ? 'bg-lime-500 w-full'
+                                                                : getPasswordStrength(form.password) === 5
+                                                                    ? 'bg-green-500 w-full'
+                                                                    : 'w-0'
+                                            }`}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-gray-400">
+                                        {getPasswordStrength(form.password) === 0 ? '' :
+                                         getPasswordStrength(form.password) === 1 ? '비밀번호가 너무 짧습니다.' :
+                                         getPasswordStrength(form.password) === 2 ? '최소 기준은 충족했지만 보안에 취약할 수 있습니다.' :
+                                         getPasswordStrength(form.password) === 3 ? '일반적인 보안 수준입니다.' :
+                                         getPasswordStrength(form.password) === 4 ? '안전한 비밀번호입니다.' :
+                                         '매우 안전한 비밀번호입니다.'}
+                                    </p>
+                                </div>
+                            )}
 
                             <label className="block text-sm font-medium text-gray-700">비밀번호 확인<span className="text-red-500">*</span></label>
                             <input name="confirmPassword" type="password" placeholder="비밀번호 확인" value={form.confirmPassword} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-md" />

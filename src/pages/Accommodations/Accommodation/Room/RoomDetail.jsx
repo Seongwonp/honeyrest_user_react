@@ -145,7 +145,11 @@ export default function RoomDetail() {
             {/* 상세 설명 */}
             <div className="mt-8">
                 <h3 className="font-semibold text-xl mb-3 text-gray-800">상세 설명</h3>
-                <p className="text-gray-600 leading-relaxed text-base">{roomDetail.description}</p>
+                <div className="text-gray-600 leading-relaxed text-base space-y-2">
+                    {roomDetail.description.split("\n\n").map((desc, idx) => (
+                        <p key={idx}>{desc.trim()}</p>
+                    ))}
+                </div>
             </div>
 
             {/* 리뷰 섹션 */}
