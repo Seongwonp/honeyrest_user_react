@@ -63,6 +63,24 @@
 
 ---
 
+## 🔗 사용자 API 백엔드 바로가기
+
+> HoneyRest의 사용자(User) 영역 API 서버는 Spring Boot 기반으로 구성되어 있으며,  
+> 프론트엔드와 연동되는 모든 기능을 RESTful API로 제공합니다.
+
+📦 [User API GitHub 저장소 바로가기](https://github.com/Seongwonp/honeyRest_user)
+
+---
+
+### 📌 주요 기능 요약
+
+- 사용자 회원가입 / 로그인 / 소셜 로그인 (Google, Kakao)  
+- 숙소 검색 / 예약 / 리뷰 작성 / 마이페이지 관리  
+- Toss 결제 연동 / 이메일 인증 / Redis 기반 추천  
+- Swagger UI를 통한 API 문서 제공 (`/swagger-ui.html`)
+
+---
+
 ## 🙋‍♂️ 개발자 정보
 
 **박성원 (Seongwon Park)** – 사용자(User) 영역 총괄
