@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import axios from "axios";
 import CategorySelector from "./CategorySelector";
 
@@ -7,6 +7,8 @@ function PlaceList() {
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("전체");
     const [places, setPlaces] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(6);
 
     useEffect(() => {
         axios.get("/api/accommodations/categories").then((res) => {
@@ -21,11 +23,16 @@ function PlaceList() {
     }, []);
 
     useEffect(() => {
+        setCurrentPage(1);
         const params = selectedCategory === "전체" ? {} : {category: selectedCategory};
         axios
             .get("/api/accommodations/popular", {params})
             .then((res) => setPlaces(res.data));
     }, [selectedCategory]);
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentPlaces = places.slice(indexOfFirstItem, indexOfLastItem);
 
     return (
         <div className="max-w-screen-xl mx-auto px-4 py-10" data-aos="fade-up">
@@ -38,7 +45,7 @@ function PlaceList() {
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {places.map((place, idx) => (
+                {currentPlaces.map((place, idx) => (
                     <a
                         href={`/accommodations/${place.id}`}
                         className="block"
@@ -67,6 +74,23 @@ function PlaceList() {
                         </div>
                     </a>
                 ))}
+            </div>
+            <div className="flex justify-center gap-3 mt-6">
+                <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev-1, 1))}
+                    disabled={currentPage === 1}
+                    className={`px-3 py-1 rounded-lg shadow transition ${currentPage === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:shadow-lg'}`}
+                >
+                    <FaChevronLeft />
+                </button>
+                <span>{currentPage}</span>
+                <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev+1, Math.ceil(places.length/itemsPerPage)))}
+                    disabled={currentPage === Math.ceil(places.length/itemsPerPage)}
+                    className={`px-3 py-1 rounded-lg shadow transition ${currentPage === Math.ceil(places.length/itemsPerPage) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:shadow-lg'}`}
+                >
+                    <FaChevronRight />
+                </button>
             </div>
         </div>
     );
