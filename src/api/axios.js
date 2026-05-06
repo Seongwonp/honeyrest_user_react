@@ -15,10 +15,13 @@ let refreshPromise = null;
 const getStorage = () =>
     localStorage.getItem('accessToken') ? localStorage : sessionStorage;
 
-// 로그아웃 처리 함수
+const AUTH_KEYS = ['accessToken', 'userInfo'];
+
 const handleLogout = (navigate) => {
-    localStorage.clear();
-    sessionStorage.clear();
+    AUTH_KEYS.forEach(key => {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+    });
     toast.error('세션이 만료되었습니다. 다시 로그인해주세요.');
     navigate('/login');
 };

@@ -30,6 +30,7 @@ const useApiRequest = () => {
         }
 
         let attempt = 0;
+        let lastError;
 
         while (attempt <= retry) {
             try {
@@ -40,8 +41,18 @@ const useApiRequest = () => {
                 }
 
                 if (onSuccess) onSuccess(response.data);
+                setLoading(label, false);
                 return response.data;
             } catch (error) {
+                lastError = error;
+
+                if (error.name === 'CanceledError') break;
+
+                if (attempt < retry) {
+                    attempt += 1;
+                    continue;
+                }
+
                 const message =
                     error.response?.data?.message ||
                     error.message ||
@@ -51,18 +62,13 @@ const useApiRequest = () => {
                     toast.error(errorMessage || message);
                 }
 
-
                 if (onError) onError(error);
-
-                if (attempt === retry || error.name === 'CanceledError') {
-                    throw error;
-                }
-
-                attempt += 1;
-            } finally {
-                setLoading(label, false);
+                break;
             }
         }
+
+        setLoading(label, false);
+        if (lastError) throw lastError;
     };
 
     const abort = () => {
