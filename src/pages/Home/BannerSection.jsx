@@ -16,9 +16,9 @@ function BannerSection({
                            getTomorrow,
                        }) {
     return (
-        <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
+        <section className="relative w-full h-[600px] md:h-[700px]">
             {/* 배경 이미지 & 그라데이션 오버레이 */}
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 overflow-hidden">
                 {randomBanner?.imageUrl ? (
                     <img
                         src={randomBanner.imageUrl}
