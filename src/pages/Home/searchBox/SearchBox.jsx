@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { HiOutlineSearch } from "react-icons/hi";
-import { FiCalendar } from "react-icons/fi";
-import { FaUserFriends } from "react-icons/fa";
+import { HiOutlineSearch, HiLocationMarker } from "react-icons/hi";
+import { FiCalendar, FiUsers, FiMinus, FiPlus } from "react-icons/fi";
 import { differenceInCalendarDays } from "date-fns";
 import DateRangeModal from "./DateRangeModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 function SearchBox({
                        location,
@@ -18,6 +18,7 @@ function SearchBox({
                        handleSearch,
                    }) {
     const [showCalendar, setShowCalendar] = useState(false);
+    const [isGuestOpen, setIsGuestOpen] = useState(false);
 
     const safeCheckIn = checkIn ? new Date(checkIn) : null;
     const safeCheckOut = checkOut ? new Date(checkOut) : null;
@@ -28,89 +29,107 @@ function SearchBox({
             : 0;
 
     return (
-        <div className="relative z-30 px-4 max-sm:px-2">
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSearch();
-                }}
-                className="w-full max-w-6xl mx-auto px-4 py-6 bg-white/90 backdrop-blur-md rounded-2xl shadow-lg space-y-6 text-center"
-                data-aos="fade-up"
-                data-aos-delay="1100"
+        <div className="relative">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 }}
+                className="bg-white rounded-3xl md:rounded-full shadow-2xl p-2 md:p-3 flex flex-col md:flex-row items-stretch gap-2 md:gap-0 border border-gray-100"
             >
-                {/* 타이틀 */}
-                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 text-center">숙소 검색하기 🐝</h2>
-                <p className="text-sm sm:text-base text-gray-600 text-center">
-                    원하는 지역과 날짜를 선택하면 숙소를 빠르게 찾아드릴게요! ✈️
-                </p>
-
-                {/* 입력 필드들 */}
-                <div className="flex flex-col md:flex-row gap-4 items-stretch">
-                    {/* 지역 입력 */}
-                    <div className="flex items-center border rounded-lg px-4 py-3 bg-white shadow-sm flex-1">
-                        <HiOutlineSearch className="text-2xl text-yellow-400 mr-3" />
+                {/* 지역 검색 */}
+                <div className="flex-1 flex items-center gap-3 px-6 py-3 md:py-0 md:border-r border-gray-100 group">
+                    <HiLocationMarker className="text-honey-yellow text-2xl shrink-0 group-hover:scale-110 transition-transform" />
+                    <div className="flex-1">
+                        <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-0.5">Location</p>
                         <input
                             type="text"
-                            placeholder="지역 또는 도시명을 입력하세요"
+                            placeholder="어디로 떠나시나요?"
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
-                            className="w-full text-base outline-none bg-transparent placeholder-gray-400"
+                            className="w-full bg-transparent text-sm md:text-base font-semibold text-deep-gray outline-none placeholder-gray-300"
                         />
-                    </div>
-
-                    {/* 날짜 선택 */}
-                    <div
-                        onClick={() => setShowCalendar(true)}
-                        className="flex-2 border rounded-lg px-4 py-3 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition"
-                    >
-                        <div className="flex items-center mb-1">
-                            <FiCalendar className="text-2xl text-yellow-400 mr-3" />
-                            <span className="text-sm text-gray-500">날짜 선택</span>
-                        </div>
-                        <span className="text-base font-semibold block">
-              {checkIn && checkOut
-                  ? `${checkIn} ~ ${checkOut} (${nights}박)`
-                  : "날짜를 선택해주세요"}
-            </span>
-                    </div>
-
-                    {/* 인원 선택 */}
-                    <div className="flex-1 border rounded-lg px-4 py-3 bg-white shadow-sm">
-                        <div className="flex items-center mb-1">
-                            <FaUserFriends className="text-2xl text-yellow-400 mr-3" />
-                            <span className="text-sm text-gray-500">인원수 선택</span>
-                        </div>
-                        <div className="flex items-center justify-between gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setGuests((prev) => Math.max(1, prev - 1))}
-                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-lg font-bold text-base"
-                            >
-                                −
-                            </button>
-                            <span className="text-base font-semibold">
-                {guests >= 10 ? "10+명" : `${guests}명`}
-              </span>
-                            <button
-                                type="button"
-                                onClick={() => setGuests((prev) => Math.min(10, prev + 1))}
-                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-lg font-bold text-base"
-                            >
-                                ＋
-                            </button>
-                        </div>
                     </div>
                 </div>
 
-                {/* 검색 버튼 */}
-                <button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white font-bold py-3 rounded-lg shadow-md transition flex items-center justify-center gap-2 text-lg"
+                {/* 날짜 선택 */}
+                <div 
+                    onClick={() => setShowCalendar(true)}
+                    className="flex-1 flex items-center gap-3 px-6 py-3 md:py-0 md:border-r border-gray-100 cursor-pointer hover:bg-gray-50/50 transition-colors group"
                 >
-                    <HiOutlineSearch className="text-xl icon-shake" />
-                    검색하기
-                </button>
-            </form>
+                    <FiCalendar className="text-honey-yellow text-2xl shrink-0 group-hover:scale-110 transition-transform" />
+                    <div className="flex-1">
+                        <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-0.5">Check-in / Out</p>
+                        <p className={`text-sm md:text-base font-semibold ${checkIn ? 'text-deep-gray' : 'text-gray-300'}`}>
+                            {checkIn && checkOut ? `${checkIn} - ${checkOut} (${nights}박)` : '날짜를 선택하세요'}
+                        </p>
+                    </div>
+                </div>
+
+                {/* 인원 선택 */}
+                <div className="flex-1 relative">
+                    <div 
+                        onClick={() => setIsGuestOpen(!isGuestOpen)}
+                        className="h-full flex items-center gap-3 px-6 py-3 md:py-0 cursor-pointer hover:bg-gray-50/50 transition-colors group"
+                    >
+                        <FiUsers className="text-honey-yellow text-2xl shrink-0 group-hover:scale-110 transition-transform" />
+                        <div className="flex-1">
+                            <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-0.5">Guests</p>
+                            <p className="text-sm md:text-base font-semibold text-deep-gray">
+                                {guests}명
+                            </p>
+                        </div>
+                    </div>
+
+                    <AnimatePresence>
+                        {isGuestOpen && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setIsGuestOpen(false)} />
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className="absolute top-full mt-4 right-0 md:left-0 w-[240px] bg-white rounded-2xl shadow-2xl p-6 border border-gray-100 z-50"
+                                >
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div>
+                                            <p className="font-bold text-deep-gray">인원수</p>
+                                            <p className="text-xs text-gray-400">최대 10명</p>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => setGuests(prev => Math.max(1, prev - 1))}
+                                                className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 text-gray-600 transition-colors"
+                                            >
+                                                <FiMinus size={14} />
+                                            </button>
+                                            <span className="font-bold text-lg min-w-[20px] text-center">{guests}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setGuests(prev => Math.min(10, prev + 1))}
+                                                className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 text-gray-600 transition-colors"
+                                            >
+                                                <FiPlus size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* 검색 버튼 */}
+                <div className="p-2">
+                    <button
+                        onClick={handleSearch}
+                        className="w-full md:w-auto h-full px-8 py-4 md:py-0 bg-honey-yellow hover:bg-honey-yellow-dark text-white font-bold rounded-2xl md:rounded-full transition-all flex items-center justify-center gap-2 shadow-lg shadow-honey-yellow/20 active:scale-95"
+                    >
+                        <HiOutlineSearch className="text-xl" />
+                        <span className="md:hidden lg:inline">검색하기</span>
+                    </button>
+                </div>
+            </motion.div>
 
             {/* 날짜 선택 모달 */}
             <DateRangeModal

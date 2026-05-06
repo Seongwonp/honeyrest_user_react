@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Slider from "react-slick";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaFire } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, verticalSliderSettings, navigate, userInfo }) {
     const [hotList, setHotList] = useState([]);
@@ -15,6 +16,7 @@ function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, vertic
                 console.error("핫 여행지 불러오기 실패:", err);
             });
     }, []);
+
     const handlePlaceClick = (placeName) => {
         const today = new Date().toISOString().split("T")[0];
         const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
@@ -35,51 +37,63 @@ function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, vertic
     };
 
     return (
-        <div className="w-full bg-white rounded-xl shadow-md p-6 relative">
+        <div className="w-full bg-white/80 backdrop-blur-sm rounded-3xl shadow-sm border border-gray-100 p-5 relative">
             <div className="flex items-center gap-4">
-                <h3 className="text-base font-bold text-gray-700 flex items-center gap-2 whitespace-nowrap">
-                    <span role="img" aria-label="fire">🔥</span> 핫한 여행지
-                </h3>
-
-                <div className="flex-1 max-h-10 overflow-hidden">
-                    <Slider {...verticalSliderSettings}>
-                        {hotList.map((place, idx) => (
-                            <div
-                                key={idx}
-                                className="bg-gray-50 rounded-md px-3 py-1 text-sm text-gray-700 hover:bg-yellow-50 transition text-center cursor-pointer"
-                                onClick={() => handlePlaceClick(place.name)}
-                            >
-                                {place.name}
-                            </div>
-                        ))}
-                    </Slider>
+                <div className="w-10 h-10 rounded-2xl bg-orange-100 flex items-center justify-center shrink-0">
+                    <FaFire className="text-orange-500 text-lg animate-pulse" />
+                </div>
+                
+                <div className="flex-1">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Trending Now</p>
+                    <div className="h-6 overflow-hidden">
+                        <Slider {...verticalSliderSettings}>
+                            {hotList.map((place, idx) => (
+                                <div
+                                    key={idx}
+                                    className="text-sm font-bold text-deep-gray cursor-pointer hover:text-honey-yellow-dark transition-colors"
+                                    onClick={() => handlePlaceClick(place.name)}
+                                >
+                                    {idx + 1}. {place.name}
+                                </div>
+                            ))}
+                        </Slider>
+                    </div>
                 </div>
 
                 <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1 whitespace-nowrap"
+                    className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-400"
                 >
-                    {isDropdownOpen ? <FaChevronUp className="w-3 h-3" /> : <FaChevronDown className="w-3 h-3" />}
+                    {isDropdownOpen ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
                 </button>
             </div>
 
-            {isDropdownOpen && (
-                <div className="absolute top-full left-0 w-full z-10 mt-2">
-                    <ul className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto bg-white rounded-xl shadow-lg p-3 border border-gray-200">
-                        {hotList.map((place, idx) => (
-                            <li
-                                key={idx}
-                                className="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-lg hover:bg-yellow-50 transition transform hover:scale-105 cursor-pointer shadow-sm"
-                                onClick={() => handlePlaceClick(place.name)}
-                            >
-                                <span className="text-sm font-semibold text-gray-500">{idx + 1}</span>
-                                <span className="text-sm font-medium text-gray-800">{place.name}</span>
-                                <span className="text-xs text-gray-400">{place.searchCount}회</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+            <AnimatePresence>
+                {isDropdownOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute top-full left-0 w-full z-50 mt-3"
+                    >
+                        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-4 max-h-64 overflow-y-auto">
+                            <ul className="space-y-1">
+                                {hotList.map((place, idx) => (
+                                    <li
+                                        key={idx}
+                                        className="flex items-center gap-4 p-3 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer group"
+                                        onClick={() => handlePlaceClick(place.name)}
+                                    >
+                                        <span className="w-6 text-sm font-black text-gray-300 group-hover:text-honey-yellow transition-colors">{idx + 1}</span>
+                                        <span className="flex-1 text-sm font-bold text-deep-gray">{place.name}</span>
+                                        <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">{place.searchCount} searches</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

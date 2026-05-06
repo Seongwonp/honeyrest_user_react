@@ -73,7 +73,7 @@ function Home() {
     }, []);
 
     useEffect(() => {
-        const timer = setTimeout(() => setShowScrollHint(false), 3000);
+        const timer = setTimeout(() => setShowScrollHint(false), 5000);
         return () => clearTimeout(timer);
     }, []);
 
@@ -89,10 +89,10 @@ function Home() {
                         : "인원 수를 선택해주세요!";
 
             setModalMessage(
-                <span className="flex items-center gap-2 text-black">
-        <GoAlertFill className="text-yellow-300" />
+                <span className="flex items-center gap-2 text-black font-bold">
+                    <GoAlertFill className="text-honey-yellow text-xl" />
                     {message}
-      </span>
+                </span>
             );
             setShowModal(true);
             return;
@@ -112,9 +112,10 @@ function Home() {
         dots: true,
         infinite: true,
         autoplay: true,
-        speed: 500,
+        speed: 800,
         slidesToShow: 1,
         slidesToScroll: 1,
+        arrows: false,
     };
 
     const verticalSliderSettings = {
@@ -133,11 +134,9 @@ function Home() {
 
     return (
         <div className="bg-white min-h-screen">
-            {/* 인트로 모달 */}
             <IntroModal />
 
-
-            {/* 배너 영역 */}
+            {/* 1. Hero Banner */}
             <BannerSection
                 randomBanner={randomBanner}
                 location={location}
@@ -153,21 +152,30 @@ function Home() {
                 getTomorrow={getTomorrow}
             />
 
-            {/* 핫플레이스 + 날씨 */}
-            <div className="px-4 md:px-10 mt-10">
-                <div className="bg-gradient-to-r from-white rounded-3xl p-8 w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 items-center justify-center">
-                    <div className="rounded-2xl overflow-hidden shadow-lg col-span-1 md:col-span-2 h-[400px] md:h-[500px]">
+            {/* 2. Main Content Grid */}
+            <main className="max-w-7xl mx-auto px-6 pt-24 pb-12 space-y-24">
+                
+                {/* 비디오 & 트렌드 & 날씨 섹션 */}
+                <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* 비디오 카드 */}
+                    <div className="lg:col-span-8 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-gray-200 h-[400px] md:h-[500px] relative group">
                         <video
                             src="/videos/video2.mp4"
                             autoPlay
                             loop
                             muted
                             playsInline
-                            className="w-full h-full  rounded-2xl"
-                            style={{ aspectRatio: "16/9" }}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-8">
+                            <p className="text-white font-bold text-xl md:text-2xl drop-shadow-md">
+                                당신이 꿈꾸던 여행, 지금 시작됩니다.
+                            </p>
+                        </div>
                     </div>
-                    <div className="md:col-span-1 flex flex-col gap-3 scale-90">
+
+                    {/* 사이드 위젯 */}
+                    <div className="lg:col-span-4 space-y-6">
                         <HotPlacesSection
                             isDropdownOpen={isDropdownOpen}
                             setIsDropdownOpen={setIsDropdownOpen}
@@ -177,48 +185,62 @@ function Home() {
                         />
                         <WeatherWidget coords={coords} locationError={locationError} />
                     </div>
-                </div>
-            </div>
+                </section>
+
+                {/* 🔥 인기 여행지 */}
+                <HotSpots userInfo={userInfo} navigate={navigate} />
+
+                {/* 🎉 이벤트 슬라이더 */}
+                <EventSlider events={events} sliderSettings={sliderSettings} />
+
+                {/* 🏡 추천 숙소 리스트 */}
+                <PlaceList />
+
+                {/* 📍 국내 여행지 펼침형 */}
+                <DomesticSpots userInfo={userInfo} navigate={navigate} />
+
+            </main>
 
             {/* 스크롤 힌트 */}
-            {showScrollHint && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-center text-gray-600 text-lg mt-10"
-                >
-                    <span className="block mb-5">👇 아래로 스크롤해서 이벤트와 추천 숙소를 확인해보세요!</span>
-                    <BsChevronDoubleDown className="mx-auto text-yellow-300 animate-bounce text-3xl" />
-                </motion.div>
-            )}
-
-            {/* 🔥 인기 여행지 */}
-            <HotSpots userInfo={userInfo} navigate={navigate} />
-
-            {/* 🎉 이벤트 슬라이더 */}
-            <EventSlider events={events} sliderSettings={sliderSettings} />
-
-            {/* 🏡 추천 숙소 리스트 */}
-            <PlaceList />
-
-            {/* 📍 국내 여행지 펼침형 */}
-            <DomesticSpots userInfo={userInfo} navigate={navigate} />
+            <AnimatePresence>
+                {showScrollHint && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2 pointer-events-none"
+                    >
+                        <span className="text-deep-gray/60 text-xs font-bold tracking-widest uppercase">Scroll Down</span>
+                        <motion.div
+                            animate={{ y: [0, 8, 0] }}
+                            transition={{ repeat: Infinity, duration: 1.5 }}
+                        >
+                            <BsChevronDoubleDown className="text-honey-yellow text-xl" />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* 모달 */}
             <AnimatePresence>
                 {showModal && (
                     <>
-                        <div className="fixed inset-0 bg-black/40 z-40" />
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]" 
+                            onClick={() => setShowModal(false)}
+                        />
                         <motion.div
-                            className="fixed inset-0 z-50 flex items-center justify-center"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.3 }}
+                            className="fixed inset-0 z-[210] flex items-center justify-center pointer-events-none"
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         >
-                            <Modal message={modalMessage} onClose={() => setShowModal(false)} />
+                            <div className="pointer-events-auto">
+                                <Modal message={modalMessage} onClose={() => setShowModal(false)} />
+                            </div>
                         </motion.div>
                     </>
                 )}

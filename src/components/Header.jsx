@@ -5,14 +5,24 @@ import {
     FaUserCircle, FaSignInAlt, FaSignOutAlt,
     FaUserPlus, FaBars, FaTimes, FaClipboardList
 } from 'react-icons/fa';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const navigate = useNavigate();
     const { user, isLoggedIn } = useAuth();
     const isAdmin = isLoggedIn && user.role?.includes('ADMIN');
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const navItems = isLoggedIn
         ? [
@@ -35,101 +45,150 @@ function Header() {
 
     const handleAdminClick = () => {
         setMenuOpen(false);
-        window.open('http://localhost:8082/', '_blank'); // 배포 후 URL 교체
+        window.open('http://localhost:8082/', '_blank');
     };
 
-    const renderNavButtons = (isMobile = false) => (
-        <>
-            {isAdmin && (
-                <button
-                    onClick={handleAdminClick}
-                    className={`flex items-center gap-2 ${
-                        isMobile
-                            ? 'text-[#4B5563] hover:bg-[#E8F5E9] px-4 py-2 rounded transition'
-                            : 'text-[#4B5563] hover:text-[#81C784] transition'
-                    }`}
-                >
-                    <FaClipboardList />
-                    관리자 페이지
-                </button>
-            )}
-            {navItems.map((item) => (
-                <button
-                    key={item.path}
-                    onClick={() => handleNavClick(item)}
-                    className={`flex items-center gap-2 ${
-                        isMobile
-                            ? 'text-[#4B5563] hover:bg-[#FFF9C4] px-4 py-2 rounded transition'
-                            : 'text-[#4B5563] hover:text-[#C8E6C9] transition'
-                    }`}
-                >
-                    {item.icon}
-                    {item.label}
-                </button>
-            ))}
-        </>
-    );
-
-    const renderProfile = (isMobile = false) => (
-        isLoggedIn && (
-            <div className={`flex items-center gap-2 ${isMobile ? 'px-4' : 'ml-4'}`}>
-                <img
-                    src={user.profileImage?.trim() ? user.profileImage : defaultProfile}
-                    alt="프로필"
-                    className="w-8 h-8 rounded-full object-cover"
-                />
-                <span className="text-sm font-medium text-gray-800">
-                    {user.name}님
-                </span>
-            </div>
-        )
-    );
-
     return (
-        <header className="bg-white shadow-md sticky top-0 z-50">
-            <div className="max-w-screen-xl mx-auto px-4 py-4 flex justify-between items-center">
+        <header 
+            className={`sticky top-0 z-[100] transition-all duration-300 ${
+                scrolled 
+                ? 'bg-white/80 backdrop-blur-lg shadow-sm py-2' 
+                : 'bg-white py-4'
+            }`}
+        >
+            <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
                 {/* 로고 */}
-                <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-[#4B5563] transition">
-                    HoneyRest
-                    <img src={logo} alt="logo" width={50} className="inline" />
+                <Link to="/" className="flex items-center gap-2 group">
+                    <img 
+                        src={logo} 
+                        alt="logo" 
+                        className="w-10 h-10 object-contain transition-transform group-hover:rotate-12" 
+                    />
+                    <span className="text-2xl font-bold bg-gradient-to-r from-deep-gray to-gray-500 bg-clip-text text-transparent">
+                        HoneyRest
+                    </span>
                 </Link>
 
                 {/* 데스크탑 메뉴 */}
-                <nav className="hidden md:flex space-x-6 items-center">
-                    {renderNavButtons()}
-                    {renderProfile()}
+                <nav className="hidden md:flex items-center gap-1">
+                    {isAdmin && (
+                        <button
+                            onClick={handleAdminClick}
+                            className="flex items-center gap-2 px-4 py-2 rounded-full text-deep-gray hover:bg-leaf-green/10 hover:text-leaf-green transition-all font-medium"
+                        >
+                            <FaClipboardList className="text-sm" />
+                            <span>관리자</span>
+                        </button>
+                    )}
+                    {navItems.map((item) => (
+                        <button
+                            key={item.path}
+                            onClick={() => handleNavClick(item)}
+                            className="flex items-center gap-2 px-4 py-2 rounded-full text-deep-gray hover:bg-honey-yellow/10 hover:text-honey-yellow-dark transition-all font-medium"
+                        >
+                            <span className="text-sm opacity-70 group-hover:opacity-100">{item.icon}</span>
+                            <span>{item.label}</span>
+                        </button>
+                    ))}
+                    
+                    {isLoggedIn && (
+                        <div className="flex items-center gap-3 ml-4 pl-4 border-l border-gray-200">
+                            <div className="text-right hidden lg:block">
+                                <p className="text-xs text-gray-400">Welcome</p>
+                                <p className="text-sm font-bold text-deep-gray">{user.name}님</p>
+                            </div>
+                            <img
+                                src={user.profileImage?.trim() ? user.profileImage : defaultProfile}
+                                alt="프로필"
+                                className="w-10 h-10 rounded-full object-cover ring-2 ring-honey-yellow/20"
+                            />
+                        </div>
+                    )}
                 </nav>
 
                 {/* 모바일 메뉴 버튼 */}
-                <div className="md:hidden">
-                    <button
-                        onClick={() => setMenuOpen(true)}
-                        aria-label="메뉴 열기"
-                        className="text-[#4B5563] hover:text-[#C8E6C9] transition text-xl"
-                    >
-                        <FaBars />
-                    </button>
-                </div>
+                <button
+                    onClick={() => setMenuOpen(true)}
+                    className="md:hidden p-2 rounded-xl bg-gray-50 text-deep-gray hover:bg-honey-yellow/20 transition-colors"
+                >
+                    <FaBars size={20} />
+                </button>
             </div>
 
             {/* 모바일 사이드 드로어 */}
-            <div
-                className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ${
-                    menuOpen ? 'translate-x-0' : 'translate-x-full'
-                }`}
-            >
-                <div className="flex flex-col p-4 space-y-4">
-                    <button
-                        onClick={() => setMenuOpen(false)}
-                        aria-label="메뉴 닫기"
-                        className="self-end text-[#4B5563] hover:text-red-500 text-xl"
-                    >
-                        <FaTimes />
-                    </button>
-                    {renderProfile(true)}
-                    {renderNavButtons(true)}
-                </div>
-            </div>
+            <AnimatePresence>
+                {menuOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setMenuOpen(false)}
+                            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] md:hidden"
+                        />
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="fixed top-0 right-0 h-full w-[280px] bg-white z-[120] shadow-2xl md:hidden flex flex-col"
+                        >
+                            <div className="p-6 flex justify-between items-center border-b border-gray-50">
+                                <span className="font-bold text-xl text-deep-gray">Menu</span>
+                                <button
+                                    onClick={() => setMenuOpen(false)}
+                                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                                >
+                                    <FaTimes size={20} />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-6 space-y-2">
+                                {isLoggedIn && (
+                                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-honey-yellow/5 mb-6">
+                                        <img
+                                            src={user.profileImage?.trim() ? user.profileImage : defaultProfile}
+                                            alt="프로필"
+                                            className="w-12 h-12 rounded-full object-cover border-2 border-honey-yellow/30"
+                                        />
+                                        <div>
+                                            <p className="font-bold text-deep-gray">{user.name}님</p>
+                                            <p className="text-xs text-gray-500">{user.email}</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {isAdmin && (
+                                    <button
+                                        onClick={handleAdminClick}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-deep-gray hover:bg-leaf-green/10 hover:text-leaf-green-dark transition-all"
+                                    >
+                                        <FaClipboardList />
+                                        <span className="font-medium">관리자 페이지</span>
+                                    </button>
+                                )}
+
+                                {navItems.map((item) => (
+                                    <button
+                                        key={item.path}
+                                        onClick={() => handleNavClick(item)}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-deep-gray hover:bg-honey-yellow/10 hover:text-honey-yellow-dark transition-all"
+                                    >
+                                        <span className="text-lg opacity-60">{item.icon}</span>
+                                        <span className="font-medium">{item.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="p-6 border-t border-gray-50">
+                                <p className="text-center text-xs text-gray-400">
+                                    © HoneyRest. All rights reserved.
+                                </p>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </header>
     );
 }

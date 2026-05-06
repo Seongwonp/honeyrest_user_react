@@ -8,6 +8,9 @@ const api = axios.create({
     withCredentials: true,
 });
 
+let responseInterceptorId = null;
+let refreshPromise = null;
+
 // 🔧 토큰 저장소 결정
 const getStorage = () =>
     localStorage.getItem('accessToken') ? localStorage : sessionStorage;
@@ -26,7 +29,6 @@ const requestInterceptor = (config) => {
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log(`[API 요청] ${config.method?.toUpperCase()} ${config.url}`);
     return config;
 };
 
@@ -34,30 +36,42 @@ api.interceptors.request.use(requestInterceptor);
 
 // 응답 인터셉터: 에러 핸들링 + 재발급 + 로그아웃
 export const attachErrorInterceptor = (navigate) => {
-    let isRefreshing = false;
+    if (responseInterceptorId !== null) {
+        api.interceptors.response.eject(responseInterceptorId);
+    }
 
-    api.interceptors.response.use(
+    responseInterceptorId = api.interceptors.response.use(
         res => res,
         async err => {
             const status = err.response?.status;
             const skipRedirect = err.config?.skipRedirect;
+            const isRefreshRequest = err.config?.url?.includes('/api/auth/refresh');
+
+            if (status === 401 && isRefreshRequest) {
+                handleLogout(navigate);
+                return Promise.reject(err);
+            }
 
             // 401 처리: 토큰 재발급
-            if (status === 401 && !isRefreshing) {
-                isRefreshing = true;
+            if (status === 401 && !err.config?._retry) {
+                err.config._retry = true;
                 try {
-                    const res = await api.post('/api/auth/refresh');
+                    if (!refreshPromise) {
+                        refreshPromise = api.post('/api/auth/refresh');
+                    }
+
+                    const res = await refreshPromise;
                     const newAccessToken = res.data;
                     getStorage().setItem('accessToken', newAccessToken);
 
+                    err.config.headers = err.config.headers || {};
                     err.config.headers.Authorization = `Bearer ${newAccessToken}`;
-                    isRefreshing = false;
                     return api(err.config);
                 } catch (refreshErr) {
-                    console.error('[API] ❌ 토큰 재발급 실패:', refreshErr);
-                    isRefreshing = false;
                     handleLogout(navigate);
                     return Promise.reject(refreshErr);
+                } finally {
+                    refreshPromise = null;
                 }
             }
 

@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+@theme {
+  --color-honey-yellow: #FFD54F;
+  --color-honey-yellow-dark: #FFC107;
+  --color-leaf-green: #81C784;
+  --color-leaf-green-dark: #66BB6A;
+  --color-deep-gray: #374151;
+  --color-off-white: #F9FAFB;
+
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+}
+
+@layer base {
+  body {
+    @apply bg-off-white text-deep-gray font-sans antialiased;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-glass;
+  }
+}

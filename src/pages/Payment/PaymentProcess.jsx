@@ -54,9 +54,8 @@ export default function PaymentProcess() {
 
     const handlePayment = async () => {
         const baseCode = "HR-" + crypto.randomUUID().slice(0, 8).toUpperCase();
-        const orderId = state.userId
-            ? baseCode
-            : `${baseCode}-${state.guestPassword}`;
+        // 주문번호에는 비밀번호/개인정보를 절대 포함하지 않는다.
+        const orderId = baseCode;
 
         // ✅ 예약 정보 저장
         sessionStorage.setItem("reservationInfo", JSON.stringify({

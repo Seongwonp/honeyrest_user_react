@@ -1,6 +1,7 @@
 import Slider from "react-slick";
 import { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 function HotSpatsList({ userInfo, navigate }) {
     const [popularCities, setPopularCities] = useState([]);
@@ -37,7 +38,7 @@ function HotSpatsList({ userInfo, navigate }) {
     const CustomPrevArrow = ({ onClick }) => (
         <button
             onClick={onClick}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 text-gray-600 hover:text-blue-500"
+            className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white shadow-xl rounded-full flex items-center justify-center text-deep-gray hover:text-honey-yellow transition-all border border-gray-50 active:scale-90"
         >
             <FaChevronLeft />
         </button>
@@ -46,7 +47,7 @@ function HotSpatsList({ userInfo, navigate }) {
     const CustomNextArrow = ({ onClick }) => (
         <button
             onClick={onClick}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 text-gray-600 hover:text-blue-500"
+            className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white shadow-xl rounded-full flex items-center justify-center text-deep-gray hover:text-honey-yellow transition-all border border-gray-50 active:scale-90"
         >
             <FaChevronRight />
         </button>
@@ -54,8 +55,8 @@ function HotSpatsList({ userInfo, navigate }) {
 
     const sliderSettings = {
         dots: false,
-        infinite: false,
-        speed: 500,
+        infinite: true,
+        speed: 800,
         slidesToShow: 4,
         slidesToScroll: 1,
         arrows: true,
@@ -63,39 +64,46 @@ function HotSpatsList({ userInfo, navigate }) {
         nextArrow: <CustomNextArrow />,
         responsive: [
             {
+                breakpoint: 1280,
+                settings: { slidesToShow: 3 },
+            },
+            {
                 breakpoint: 1024,
-                settings: {
-                    slidesToShow: 2,
-                },
+                settings: { slidesToShow: 2 },
             },
             {
                 breakpoint: 640,
-                settings: {
-                    slidesToShow: 1,
-                },
+                settings: { slidesToShow: 1.2, arrows: false },
             },
         ],
     };
 
     return (
-        <div className="relative max-w-screen-xl mx-auto mt-16 px-4 py-10" data-aos="fade-up">
+        <div className="relative" data-aos="fade-up">
             <Slider {...sliderSettings}>
-                {popularCities.map(city => (
+                {popularCities.map((city, idx) => (
                     <div
-                        key={city.regionId}
-                        className="px-2"
+                        key={city.regionId || idx}
+                        className="px-3 py-4"
                         onClick={() => handleClick(city.name)}
                     >
-                        <div className="bg-white rounded-xl shadow hover:shadow-lg transition duration-300 overflow-hidden cursor-pointer">
-                            <img
-                                src={city.imgUrl || "/images/default-region.jpg"}
-                                alt={city.name}
-                                className="w-full h-[180px] sm:h-[160px] xs:h-[140px] object-cover"
-                            />
-                            <div className="p-3 text-center text-gray-800 font-semibold text-sm truncate">
-                                {city.name}
+                        <motion.div 
+                            whileHover={{ y: -10 }}
+                            className="bg-white rounded-[2rem] shadow-sm hover:shadow-2xl hover:shadow-honey-yellow/10 transition-all duration-500 overflow-hidden cursor-pointer border border-gray-50"
+                        >
+                            <div className="relative h-[240px] overflow-hidden">
+                                <img
+                                    src={city.imgUrl || "/images/default-region.jpg"}
+                                    alt={city.name}
+                                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+                                <div className="absolute bottom-6 left-6">
+                                    <p className="text-white font-black text-2xl drop-shadow-md">{city.name}</p>
+                                    <p className="text-white/80 text-xs font-bold uppercase tracking-widest mt-1">Explore Now</p>
+                                </div>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 ))}
             </Slider>

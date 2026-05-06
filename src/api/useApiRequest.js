@@ -34,7 +34,6 @@ const useApiRequest = () => {
         while (attempt <= retry) {
             try {
                 const response = await api(config);
-                console.log(`[API 응답]`, response.data);
 
                 if (successMessage && !silent) {
                     toast.success(successMessage);
@@ -52,15 +51,6 @@ const useApiRequest = () => {
                     toast.error(errorMessage || message);
                 }
 
-                if (error.response?.status === 401) {
-                    localStorage.removeItem('accessToken');
-                    localStorage.removeItem('userInfo');
-                    sessionStorage.removeItem('accessToken');
-                    sessionStorage.removeItem('userInfo');
-                    toast.error('세션이 만료되었습니다. 다시 로그인해주세요.');
-                    window.location.href = '/login';
-                    return;
-                }
 
                 if (onError) onError(error);
 

@@ -19,12 +19,12 @@ function WeatherInfo({ city, displayName, coords }) {
     };
 
     const colorMap = {
-        "맑음": "text-yellow-400",
-        "흐림": "text-gray-500",
-        "비": "text-blue-500",
-        "눈": "text-blue-200",
-        "뇌우": "text-purple-600",
-        "안개": "text-gray-400",
+        "맑음": "text-honey-yellow-dark",
+        "흐림": "text-gray-400",
+        "비": "text-blue-400",
+        "눈": "text-blue-100",
+        "뇌우": "text-indigo-500",
+        "안개": "text-gray-300",
     };
 
     useEffect(() => {
@@ -62,34 +62,36 @@ function WeatherInfo({ city, displayName, coords }) {
 
     if (error || !weather) {
         return (
-            <div className="bg-white shadow-md rounded-lg p-4 w-full max-w-sm mx-auto text-gray-800 text-center">
-                <p className="text-sm mb-2">현재 위치 정보를 불러올 수 없어요!</p>
-                <p className="text-sm mb-2">도시 이름을 직접 입력해 주세요 😊</p>
-                <p className="text-xs text-gray-500">혹시 위치 권한이 꺼져 있다면 브라우저 설정도 한번 확인해 주세요!</p>
+            <div className="text-center p-4">
+                <p className="text-xs text-gray-400">날씨 정보를 불러오는 중...</p>
             </div>
         );
     }
 
     const iconClass = iconClassMap[weather.icon] || "wi-na";
-    const iconColor = colorMap[weather.description] || "text-gray-600";
+    const iconColor = colorMap[weather.description] || "text-gray-400";
 
     return (
-        <div className="bg-white shadow-md rounded-lg p-4 w-full max-w-sm mx-auto text-gray-800">
-            <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-bold">
-                    {city
-                        ? `${displayName || city} 날씨`
-                        : weather?.name
-                            ? `${weather.name} 날씨`
-                            : "현재 위치 날씨"}
-                </h3>
-                <i className={`wi ${iconClass} ${iconColor} text-5xl`} title={weather.description} />
+        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+            <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                    {city ? displayName || city : weather.name || 'Current'}
+                </p>
+                <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-black text-deep-gray">{weather.temp}</span>
+                    <span className="text-lg font-bold text-gray-400">°C</span>
+                </div>
+                <p className="text-xs font-medium text-gray-500 mt-1">{weather.description}</p>
             </div>
-            <div className="text-xl font-semibold">
-                {weather.temp}°C
-            </div>
-            <div className="text-sm text-gray-600">
-                상태: {weather.description}
+            
+            <div className="flex flex-col items-center">
+                <i className={`wi ${iconClass} ${iconColor} text-4xl mb-1`} />
+                <div className="flex gap-2">
+                    <div className="flex flex-col items-center">
+                        <span className="text-[8px] font-bold text-gray-300">Humidity</span>
+                        <span className="text-[10px] font-bold text-gray-500">{weather.humidity}%</span>
+                    </div>
+                </div>
             </div>
         </div>
     );

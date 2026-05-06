@@ -1,7 +1,9 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { HiLocationMarker, HiStar } from "react-icons/hi";
 import axios from "axios";
 import CategorySelector from "./CategorySelector";
+import { motion, AnimatePresence } from "framer-motion";
 
 function PlaceList() {
     const [categories, setCategories] = useState([]);
@@ -15,7 +17,7 @@ function PlaceList() {
             const allCategory = {
                 categoryId: 0,
                 name: "전체",
-                iconUrl: "https://cdn-icons-png.flaticon.com/512/5110/5110754.png", // 전체용 기본 아이콘
+                iconUrl: "https://cdn-icons-png.flaticon.com/512/5110/5110754.png",
                 sortOrder: 0,
             };
             setCategories([allCategory, ...res.data]);
@@ -24,19 +26,25 @@ function PlaceList() {
 
     useEffect(() => {
         setCurrentPage(1);
-        const params = selectedCategory === "전체" ? {} : {category: selectedCategory};
+        const params = selectedCategory === "전체" ? {} : { category: selectedCategory };
         axios
-            .get("/api/accommodations/popular", {params})
+            .get("/api/accommodations/popular", { params })
             .then((res) => setPlaces(res.data));
     }, [selectedCategory]);
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentPlaces = places.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(places.length / itemsPerPage);
 
     return (
-        <div className="max-w-screen-xl mx-auto px-4 py-10" data-aos="fade-up">
-            <h2 className="text-2xl font-bold text-[#4B5563] mb-6 text-center">인기 추천 숙소</h2>
+        <section className="space-y-12" data-aos="fade-up">
+            <div className="text-center space-y-4">
+                <h2 className="text-3xl md:text-4xl font-black text-deep-gray tracking-tight">
+                    나만을 위한 <span className="text-leaf-green">추천 숙소</span>
+                </h2>
+                <p className="text-gray-400 font-medium">카테고리별로 가장 인기 있는 숙소들을 엄선했습니다.</p>
+            </div>
 
             <CategorySelector
                 categories={categories}
@@ -45,54 +53,83 @@ function PlaceList() {
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {currentPlaces.map((place, idx) => (
-                    <a
-                        href={`/accommodations/${place.id}`}
-                        className="block"
-                        key={idx}
-                    >
-                        <div
-                            className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition"
-                            data-aos="fade-up"
-                            data-aos-delay={idx * 100}
+                <AnimatePresence mode="wait">
+                    {currentPlaces.map((place, idx) => (
+                        <motion.a
+                            href={`/accommodations/${place.id}`}
+                            key={place.id || idx}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ delay: idx * 0.05 }}
+                            className="group"
                         >
-                            <img src={place.image} alt={place.title} className="w-full h-48 object-cover"/>
-                            <div className="p-4">
-                                <h3 className="text-lg font-semibold text-[#4B5563]">{place.title}</h3>
-                                <p className="text-sm text-gray-500">{place.location}</p>
-                                <div className="flex justify-between items-center mt-3">
-                                    <span className="flex items-center text-yellow-600 font-bold">
-                                        ₩{new Intl.NumberFormat("ko-KR").format(place.price)}
-                                        <span className="text-xs text-gray-500 ml-1">/ 1박</span>
-                                    </span>
-                                    <span className="flex items-center text-sm text-gray-700">
-                                        <FaStar className="mr-1 text-yellow-500" />
-                                        {place.rating}
-                                    </span>
+                            <div className="bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-leaf-green/10 transition-all duration-500 h-full flex flex-col">
+                                <div className="relative h-64 overflow-hidden">
+                                    <img 
+                                        src={place.image} 
+                                        alt={place.title} 
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
+                                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-2xl flex items-center gap-1 shadow-sm">
+                                        <HiStar className="text-honey-yellow text-lg" />
+                                        <span className="text-sm font-bold text-deep-gray">{place.rating}</span>
+                                    </div>
+                                </div>
+                                
+                                <div className="p-6 flex-1 flex flex-col space-y-3">
+                                    <div className="flex items-center gap-1 text-gray-400">
+                                        <HiLocationMarker className="text-xs" />
+                                        <span className="text-xs font-bold uppercase tracking-wider">{place.location}</span>
+                                    </div>
+                                    <h3 className="text-lg font-black text-deep-gray line-clamp-1 group-hover:text-leaf-green transition-colors">
+                                        {place.title}
+                                    </h3>
+                                    
+                                    <div className="pt-4 mt-auto border-t border-gray-50 flex items-center justify-between">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Starts from</span>
+                                            <span className="text-xl font-black text-deep-gray">
+                                                ₩{new Intl.NumberFormat("ko-KR").format(place.price)}
+                                                <span className="text-xs font-bold text-gray-400 ml-1">/ night</span>
+                                            </span>
+                                        </div>
+                                        <div className="w-10 h-10 rounded-full bg-leaf-green/10 text-leaf-green flex items-center justify-center group-hover:bg-leaf-green group-hover:text-white transition-all duration-300">
+                                            <FaChevronRight size={14} />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                ))}
+                        </motion.a>
+                    ))}
+                </AnimatePresence>
             </div>
-            <div className="flex justify-center gap-3 mt-6">
-                <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev-1, 1))}
-                    disabled={currentPage === 1}
-                    className={`px-3 py-1 rounded-lg shadow transition ${currentPage === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:shadow-lg'}`}
-                >
-                    <FaChevronLeft />
-                </button>
-                <span>{currentPage}</span>
-                <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev+1, Math.ceil(places.length/itemsPerPage)))}
-                    disabled={currentPage === Math.ceil(places.length/itemsPerPage)}
-                    className={`px-3 py-1 rounded-lg shadow transition ${currentPage === Math.ceil(places.length/itemsPerPage) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:shadow-lg'}`}
-                >
-                    <FaChevronRight />
-                </button>
-            </div>
-        </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-6 pt-10">
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="w-12 h-12 rounded-2xl border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-white hover:shadow-lg hover:text-deep-gray disabled:opacity-30 disabled:hover:shadow-none transition-all"
+                    >
+                        <FaChevronLeft size={14} />
+                    </button>
+                    <div className="flex items-center gap-2">
+                        <span className="text-lg font-black text-deep-gray">{currentPage}</span>
+                        <span className="text-sm font-bold text-gray-300">/</span>
+                        <span className="text-sm font-bold text-gray-400">{totalPages}</span>
+                    </div>
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="w-12 h-12 rounded-2xl border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-white hover:shadow-lg hover:text-deep-gray disabled:opacity-30 disabled:hover:shadow-none transition-all"
+                    >
+                        <FaChevronRight size={14} />
+                    </button>
+                </div>
+            )}
+        </section>
     );
 }
 

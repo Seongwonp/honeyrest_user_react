@@ -1,7 +1,8 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import WeatherInfo from "./WeatherInfo";
+import { HiSearch, HiLocationMarker } from "react-icons/hi";
 
-function WeatherWidget({coords, locationError}) {
+function WeatherWidget({ coords, locationError }) {
     const [city, setCity] = useState("");
     const [searchCity, setSearchCity] = useState(null);
     const [displayCity, setDisplayCity] = useState("");
@@ -30,46 +31,56 @@ function WeatherWidget({coords, locationError}) {
         }
     };
 
-
     return (
-        <div className="p-6 rounded-xl w-full shadow-xl  max-w-md mx-auto">
-            <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
+        <div className="w-full bg-white/80 backdrop-blur-sm rounded-3xl shadow-sm border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <HiLocationMarker className="text-leaf-green text-xl" />
+                    <h3 className="font-bold text-deep-gray">Local Weather</h3>
+                </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="relative mb-6 group">
                 <input
                     type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    placeholder="도시 이름을 입력하세요"
-                    className="flex-1 px-2 py-1 border rounded"
+                    placeholder="도시를 입력하세요 (예: 서울)"
+                    className="w-full pl-4 pr-12 py-3 bg-gray-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-leaf-green/20 transition-all outline-none"
                 />
-                <button type="submit" className="px-4 py-1 bg-blue-500 text-white rounded">
-                    검색
+                <button 
+                    type="submit" 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-leaf-green text-white rounded-xl hover:bg-leaf-green-dark transition-colors shadow-lg shadow-leaf-green/20"
+                >
+                    <HiSearch size={16} />
                 </button>
             </form>
 
+            <div className="space-y-4">
+                {locationError && !searchCity && (
+                    <div className="p-4 rounded-2xl bg-orange-50 border border-orange-100 text-center">
+                        <p className="text-xs font-bold text-orange-600 mb-1">위치 정보를 찾을 수 없어요!</p>
+                        <p className="text-[10px] text-orange-400">도시 이름을 직접 입력해 보세요 😊</p>
+                    </div>
+                )}
 
-            {locationError && !searchCity && (
-                <div className="text-center text-yellow-600 bg-yellow-50 p-3 border border-yellow-300 rounded mb-4">
-                    현재 위치 정보를 불러올 수 없어요!! <br/>
-                    도시 이름을 직접 입력해 주세요 😊<br/>
-                    <span className="text-blue-600 font-medium text-sm">
-            혹시 위치 권한이 꺼져 있다면 브라우저 설정도 한번 확인해 주세요!
-        </span>
-                </div>
-            )}
-
-
-            {searchCity ? (
-                <WeatherInfo
-                    key={searchCity}
-                    city={searchCity}
-                    displayName={displayCity}
-                />
-            ) : !locationError && coords ? (
-                <WeatherInfo
-                    key={`${coords.lat}-${coords.lon}`}
-                    coords={coords}
-                />
-            ) : null}
+                {searchCity ? (
+                    <WeatherInfo
+                        key={searchCity}
+                        city={searchCity}
+                        displayName={displayCity}
+                    />
+                ) : !locationError && coords ? (
+                    <WeatherInfo
+                        key={`${coords.lat}-${coords.lon}`}
+                        coords={coords}
+                    />
+                ) : (
+                    <div className="h-24 flex items-center justify-center border-2 border-dashed border-gray-100 rounded-2xl">
+                        <p className="text-xs text-gray-300 font-medium italic">도시를 검색해 보세요</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

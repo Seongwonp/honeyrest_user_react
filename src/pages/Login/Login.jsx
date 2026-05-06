@@ -39,9 +39,7 @@ function Login() {
                     label: 'login',
                     errorMessage: '이메일 또는 비밀번호가 올바르지 않습니다.',
                     onSuccess: (res) => {
-                        console.log('[Login] ✅ 로그인 응답 전체:', res);
-
-                        const { accessToken, refreshToken, user } = res;
+                        const { accessToken, user } = res;
 
                         if (!user || !user.userId) {
                             console.error('[Login] ❌ 응답에 user 정보 없음:', user);
@@ -61,10 +59,7 @@ function Login() {
 
                         const storage = autoLogin ? localStorage : sessionStorage;
                         storage.setItem('accessToken', accessToken);
-                        storage.setItem('refreshToken', refreshToken);
                         storage.setItem('userInfo', JSON.stringify(userWithProvider));
-
-                        console.log('[Login] ✅ 저장 완료 → syncUserFromServer() 호출');
                         syncUserFromServer();
 
                         Swal.fire({
@@ -74,7 +69,6 @@ function Login() {
                             confirmButtonText: '확인',
                             confirmButtonColor: '#FDD835',
                         }).then(() => {
-                            console.log('[Login] 🚀 페이지 이동:', redirectTo);
                             navigate(redirectTo, {
                                 state: reservationInfo || undefined
                             });
