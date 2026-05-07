@@ -1,94 +1,240 @@
 # 🐝 HoneyRest – 사용자 예약 프론트엔드
+
 **박성원 (Seongwon Park)** – 사용자(User) 영역 총괄
 
-
 > 감성 숙소 예약 플랫폼 HoneyRest의 사용자(User) 영역 프론트엔드입니다.  
-> 숙소 검색부터 예약, 마이페이지까지 사용자 중심의 흐름을 React로 구현했습니다.
+> 숙소 검색부터 예약, 결제, 마이페이지까지 사용자 중심의 전체 흐름을 React로 구현했습니다.
 
 ---
 
-## ⚙️ 기술 스택 요약
+## ⚙️ 기술 스택
 
-| 구분           | 기술 / 라이브러리                              | 역할 / 설명                   | 사용처 / 특징 |
-|----------------|--------------------------------------------------|-------------------------------|----------------|
-| **프레임워크** | React 18 + Vite                                  | SPA 개발                      | JSX, 컴포넌트 기반 구조, 빠른 빌드(HMR) |
-| **스타일링**   | Tailwind CSS                                     | 유틸리티 기반 CSS             | 반응형, 모듈화, 모션 지원 |
-| **애니메이션** | Framer Motion                                     | UI 모션 / 트랜지션            | 모달, 버튼, 페이지 전환, 인트로 애니메이션 |
-| **스크롤 효과**| AOS (Animate On Scroll)                          | 스크롤 애니메이션             | fade, slide 등 다양한 효과 |
-| **알림 / UI**  | SweetAlert2, React Toastify                      | 모달 / 토스트 알림            | Swal: 예외 처리 / Toast: 짧은 상태 메시지 |
-| **지도**       | Google Maps JavaScript API                       | 지도 렌더링                   | 숙소 리스트, 상세정보, 방 위치 표시 / 마커 활용 / 반응형 지원 |
-| **결제**       | Toss Payments Widget                             | PG 결제 연동                  | 카드, 가상계좌, 간편 결제 지원 |
-| **소셜 로그인**| Kakao JS SDK, Google OAuth JS                    | 소셜 로그인 연동              | Client ID, Redirect URI 사용 |
-| **HTTP 통신**  | Axios + Custom Hook                              | REST API 호출                 | JWT 자동 주입, 인터셉터, 토큰 만료 처리 |
-| **환경변수**   | Vite 환경변수                                    | API URL, 키 관리              | `.env` 파일 활용, 외부 API 키 및 로그인 키 관리 |
-
----
-
-## 🖥️ 주요 화면 캡처
-
-> 사용자 중심의 직관적인 UI와 예약 흐름을 제공합니다.
-
-### 🏠 메인 페이지
-- 숙소 검색, 지역 필터, 추천 태그 등 핵심 기능이 배치된 메인 화면  
-- 반응형 디자인으로 모바일에서도 최적화된 UI 제공
-
-### 📍 지도 기능
-- Google Maps API를 활용해 숙소 위치를 시각적으로 표시  
-- 상세정보 페이지에 마커 및 위치 안내 적용
-
-### 📅 예약 흐름
-- Toss Payments 연동으로 간편 결제  
-- 예약 후 이메일 알림 및 마이페이지에서 확인 가능
-
-### 🧑‍💼 마이페이지
-- 예약 내역, 리뷰 작성, 프로필 수정, 쿠폰 확인 등  
-- 사용자 경험을 고려한 기능 배치와 인터페이스 구성
+| 구분 | 기술 / 라이브러리 | 버전 | 역할 |
+|------|------------------|------|------|
+| **런타임** | Node.js | ≥ 20.19.0 | 빌드 환경 |
+| **프레임워크** | React | 19 | SPA 컴포넌트 기반 개발 |
+| **빌드 도구** | Vite | 7 | HMR, 빠른 빌드, 환경변수 관리 |
+| **스타일링** | Tailwind CSS | 4 | 유틸리티 기반 CSS, 커스텀 테마 |
+| **라우팅** | React Router DOM | 7 | SPA 라우팅, PrivateRoute / PublicRoute |
+| **HTTP 통신** | Axios | 1.16 | JWT 자동 주입, 토큰 재발급 인터셉터 |
+| **애니메이션** | Framer Motion | 12 | 모달, 페이지 전환, 인트로 애니메이션 |
+| **스크롤 효과** | AOS | 2 | 스크롤 기반 fade/slide 등장 효과 |
+| **알림** | React Toastify | 11 | 상태 메시지 토스트 |
+| **다이얼로그** | SweetAlert2 | 11 | 확인/취소 모달 처리 |
+| **지도** | @vis.gl/react-google-maps | 1.8 | 숙소 위치 마커, 지도 검색 |
+| **결제** | Toss Payments SDK | 2.7 | 카드·간편결제·가상계좌 PG 연동 |
+| **분석** | Firebase Analytics | 12 | 사용자 행동 분석 |
+| **아이콘** | React Icons | 5 | FA, HI, RI, MD, FI, BS 계열 아이콘 |
+| **날짜** | date-fns + dayjs | 4 / 1.11 | 날짜 계산 및 포맷 |
+| **캘린더** | react-date-range | 2 | 체크인/아웃 날짜 범위 선택 |
+| **슬라이더** | react-slick | 0.31 | 이미지 / 컨텐츠 슬라이더 |
+| **날씨** | weather-icons | 1.3 | 날씨 아이콘 표시 |
 
 ---
 
-## 🎬 사용자 시연 영상
+## 🚀 로컬 개발 시작하기
 
-> 실제 사용자 흐름을 담은 시연 영상입니다.
+### 1. 사전 요구사항
 
-📺 [User 시연 영상 보러가기](#)
+```bash
+node --version   # 20.19.0 이상 필요
+```
+
+> nvm 사용 시: `nvm use 20`
+
+### 2. 패키지 설치
+
+```bash
+npm install
+```
+
+### 3. 환경변수 설정
+
+`.env.example`을 복사해 `.env` 파일을 만들고 값을 채워주세요.
+
+```bash
+cp .env.example .env
+```
+
+```env
+# 백엔드 URL (예: http://localhost:8080)
+VITE_BACKEND_URL=
+
+# Firebase (Firebase 콘솔 > 프로젝트 설정 > 앱에서 확인)
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FIREBASE_MEASUREMENT_ID=
+```
+
+### 4. 개발 서버 실행
+
+```bash
+npm run dev       # 개발 서버 (http://localhost:5173)
+npm run build     # 프로덕션 빌드
+npm run preview   # 빌드 결과 미리보기
+npm run lint      # ESLint 검사
+```
 
 ---
 
-## 📝 프로젝트 발표 자료
+## 📁 프로젝트 구조
 
-> HoneyRest의 전체 기획, 기능 흐름, 기술 스택, 시연 화면 등을 담은 발표용 PPT입니다.  
-> 자세한 내용은 아래 PDF를 참고해주세요.
+```
+src/
+├── api/
+│   ├── axios.js            # Axios 인스턴스 + JWT 인터셉터 + 에러 핸들러
+│   └── useApiRequest.js    # 공통 API 요청 훅 (로딩/재시도/취소 처리)
+│
+├── components/             # 공통 컴포넌트
+│   ├── Header.jsx
+│   ├── Footer.jsx
+│   ├── Layout.jsx
+│   ├── Modal.jsx
+│   ├── IntroModal.jsx
+│   ├── InquiryModal.jsx
+│   ├── PasswordVerifyModal.jsx
+│   ├── WishToggleButton.jsx
+│   └── ImageLoader.jsx
+│
+├── hooks/
+│   └── useAuth.js          # 인증 상태 관리 (로그인/로그아웃/서버 동기화)
+│
+├── routes/
+│   ├── PrivateRoute.jsx    # 로그인 필수 라우트 가드
+│   └── PublicRoute.jsx     # 비로그인 전용 라우트 가드
+│
+├── pages/
+│   ├── Home/               # 메인 홈 화면
+│   │   ├── BannerSection   # 히어로 배너 + 검색창
+│   │   ├── searchBox/      # 날짜·지역·인원 검색 컴포넌트
+│   │   ├── HotPlacesSection
+│   │   ├── HotSpots/
+│   │   ├── PlaceList/      # 추천 숙소 리스트
+│   │   ├── DomesticSpotsList/
+│   │   ├── Event/          # 이벤트 슬라이더
+│   │   └── Weather/        # 날씨 위젯
+│   │
+│   ├── Accommodations/     # 숙소 목록 / 상세
+│   │   ├── Accommodation/  # 숙소 상세 (사진, 방 목록, 지도, 리뷰)
+│   │   │   └── Room/       # 방 상세
+│   │   └── Map/            # 지도 검색
+│   │
+│   ├── Reservation/        # 예약 흐름
+│   │   └── guest/          # 비회원 예약
+│   │
+│   ├── Payment/            # 결제
+│   │   ├── PaymentProcess  # Toss Payments 위젯 렌더링
+│   │   ├── PaymentSuccess
+│   │   └── PaymentFail
+│   │
+│   ├── Login/              # 로그인 / 비밀번호 재설정
+│   │   ├── google/         # Google OAuth 콜백
+│   │   └── kakao/          # Kakao 로그인 콜백
+│   │
+│   ├── SignUp/             # 회원가입 + 이메일 인증
+│   │
+│   ├── Review/             # 리뷰 작성
+│   │
+│   ├── myPage/             # 마이페이지
+│   │   ├── Profile         # 프로필 수정
+│   │   ├── ReservationList / ReservationDetail
+│   │   ├── ReviewList
+│   │   ├── MyWishList
+│   │   ├── Inquiry/        # 1:1 문의
+│   │   ├── Coupon/         # 쿠폰 목록
+│   │   └── Point/          # 포인트 내역
+│   │
+│   └── Error/              # 에러 페이지 (400/401/403/404/408/422/429/500/503)
+│
+├── firebase.js             # Firebase 초기화 (Analytics)
+├── App.jsx                 # BrowserRouter + 전역 인증 가드 (GlobalGuard)
+├── AppWrapper.jsx          # Route 정의 전체
+└── main.jsx                # React 진입점
+```
 
+---
+
+## 🔐 인증 구조
+
+```
+로그인 성공
+  └── accessToken → localStorage or sessionStorage
+  └── userInfo    → localStorage or sessionStorage
+
+요청 시
+  └── axios 인터셉터가 Authorization: Bearer {token} 자동 주입
+
+401 응답 시
+  └── /api/auth/refresh 로 토큰 재발급 시도
+      └── 성공 → 원래 요청 재시도
+      └── 실패 → 로그아웃 후 /login 이동
+
+토큰 만료 시
+  └── JWT exp 파싱 → setTimeout으로 자동 로그아웃
+
+라우트 보호
+  ├── PrivateRoute → 미로그인 시 /error/401 리디렉트
+  └── PublicRoute  → 로그인 상태에서 접근 시 /error/403 리디렉트
+```
+
+---
+
+## 💳 결제 흐름
+
+```
+예약 폼 작성
+  └── /reserve → Reservation.jsx
+
+결제 요청
+  └── /payment/process → PaymentProcess.jsx
+      └── Toss Payments SDK 위젯 렌더링
+
+결제 완료
+  ├── 성공 → /payment/success → PaymentSuccess.jsx
+  └── 실패 → /payment/fail   → PaymentFail.jsx
+```
+
+---
+
+## 🖥️ 주요 화면
+
+| 화면 | 경로 | 설명 |
+|------|------|------|
+| 메인 홈 | `/` | 배너, 검색창, 추천 숙소, 이벤트, 날씨 |
+| 숙소 목록 | `/accommodations` | 지역/날짜/인원 필터, 지도 검색 |
+| 숙소 상세 | `/accommodations/:id` | 사진, 방 목록, 리뷰, 구글 지도 |
+| 방 상세 | `/room/:roomId` | 방 정보, 예약 버튼 |
+| 예약 | `/reserve` | 예약 폼 |
+| 결제 | `/payment/process` | Toss Payments 위젯 |
+| 마이페이지 | `/user/mypage` | 예약/리뷰/쿠폰/포인트/문의 |
+| 로그인 | `/login` | 일반 + Google + Kakao |
+| 회원가입 | `/signup` | 이메일 인증 포함 |
+
+---
+
+## 🎬 시연 영상 / 발표 자료
+
+📺 [User 시연 영상 보러가기](#)  
 📄 [HoneyRest 발표 자료 (PDF)](https://github.com/user-attachments/files/22292418/HoneyRest.pdf)
 
 ---
 
-## 🔗 사용자 API 백엔드 바로가기
+## 🔗 관련 저장소
 
-> HoneyRest의 사용자(User) 영역 API 서버는 Spring Boot 기반으로 구성되어 있으며,  
-> 프론트엔드와 연동되는 모든 기능을 RESTful API로 제공합니다.
-
-📦 [User API GitHub 저장소 바로가기](https://github.com/Seongwonp/honeyRest_user)
+📦 [User API 백엔드 (Spring Boot)](https://github.com/Seongwonp/honeyRest_user)
 
 ---
 
-### 📌 주요 기능 요약
-
-- 사용자 회원가입 / 로그인 / 소셜 로그인 (Google, Kakao)  
-- 숙소 검색 / 예약 / 리뷰 작성 / 마이페이지 관리  
-- Toss 결제 연동 / 이메일 인증 / Redis 기반 추천  
-- Swagger UI를 통한 API 문서 제공 (`/swagger-ui.html`)
-
----
-
-## 🙋‍♂️ 개발자 정보
+## 🙋‍♂️ 개발자
 
 **박성원 (Seongwon Park)** – 사용자(User) 영역 총괄
 
-- User API 백엔드 및 프론트엔드 전체 설계 및 개발  
-- DB 설계 및 ERD 작성  
-- API 명세서 작성 및 문서화  
-- 광고 영상 및 일러스트 제작  
-- 프로젝트 발표용 PPT 기획 및 디자인 총괄
-
----
+- User API 백엔드 및 프론트엔드 전체 설계·개발
+- DB 설계 및 ERD 작성
+- API 명세서 작성 및 문서화
+- 광고 영상 및 일러스트 제작
+- 프로젝트 발표 PPT 기획·디자인 총괄
