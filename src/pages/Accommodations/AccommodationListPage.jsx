@@ -15,6 +15,7 @@ function AccommodationListPage() {
     const userId = user?.userId || null;
 
     const [results, setResults] = useState([]);
+    const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -57,6 +58,7 @@ function AccommodationListPage() {
 
             const data = res.data;
             setResults(data.content || []);
+            setTotalElements(data.totalElements ?? data.content?.length ?? 0);
             setTotalPages(data.totalPages || 1);
         } catch (err) {
             console.error("❌ 숙소 검색 실패:", err);
@@ -89,7 +91,7 @@ function AccommodationListPage() {
                 <div className="flex flex-col">
                     <p className="text-xs font-bold text-gray-300 uppercase tracking-widest">Search Results</p>
                     <p className="text-sm font-bold text-deep-gray">
-                        총 <span className="text-leaf-green">{results.length}개</span>의 숙소를 찾았습니다.
+                        총 <span className="text-leaf-green">{totalElements}개</span>의 숙소를 찾았습니다.
                     </p>
                 </div>
 
