@@ -9,6 +9,7 @@ import axios from "axios";
 import RoomImageViewer from "./RoomImageViewer";
 import ReviewSlider from "./ReviewSlider";
 import { useAuth } from "@/hooks/useAuth"; // 추가
+import SafeImage from "@/components/SafeImage.jsx";
 
 export default function RoomDetail() {
     const navigate = useNavigate();
@@ -71,7 +72,7 @@ export default function RoomDetail() {
 
             {/* 숙소 정보 */}
             <div className="mt-6 flex items-center gap-4">
-                <img
+                <SafeImage
                     src={roomDetail.accommodationThumbnail}
                     alt="숙소 썸네일"
                     className="w-16 h-16 object-cover rounded-lg shadow-sm"

@@ -2,6 +2,7 @@ import Slider from "react-slick";
 import { MdCelebration } from "react-icons/md";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion } from "framer-motion";
+import SafeImage from "@/components/SafeImage.jsx";
 
 function PrevArrow(props) {
     const { onClick } = props;
@@ -71,7 +72,7 @@ function EventSlider({ events }) {
                             className="bg-white rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
                         >
                             <div className="h-[300px] overflow-hidden">
-                                <img
+                                <SafeImage
                                     src={event.imageUrl}
                                     alt={event.title}
                                     className="w-full h-full object-cover"

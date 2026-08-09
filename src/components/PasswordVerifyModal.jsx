@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import useApiRequest from "@/api/useApiRequest";
-import { toast } from "react-toastify";
 
 export default function PasswordVerifyModal({ onSuccess, onClose }) {
     const [password, setPassword] = useState("");

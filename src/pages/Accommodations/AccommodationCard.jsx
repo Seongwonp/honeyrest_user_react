@@ -5,6 +5,7 @@ import { HiStar, HiLocationMarker, HiCheckCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import WishToggleButton from "@/components/WishToggleButton.jsx";
 import { motion } from "framer-motion";
+import SafeImage from "@/components/SafeImage.jsx";
 
 function AccommodationCard({ item, userId, checkIn, checkOut, guests }) {
     const isSoldOut = item.available === false;
@@ -17,7 +18,7 @@ function AccommodationCard({ item, userId, checkIn, checkOut, guests }) {
             >
                 {/* 이미지 섹션 */}
                 <div className="relative w-full md:w-64 h-48 shrink-0 overflow-hidden rounded-2xl">
-                    <img
+                    <SafeImage
                         src={item.image}
                         alt={item.title}
                         className={`w-full h-full object-cover transition-transform duration-700 ${!isSoldOut ? "hover:scale-110" : "grayscale"}`}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title description">
+  <title id="title">HoneyRest accommodation placeholder</title>
+  <desc id="description">A warm illustrated room used when an accommodation photo is unavailable.</desc>
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7df"/><stop offset="1" stop-color="#f1f7e8"/></linearGradient>
+    <linearGradient id="window" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bde4ef"/><stop offset="1" stop-color="#eef9f7"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#805d28" flood-opacity=".16"/></filter>
+  </defs>
+  <rect width="1200" height="800" fill="url(#wall)"/><circle cx="1025" cy="115" r="180" fill="#f7d35e" opacity=".22"/>
+  <path d="M0 610C210 560 385 650 610 605s390-36 590 22v173H0z" fill="#dce9cc"/>
+  <g filter="url(#shadow)"><rect x="135" y="110" width="410" height="330" rx="28" fill="#fff"/><rect x="165" y="140" width="350" height="270" rx="16" fill="url(#window)"/><path d="M165 350c105-120 180-90 350-190v250H165z" fill="#b9d59b"/><path d="M165 382c120-95 245-60 350-140v168H165z" fill="#7fa96c" opacity=".72"/><path d="M337 140v270M165 275h350" stroke="#fff" stroke-width="18"/></g>
+  <g filter="url(#shadow)"><rect x="375" y="425" width="620" height="210" rx="48" fill="#fffdf7"/><rect x="410" y="377" width="250" height="135" rx="40" fill="#f5d88d"/><rect x="680" y="377" width="250" height="135" rx="40" fill="#e8efda"/><rect x="405" y="500" width="560" height="145" rx="42" fill="#fff"/><path d="M405 570h560v75H405z" fill="#f2c85b" opacity=".78"/></g>
+  <g fill="#54624d"><rect x="1040" y="385" width="25" height="230" rx="12"/><path d="M1052 425c-80-10-105-66-66-102 56 5 80 43 66 102zM1053 486c72-11 107-63 78-105-62 2-91 42-78 105zM1051 540c-68-8-98-50-73-91 56 0 82 33 73 91z" fill="#7fa96c"/></g>
+  <g transform="translate(78 690)"><path d="M0 0h48l14 22 14-22h48l-27 43 17 34H10l17-34z" fill="#f2c85b"/><text x="145" y="47" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#4d554c">HoneyRest</text></g>
+</svg>

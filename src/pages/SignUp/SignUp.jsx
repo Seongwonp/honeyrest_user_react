@@ -17,7 +17,6 @@ const getPasswordStrength = (password) => {
 };
 
 const strengthLabels = ["매우 약함", "약함", "보통", "강함", "매우 강함"];
-const strengthColors = ["bg-gray-300", "bg-red-500", "bg-yellow-500", "bg-green-500", "bg-blue-600"];
 
 const termsList = [
     {

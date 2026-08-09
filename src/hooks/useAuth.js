@@ -34,7 +34,7 @@ export const useAuth = () => {
             } else {
                 setUser(null);
             }
-        } catch (err) {
+        } catch {
             setUser(null);
         } finally {
             setIsLoadingUser(false);

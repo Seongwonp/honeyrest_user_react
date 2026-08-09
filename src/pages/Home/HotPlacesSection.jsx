@@ -4,7 +4,7 @@ import Slider from "react-slick";
 import { FaChevronDown, FaChevronUp, FaFire } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
-function HotPlacesSection({ hotPlaces, isDropdownOpen, setIsDropdownOpen, verticalSliderSettings, navigate, userInfo }) {
+function HotPlacesSection({ isDropdownOpen, setIsDropdownOpen, verticalSliderSettings, navigate, userInfo }) {
     const [hotList, setHotList] = useState([]);
 
     useEffect(() => {

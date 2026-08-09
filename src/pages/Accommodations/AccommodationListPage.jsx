@@ -66,7 +66,7 @@ function AccommodationListPage() {
     };
 
     useEffect(() => {
-        if (location && checkIn && checkOut) {
+        if (checkIn && checkOut) {
             fetchData();
         }
     }, [

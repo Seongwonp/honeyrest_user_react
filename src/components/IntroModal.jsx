@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { FaVolumeMute, FaVolumeUp, FaHandPointRight, FaTimes } from "react-icons/fa";
 
 function IntroModal() {
     const [muted, setMuted] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [dontShow, setDontShow] = useState(false);
-    const navigate = useNavigate();
-
     useEffect(() => {
         const cookie = document.cookie.split('; ').find(row => row.startsWith('hideIntroModal='));
         if (!cookie) {

@@ -27,6 +27,9 @@ import DateRangeModal from "@/pages/Home/searchBox/DateRangeModal.jsx";
 import {FiCalendar} from "react-icons/fi";
 import InquiryModal from "@/components/InquiryModal.jsx";
 import { motion, AnimatePresence } from "framer-motion";
+import SafeImage from "@/components/SafeImage.jsx";
+
+const MotionDiv = motion.div;
 
 function Accommodation({ accommodationId, sectionRefs }) {
     const navigate = useNavigate();
@@ -64,6 +67,12 @@ function Accommodation({ accommodationId, sectionRefs }) {
     const [tempCheckOut, setTempCheckOut] = useState(checkOut);
     const [tempGuests, setTempGuests] = useState(guests);
     const [showInquiryModal, setShowInquiryModal] = useState(false);
+    const isChangeReady = Boolean(
+        tempCheckIn
+        && tempCheckOut
+        && Number(tempGuests) > 0
+        && new Date(tempCheckOut) > new Date(tempCheckIn)
+    );
 
     useEffect(() => {
         if (!checkIn || !checkOut || !guests) return;
@@ -153,7 +162,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                     <Slider {...sliderSettings}>
                         {data.images.map((src, i) => (
                             <div key={i} className="h-[400px] md:h-[600px]">
-                                <img
+                                <SafeImage
                                     src={src}
                                     alt={`Gallery ${i + 1}`}
                                     className="w-full h-full object-cover"
@@ -225,14 +234,14 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                 const isAvailable = room.available;
                                 const imageUrl = room.images?.find((img) => img.includes("s_")) || room.images?.[0];
                                 return (
-                                    <motion.div
+                                    <MotionDiv
                                         key={i}
                                         whileHover={isAvailable ? { y: -5 } : {}}
                                         onClick={() => isAvailable && navigate(`/room/${room.roomId}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`)}
                                         className={`flex flex-col md:flex-row gap-6 p-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm transition-all duration-300 ${isAvailable ? "hover:shadow-2xl hover:shadow-leaf-green/5 cursor-pointer" : "opacity-40 grayscale pointer-events-none"}`}
                                     >
                                         <div className="w-full md:w-56 h-40 overflow-hidden rounded-2xl">
-                                            <img src={imageUrl} alt={room.name} className="w-full h-full object-cover" />
+                                            <SafeImage src={imageUrl} alt={room.name} className="w-full h-full object-cover" />
                                         </div>
                                         <div className="flex-1 flex flex-col justify-between py-2">
                                             <div className="space-y-2">
@@ -254,7 +263,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                                 )}
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </MotionDiv>
                                 );
                             })}
                         </div>
@@ -370,7 +379,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                             {r.images?.length > 0 && (
                                                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                                                     {r.images.map((url, idx) => (
-                                                        <img key={idx} src={url} alt="Review" className="w-24 h-24 rounded-2xl object-cover border border-gray-100" />
+                                                        <SafeImage key={idx} src={url} alt="Review" className="w-24 h-24 rounded-2xl object-cover border border-gray-100" />
                                                     ))}
                                                 </div>
                                             )}
@@ -446,8 +455,8 @@ function Accommodation({ accommodationId, sectionRefs }) {
             <AnimatePresence>
                 {showChangeModal && (
                     <>
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowChangeModal(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]" />
-                        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="fixed inset-0 z-[210] flex items-center justify-center p-6">
+                        <MotionDiv initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowChangeModal(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]" />
+                        <MotionDiv initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="fixed inset-0 z-[210] flex items-center justify-center p-6">
                             <div className="bg-white rounded-[2.5rem] shadow-2xl p-10 max-w-md w-full space-y-8 relative">
                                 <div className="text-center space-y-2">
                                     <h2 className="text-2xl font-black text-deep-gray tracking-tight">예약 정보 변경</h2>
@@ -476,13 +485,13 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                 <button
                                     onClick={() => { setCheckIn(tempCheckIn); setCheckOut(tempCheckOut); setGuests(tempGuests); setShowChangeModal(false); }}
                                     className="w-full py-4 bg-honey-yellow text-white rounded-2xl font-black shadow-lg shadow-honey-yellow/20 hover:bg-honey-yellow-dark transition-all disabled:opacity-30"
-                                    disabled={!isReady}
+                                    disabled={!isChangeReady}
                                 >
                                     변경 사항 적용하기
                                 </button>
                                 <button onClick={() => setShowChangeModal(false)} className="absolute top-6 right-6 text-gray-300 hover:text-deep-gray transition-colors">Close</button>
                             </div>
-                        </motion.div>
+                        </MotionDiv>
                     </>
                 )}
             </AnimatePresence>
@@ -491,8 +500,8 @@ function Accommodation({ accommodationId, sectionRefs }) {
             <AnimatePresence>
                 {showDateRangeModal && (
                     <div className="fixed inset-0 z-[300] flex items-center justify-center p-6">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDateRangeModal(false)} className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="relative bg-white rounded-[2.5rem] shadow-2xl p-6">
+                        <MotionDiv initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowDateRangeModal(false)} className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+                        <MotionDiv initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="relative bg-white rounded-[2.5rem] shadow-2xl p-6">
                             <DateRangeModal
                                 isOpen={showDateRangeModal}
                                 onClose={() => setShowDateRangeModal(false)}
@@ -500,7 +509,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                 startDate={tempCheckIn}
                                 endDate={tempCheckOut}
                             />
-                        </motion.div>
+                        </MotionDiv>
                     </div>
                 )}
             </AnimatePresence>

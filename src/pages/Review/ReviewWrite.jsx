@@ -69,7 +69,7 @@ export default function ReviewWrite() {
                 locationRating,
             });
             navigate("/user/mypage/reservations");
-        } catch (err) {
+        } catch {
             alert("리뷰 등록에 실패했습니다.");
         } finally {
             setLoading(false);
