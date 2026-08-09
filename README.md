@@ -216,6 +216,40 @@ src/
 
 ---
 
+## 📸 최신 화면
+
+### 메인 홈
+
+![HoneyRest 메인 홈](docs/screenshots/home-hero.png)
+
+[메인 홈 전체 화면 보기](docs/screenshots/home-full.png)
+
+### 숙소 검색
+
+가격 캘린더가 적용된 전체 숙소 검색과 이미지 로드 실패 시 로컬 대체 이미지가 표시됩니다.
+
+![HoneyRest 숙소 검색](docs/screenshots/accommodation-list.png)
+
+### 숙소 상세 · 객실 선택
+
+![HoneyRest 숙소 상세 객실 선택](docs/screenshots/accommodation-detail.png)
+
+### 고객 리뷰
+
+![HoneyRest 고객 리뷰](docs/screenshots/accommodation-reviews.png)
+
+### 로그인 · 회원가입
+
+| 로그인 | 회원가입 |
+|---|---|
+| ![HoneyRest 로그인](docs/screenshots/login.png) | ![HoneyRest 회원가입](docs/screenshots/signup.png) |
+
+### 마이페이지
+
+![HoneyRest 마이페이지](docs/screenshots/mypage.png)
+
+---
+
 ## 🎬 시연 영상 / 발표 자료
 
 📺 [User 시연 영상 보러가기](#)  
