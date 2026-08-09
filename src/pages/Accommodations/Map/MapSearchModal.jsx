@@ -3,7 +3,6 @@ import GoogleMapSearchBox from "@/pages/Accommodations/Map/GoogleMapSearchBox.js
 
 function MapSearchModal({ onClose, onSearch }) {
     const [center, setCenter] = useState(null);
-    const [accommodations, setAccommodations] = useState([]);
 
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(
@@ -17,10 +16,7 @@ function MapSearchModal({ onClose, onSearch }) {
     }, []);
 
     const handleSearch = () => {
-        fetch(`/api/accommodations/search?lat=${center.lat}&lng=${center.lng}`)
-            .then(res => res.json())
-            .then(data => setAccommodations(data.content))
-            .catch(err => console.error("❌ 숙소 검색 실패:", err));
+        if (center) onSearch(center);
     };
 
     return (
@@ -32,7 +28,7 @@ function MapSearchModal({ onClose, onSearch }) {
                         <GoogleMapSearchBox
                             initialCenter={center}
                             onCenterChange={(newCenter) => setCenter(newCenter)}
-                            markers={accommodations}
+                            markers={[]}
                         />
                     )}
                 </div>

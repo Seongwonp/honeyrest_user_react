@@ -57,7 +57,7 @@ export default function CancelRequestPage() {
         try {
             const res = await api.get(`/api/user/reservations/${reservationId}`);
             setReservation(res.data);
-        } catch (err) {
+        } catch {
             toast.error('예약 정보를 불러오지 못했습니다.');
         }
     };
@@ -66,7 +66,7 @@ export default function CancelRequestPage() {
         try {
             const res = await api.get(`/api/accommodations/${accommodationId}/cancellation-policies`);
             setPolicies(res.data);
-        } catch (err) {
+        } catch {
             toast.error('취소 규정을 불러오지 못했습니다.');
         }
     };
@@ -93,7 +93,7 @@ export default function CancelRequestPage() {
             await api.post(`/api/user/reservations/${reservationId}/cancel-request`, { reason: finalReason });
             toast.success('취소 요청이 접수되었습니다.');
             navigate('/user/mypage/reservations');
-        } catch (err) {
+        } catch {
             toast.error('요청 중 오류가 발생했습니다.');
         } finally {
             setLoading(false);

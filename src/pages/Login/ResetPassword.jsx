@@ -25,7 +25,6 @@ function ResetPassword() {
                 },
                 {
                     label: 'resetPassword',
-                    errorMessage: '존재하지 않는 이메일입니다.',
                     onSuccess: () => {
                         Swal.fire({
                             title: '이메일을 확인해주세요',

@@ -57,15 +57,6 @@ function FilterSidebar({ onFilterChange, openMapSearch }) {
         applyFilters({ maxPrice: tempPrice });
     };
 
-    const toggleTag = (tagName) => {
-        const updated = selectedTags.includes(tagName)
-            ? selectedTags.filter(t => t !== tagName)
-            : [...selectedTags, tagName];
-
-        setSelectedTags(updated);
-        applyFilters({ tags: updated });
-    };
-
     const toggleGroup = (category) => {
         setExpandedGroups(prev => ({
             ...prev,

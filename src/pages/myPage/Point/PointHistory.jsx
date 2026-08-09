@@ -7,10 +7,9 @@ function PointHistory() {
     const [history, setHistory] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const [totalElements, setTotalElements] = useState(0);
     const [size, setSize] = useState(10);
 
-    const { request, isLoading } = useApiRequest();
+    const { request } = useApiRequest();
 
     const fetchPointHistory = (pageNumber = 0) => {
         request(
@@ -24,7 +23,6 @@ function PointHistory() {
                     setCurrentPoint(data.currentPoint);
                     setHistory(data.history);
                     setTotalPages(data.totalPages);
-                    setTotalElements(data.totalElements);
                     setPage(data.page);
                     setSize(data.size);
                 },

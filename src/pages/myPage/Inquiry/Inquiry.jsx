@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { FaRegCommentDots, FaReply, FaHotel } from 'react-icons/fa';
 
 function Inquiry() {
-    const { request, isLoading } = useApiRequest();
+    const { request } = useApiRequest();
     const { inquiryId } = useParams();
     const navigate = useNavigate();
 

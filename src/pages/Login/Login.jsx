@@ -16,7 +16,7 @@ function Login() {
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
     const { request, isLoading } = useApiRequest();
-    const { loadUser, syncUserFromServer } = useAuth();
+    const { syncUserFromServer } = useAuth();
 
     const location = useLocation();
     const redirectTo = location.state?.redirectTo || "/";

@@ -24,7 +24,7 @@ export default function ReserveGuestLookUp() {
         try {
             const response = await axios.post('/api/reserve/guest-lookup', form);
             setResult(response.data);
-        } catch (err) {
+        } catch {
             setError('예약 정보를 찾을 수 없습니다. 입력값을 다시 확인해주세요.');
         } finally {
             setLoading(false);

@@ -28,7 +28,7 @@ export default function ReservationComplete() {
 
     const {
         reservationCode, accommodationName, roomName, checkIn, checkOut,
-        guests, guestName, guestPhone, guestEmail, couponName,
+        guests, guestName, guestPhone, couponName,
         originalPrice, discountAmount, finalPrice, receiptUrl,
         paymentMethod, isEmailSent
     } = state;

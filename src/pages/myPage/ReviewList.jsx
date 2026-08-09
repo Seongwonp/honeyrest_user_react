@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
 import api from "@/api/axios";
 import {FaStar, FaTrash, FaPen, FaCommentDots} from "react-icons/fa";
 
 export default function ReviewList() {
-    const navigate = useNavigate();
     const [reviews, setReviews] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
@@ -34,7 +32,7 @@ export default function ReviewList() {
         try {
             await api.delete(`/api/user/reviews/${reviewId}`);
             fetchReviews(page);
-        } catch (err) {
+        } catch {
             alert("리뷰 삭제에 실패했습니다.");
         }
     };
@@ -300,7 +298,7 @@ export default function ReviewList() {
                                         );
                                         setEditingReview(null);
                                         fetchReviews(page);
-                                    } catch (err) {
+                                    } catch {
                                         alert("리뷰 수정에 실패했습니다.");
                                     }
                                 }}
