@@ -27,6 +27,7 @@ import DateRangeModal from "@/pages/Home/searchBox/DateRangeModal.jsx";
 import {FiCalendar} from "react-icons/fi";
 import InquiryModal from "@/components/InquiryModal.jsx";
 import { motion, AnimatePresence } from "framer-motion";
+import SafeImage from "@/components/SafeImage.jsx";
 
 function Accommodation({ accommodationId, sectionRefs }) {
     const navigate = useNavigate();
@@ -153,7 +154,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                     <Slider {...sliderSettings}>
                         {data.images.map((src, i) => (
                             <div key={i} className="h-[400px] md:h-[600px]">
-                                <img
+                                <SafeImage
                                     src={src}
                                     alt={`Gallery ${i + 1}`}
                                     className="w-full h-full object-cover"
@@ -232,7 +233,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                         className={`flex flex-col md:flex-row gap-6 p-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm transition-all duration-300 ${isAvailable ? "hover:shadow-2xl hover:shadow-leaf-green/5 cursor-pointer" : "opacity-40 grayscale pointer-events-none"}`}
                                     >
                                         <div className="w-full md:w-56 h-40 overflow-hidden rounded-2xl">
-                                            <img src={imageUrl} alt={room.name} className="w-full h-full object-cover" />
+                                            <SafeImage src={imageUrl} alt={room.name} className="w-full h-full object-cover" />
                                         </div>
                                         <div className="flex-1 flex flex-col justify-between py-2">
                                             <div className="space-y-2">
@@ -370,7 +371,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                             {r.images?.length > 0 && (
                                                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                                                     {r.images.map((url, idx) => (
-                                                        <img key={idx} src={url} alt="Review" className="w-24 h-24 rounded-2xl object-cover border border-gray-100" />
+                                                        <SafeImage key={idx} src={url} alt="Review" className="w-24 h-24 rounded-2xl object-cover border border-gray-100" />
                                                     ))}
                                                 </div>
                                             )}
