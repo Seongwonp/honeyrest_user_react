@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useRef } from 'react';
-import axios from 'axios';
+import api from '@/api/axios';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { FaExclamationCircle } from 'react-icons/fa';
@@ -19,7 +19,7 @@ const EmailVerifyPage = () => {
 
         if (token && !hasFetched.current) {
             hasFetched.current = true;
-            axios.get(`/api/user/email/verify?token=${token}`)
+            api.get(`/api/user/email/verify?token=${token}`)
                 .then(() => {
                     setMessage('이메일 인증이 완료되었습니다!');
                     setStatus('success');

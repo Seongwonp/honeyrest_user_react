@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from 'axios';
+import api from '@/api/axios';
 import Header from "../../components/Header.jsx";
 import { FaEnvelopeOpenText } from "react-icons/fa";
 
@@ -17,7 +17,7 @@ function VerifyEmail() {
         }
         console.log("이메일 정보: " + email);
 
-        axios.post('/api/user/email/resend', { email })
+        api.post('/api/user/email/resend', { email })
             .then(() => setResendStatus("인증 메일이 다시 전송되었습니다."))
             .catch(() => setResendStatus("재전송 중 오류가 발생했습니다."));
     };

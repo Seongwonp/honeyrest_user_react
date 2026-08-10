@@ -7,6 +7,7 @@ import { useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-toastify';
 import api from '@/api/axios';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 
 function GlobalGuard() {
     const location = useLocation();
@@ -79,7 +80,9 @@ function GlobalGuard() {
 function App() {
     return (
         <BrowserRouter>
-            <GlobalGuard />
+            <ErrorBoundary>
+                <GlobalGuard />
+            </ErrorBoundary>
         </BrowserRouter>
     );
 }

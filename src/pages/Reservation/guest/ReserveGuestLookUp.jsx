@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '@/api/axios';
 import { FaClipboardList } from 'react-icons/fa';
 
 export default function ReserveGuestLookUp() {
@@ -22,7 +22,7 @@ export default function ReserveGuestLookUp() {
         setResult(null);
 
         try {
-            const response = await axios.post('/api/reserve/guest-lookup', form);
+            const response = await api.post('/api/reserve/guest-lookup', form);
             setResult(response.data);
         } catch {
             setError('예약 정보를 찾을 수 없습니다. 입력값을 다시 확인해주세요.');

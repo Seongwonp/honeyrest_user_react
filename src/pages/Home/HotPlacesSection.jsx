@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/api/axios";
 import Slider from "react-slick";
 import { FaChevronDown, FaChevronUp, FaFire } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,7 +8,7 @@ function HotPlacesSection({ isDropdownOpen, setIsDropdownOpen, verticalSliderSet
     const [hotList, setHotList] = useState([]);
 
     useEffect(() => {
-        axios.get("/api/region/hot?topN=8")
+        api.get("/api/region/hot?topN=8")
             .then(res => {
                 setHotList(res.data);
             })

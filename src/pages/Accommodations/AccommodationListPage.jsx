@@ -1,7 +1,7 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import qs from "qs";
-import axios from "axios";
+import api from "@/api/axios";
 import AccommodationCard from "./AccommodationCard";
 import { motion, AnimatePresence } from "framer-motion";
 import ListSearchBox from "./ListSearchBox.jsx";
@@ -40,7 +40,7 @@ function AccommodationListPage() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await axios.get("/api/accommodations/search", {
+            const res = await api.get("/api/accommodations/search", {
                 params: {
                     location,
                     checkIn,
