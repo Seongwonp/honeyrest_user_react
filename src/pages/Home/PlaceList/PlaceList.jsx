@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { HiLocationMarker, HiStar } from "react-icons/hi";
-import axios from "axios";
+import api from "@/api/axios";
 import CategorySelector from "./CategorySelector";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -13,7 +13,7 @@ function PlaceList() {
     const [itemsPerPage] = useState(6);
 
     useEffect(() => {
-        axios.get("/api/accommodations/categories").then((res) => {
+        api.get("/api/accommodations/categories").then((res) => {
             const allCategory = {
                 categoryId: 0,
                 name: "전체",
@@ -27,7 +27,7 @@ function PlaceList() {
     useEffect(() => {
         setCurrentPage(1);
         const params = selectedCategory === "전체" ? {} : { category: selectedCategory };
-        axios
+        api
             .get("/api/accommodations/popular", { params })
             .then((res) => setPlaces(res.data));
     }, [selectedCategory]);

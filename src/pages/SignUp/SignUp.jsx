@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "@/api/axios";
 import logo from '/images/logo-Photoroom.png';
 import Header from "../../components/Header.jsx";
 import { FaUserPlus } from 'react-icons/fa';
@@ -175,7 +175,7 @@ function Signup() {
         }
 
         try {
-            const res = await axios.post("/api/auth/signup", formData);
+            const res = await api.post("/api/auth/signup", formData);
             console.log("회원가입 성공:", res.data);
             localStorage.setItem('signupEmail', form.email);
             navigate("/verify-email", { state: { email: form.email } });

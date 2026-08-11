@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import axios from "axios";
+import api from "@/api/axios";
 
 export default function PaymentSuccess() {
     const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function PaymentSuccess() {
             reservationInfo.reservationCode = orderId;
 
             try {
-                const response = await axios.post("/api/payment/toss/confirm", {
+                const response = await api.post("/api/payment/toss/confirm", {
                     paymentKey,
                     orderId,
                     amount,

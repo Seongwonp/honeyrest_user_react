@@ -21,6 +21,14 @@ export default function Reservation() {
     const {state} = useLocation();
     const [agree, setAgree] = useState(false);
 
+    // 새로고침이나 이 URL로 직접 접근하면 location.state가 없어 이전에는 구조분해 단계에서
+    // 바로 크래시가 났다(백지 화면, P0-1). 안전한 페이지로 되돌려보낸다.
+    useEffect(() => {
+        if (!state) {
+            navigate("/accommodations", {replace: true});
+        }
+    }, [state, navigate]);
+
     // 동의 항목 및 상태 관리
     const [agreements, setAgreements] = useState({
         privacy: false,
@@ -48,7 +56,7 @@ export default function Reservation() {
         checkIn,
         checkOut,
         guests,
-        originalPrice,
+        originalPrice = 0,
         userId,
         userName,
         userPhone,
@@ -56,10 +64,10 @@ export default function Reservation() {
         accommodationThumbnail,
         accommodationAddress,
         roomName,
-        cancellationPolicy,
+        cancellationPolicy = [],
         availableCoupons = [],
         availablePoints = 0
-    } = state;
+    } = state ?? {};
 
     const [form, setForm] = useState({
         guestName: userName || "",
@@ -158,6 +166,11 @@ export default function Reservation() {
         {value: "TOSS", label: "간편 결제", icon: <FaMobileAlt/>},
         {value: "BANK", label: "무통장 입금", icon: <FaMoneyCheckAlt/>}
     ];
+
+    // 위 useEffect가 리다이렉트를 시작하는 동안 잘못된 값으로 렌더링하지 않는다.
+    if (!state) {
+        return null;
+    }
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-10">

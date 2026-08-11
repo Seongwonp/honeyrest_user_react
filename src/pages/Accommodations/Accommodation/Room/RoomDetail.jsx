@@ -5,7 +5,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
-import axios from "axios";
+import api from "@/api/axios";
 import RoomImageViewer from "./RoomImageViewer";
 import ReviewSlider from "./ReviewSlider";
 import { useAuth } from "@/hooks/useAuth"; // 추가
@@ -24,7 +24,7 @@ export default function RoomDetail() {
     const [roomDetail, setRoomDetail] = useState(null);
 
     useEffect(() => {
-        axios.get(`/api/room/${roomId}`, {
+        api.get(`/api/room/${roomId}`, {
             params: { checkIn, checkOut, guests }
         }).then(res => {
             setRoomDetail(res.data);
@@ -189,7 +189,7 @@ export default function RoomDetail() {
                                 const isLoggedIn = !!userId;
 
                                 try {
-                                    const response = await axios.get("/api/reserve/form-info", {
+                                    const response = await api.get("/api/reserve/form-info", {
                                         params: {
                                             roomId: roomDetail.roomId,
                                             checkIn,

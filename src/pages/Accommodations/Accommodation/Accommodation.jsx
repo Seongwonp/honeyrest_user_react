@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Slider from "react-slick";
-import axios from "axios";
+import api from "@/api/axios";
 import {
     AiOutlineLeft,
     AiOutlineRight,
@@ -79,7 +79,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
         const params = { checkIn, checkOut, guests };
         if (userId) params.userId = userId;
 
-        axios.get(`/api/accommodations/${accommodationId}`, { params })
+        api.get(`/api/accommodations/${accommodationId}`, { params })
             .then((res) => {
                 setData(res.data);
                 setIsWished(res.data.wished);

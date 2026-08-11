@@ -1,11 +1,20 @@
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function PaymentProcess() {
     const { state } = useLocation();
+    const navigate = useNavigate();
     const [widgets, setWidgets] = useState(null);
     const [ready, setReady] = useState(false);
+
+    // 결제 처리 페이지에 새로고침이나 직접 URL 접근으로 들어오면 location.state가 없어
+    // handlePayment 내부에서 state.guestPhone 등을 그대로 참조하다 크래시가 났다(P0-2).
+    useEffect(() => {
+        if (!state) {
+            navigate("/accommodations", {replace: true});
+        }
+    }, [state, navigate]);
 
     const amount = {
         currency: "KRW",
@@ -53,6 +62,8 @@ export default function PaymentProcess() {
     }, [widgets]);
 
     const handlePayment = async () => {
+        if (!state) return;
+
         const baseCode = "HR-" + crypto.randomUUID().slice(0, 8).toUpperCase();
         // 주문번호에는 비밀번호/개인정보를 절대 포함하지 않는다.
         const orderId = baseCode;
@@ -96,6 +107,11 @@ export default function PaymentProcess() {
             console.error("❌ 결제 요청 실패:", error);
         }
     };
+
+    // 위 useEffect가 리다이렉트를 시작하는 동안 잘못된 값으로 렌더링하지 않는다.
+    if (!state) {
+        return null;
+    }
 
     return (
         <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">

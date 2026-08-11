@@ -1,6 +1,6 @@
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { motion } from "framer-motion";
-import axios from "axios";
+import api from "@/api/axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -15,7 +15,7 @@ function WishToggleButton({ accommodationId, initialLiked, userId }) {
         }
 
         try {
-            const res = await axios.post("/api/wishList/toggle", {
+            const res = await api.post("/api/wishList/toggle", {
                 userId,
                 accommodationId
             });
