@@ -16,6 +16,11 @@ export default defineConfig(({ mode }) => {
                     target: env.VITE_BACKEND_URL,
                     changeOrigin: true,
                 },
+                // 로컬 스토리지 모드(app.storage.type=local) 이미지 경로
+                '/uploads': {
+                    target: env.VITE_BACKEND_URL,
+                    changeOrigin: true,
+                },
             },
         },
         resolve: {
