@@ -4,69 +4,13 @@ import api from "@/api/axios";
 import logo from '/images/logo-Photoroom.png';
 import Header from "../../components/Header.jsx";
 import { FaUserPlus } from 'react-icons/fa';
-import { FiChevronDown } from 'react-icons/fi';
 import Input from '@/components/ui/Input.jsx';
 import Button from '@/components/ui/Button.jsx';
 import AuthCard from '@/components/ui/AuthCard.jsx';
 import { inputClass, labelClass } from '@/components/ui/styles';
-
-const getPasswordStrength = (password) => {
-    let score = 0;
-    if (!password) return 0;
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-    return score; // 0 ~ 4
-};
-
-const strengthLabels = ["매우 약함", "약함", "보통", "강함", "매우 강함"];
-
-const termsList = [
-    {
-        key: "termsOfUse",
-        label: "이용약관 동의",
-        required: true,
-        detail: `HoneyRest 서비스 이용과 관련하여 회원은 아래의 약관을 준수해야 합니다.
-
-1. 회원은 서비스 이용 시 관련 법령과 공공질서, 미풍양속을 준수해야 합니다.
-2. 타인의 권리를 침해하거나 불법적인 목적의 이용을 금합니다.
-3. 회사는 서비스 개선과 보안을 위해 이용 기록을 모니터링할 수 있습니다.
-4. 약관을 위반할 경우 서비스 이용이 제한될 수 있습니다.`
-    },
-    {
-        key: "privacyPolicy",
-        label: "개인정보 수집 및 이용 동의",
-        required: true,
-        detail: `회원가입 및 서비스 제공을 위해 아래와 같은 개인정보를 수집·이용합니다.
-
-1. 수집 항목: 이름, 이메일, 비밀번호, 연락처, 생년월일, 성별
-2. 이용 목적: 회원 관리, 예약 처리, 고객 상담, 서비스 품질 개선
-3. 보관 기간: 회원 탈퇴 시 즉시 파기 (단, 관련 법령에 따라 일정 기간 보관 가능)
-4. 권리 안내: 회원은 개인정보 수집 및 이용 동의를 거부할 권리가 있으며, 거부 시 서비스 이용에 제한이 있을 수 있습니다.`
-    },
-    {
-        key: "ageConfirm",
-        label: "만 14세 이상입니다",
-        required: true,
-        detail: `개인정보 보호법 및 관련 규정에 따라 만 14세 미만은 회원가입이 제한됩니다.
-
-1. 만 14세 이상만 회원가입이 가능합니다.
-2. 허위로 나이를 기재할 경우 서비스 이용이 제한될 수 있습니다.
-3. 법정대리인의 동의 없는 만 14세 미만 가입은 무효 처리됩니다.`
-    },
-    {
-        key: "marketingAgree",
-        label: "마케팅 정보 수신 동의",
-        required: false,
-        detail: `다양한 이벤트 및 혜택 정보를 받아보실 수 있습니다.
-
-1. 수신 항목: 이메일, SMS, 푸시 알림
-2. 이용 목적: 할인 정보, 프로모션, 맞춤형 서비스 제공
-3. 보관 기간: 동의 철회 시 즉시 파기
-4. 동의 철회: 회원은 언제든지 마케팅 수신 동의를 철회할 수 있습니다.`
-    }
-];
+import PasswordStrengthMeter from './sections/PasswordStrengthMeter.jsx';
+import TermsAgreement from './sections/TermsAgreement.jsx';
+import { termsList } from './sections/signupTerms';
 
 function Signup() {
     const [form, setForm] = useState({
@@ -187,8 +131,6 @@ function Signup() {
         }
     };
 
-    // 비밀번호 강도 (0 ~ 4)
-    const strength = getPasswordStrength(form.password);
     const required = <span className="text-red-400 ml-0.5" aria-hidden="true">*</span>;
 
     return (
@@ -215,42 +157,7 @@ function Signup() {
                             <li>영문 대소문자, 숫자, 특수문자 중 2가지 이상 조합이 권장됩니다.</li>
                             <li>보안을 위해 가능한 한 긴 비밀번호를 사용하는 것이 좋습니다.</li>
                         </ul>
-                        {form.password && (
-                            <div className="space-y-1.5 text-xs text-gray-500 mt-3" aria-live="polite">
-                                <div className="font-bold">
-                                    비밀번호 강도:{' '}
-                                    <span className={
-                                        strength >= 3 ? 'text-leaf-green-dark' :
-                                        strength === 2 ? 'text-honey-yellow-dark' :
-                                        'text-red-500'
-                                    }>
-                                        {strengthLabels[strength]}
-                                    </span>
-                                </div>
-                                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full rounded-full transition-all duration-300 ${
-                                            strength === 1
-                                                ? 'bg-red-400 w-1/5'
-                                                : strength === 2
-                                                    ? 'bg-honey-yellow w-2/5'
-                                                    : strength === 3
-                                                        ? 'bg-leaf-green w-3/5'
-                                                        : strength === 4
-                                                            ? 'bg-leaf-green-dark w-full'
-                                                            : 'w-0'
-                                        }`}
-                                    />
-                                </div>
-                                <p className="text-gray-400">
-                                    {strength === 0 ? '' :
-                                     strength === 1 ? '비밀번호가 너무 짧습니다.' :
-                                     strength === 2 ? '최소 기준은 충족했지만 보안에 취약할 수 있습니다.' :
-                                     strength === 3 ? '일반적인 보안 수준입니다.' :
-                                     '안전한 비밀번호입니다.'}
-                                </p>
-                            </div>
-                        )}
+                        <PasswordStrengthMeter password={form.password} />
                     </div>
 
                     <Input label={<>비밀번호 확인{required}</>} name="confirmPassword" type="password" placeholder="비밀번호 확인" value={form.confirmPassword} onChange={handleChange} autoComplete="new-password" />
@@ -293,69 +200,14 @@ function Signup() {
                         </div>
                     </div>
 
-                    {/* 약관 동의 */}
-                    <div className="pt-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-black text-deep-gray">약관 동의</h3>
-                            <label className="flex items-center gap-2 text-sm font-bold text-gray-500 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={allChecked}
-                                    onChange={toggleAllTerms}
-                                    className="w-4 h-4 accent-leaf-green"
-                                />
-                                전체 동의
-                            </label>
-                        </div>
-
-                        <div className="mt-3 rounded-3xl bg-off-white p-2">
-                            {termsList.map((term) => (
-                                <div key={term.key} className="rounded-2xl p-3 hover:bg-white transition-colors">
-                                    <div className="flex items-start gap-3">
-                                        <input
-                                            id={`signup-term-${term.key}`}
-                                            type="checkbox"
-                                            name={term.key}
-                                            checked={form[term.key]}
-                                            onChange={handleChange}
-                                            className="mt-0.5 w-4 h-4 shrink-0 accent-leaf-green"
-                                        />
-                                        <label htmlFor={`signup-term-${term.key}`} className="flex-1 min-w-0 flex flex-wrap items-center gap-2 cursor-pointer">
-                                            <span className="text-sm font-medium text-deep-gray break-keep">{term.label}</span>
-                                            <span
-                                                className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                                                    term.required
-                                                        ? "bg-red-50 text-red-500"
-                                                        : "bg-honey-yellow/15 text-honey-yellow-dark"
-                                                }`}
-                                            >
-                                                {term.required ? "필수" : "선택"}
-                                            </span>
-                                        </label>
-                                        <button
-                                            type="button"
-                                            aria-label={`${term.label} 상세 보기`}
-                                            aria-expanded={!!expanded[term.key]}
-                                            onClick={() => toggleDetail(term.key)}
-                                            className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-deep-gray focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-honey-yellow/40"
-                                        >
-                                            <FiChevronDown
-                                                className={`h-5 w-5 transition-transform ${
-                                                    expanded[term.key] ? "rotate-180" : ""
-                                                }`}
-                                            />
-                                        </button>
-                                    </div>
-
-                                    {expanded[term.key] && (
-                                        <div className="pl-7 pr-3 pt-2 text-xs text-gray-500 leading-relaxed whitespace-pre-line break-words">
-                                            {term.detail}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <TermsAgreement
+                        form={form}
+                        onChange={handleChange}
+                        allChecked={allChecked}
+                        onToggleAll={toggleAllTerms}
+                        expanded={expanded}
+                        toggleDetail={toggleDetail}
+                    />
 
                     {/* 에러 메시지 */}
                     {error && (

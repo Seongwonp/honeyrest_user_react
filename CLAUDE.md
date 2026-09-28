@@ -22,9 +22,10 @@ npm run lint     # ESLint
 ## 아키텍처 핵심
 
 ### 인증 흐름
-- `src/hooks/useAuth.js` — 인증 상태 관리 (localStorage / sessionStorage)
-- `src/api/axios.js` — JWT 자동 주입 + 401 시 토큰 재발급 인터셉터
-- `src/App.jsx` (GlobalGuard) — 앱 마운트 시 1회 토큰 refresh + JWT 만료 타이머
+- `src/context/AuthContext.jsx` — 앱 전체 단일 `AuthProvider` (App.jsx 에서 GlobalGuard/라우트 위에 마운트). 다른 탭은 `storage` 이벤트, 같은 탭의 React 밖 변경은 `honeyrest:auth-change` 이벤트(`notifyAuthChange()`)로 동기화
+- `src/hooks/useAuth.js` — `useContext(AuthContext)` 래퍼 (API: `user, isLoggedIn, isLoadingUser, loadUser, syncUserFromServer, logout`). 컴포넌트에서 storage 의 `userInfo` 를 직접 읽지 말 것
+- `src/api/axios.js` — JWT 자동 주입 + 401 시 토큰 재발급 인터셉터. `refreshAccessToken()` 은 single-flight(진행 중 Promise 공유), 재발급 요청은 Bearer 없이 전용 인스턴스로 전송, 늦은 401 은 이미 갱신된 토큰으로 재시도. 토큰 조회는 `getAccessToken()`
+- `src/App.jsx` (GlobalGuard) — 앱 마운트 시 1회 `refreshAccessToken()` + 새 토큰 기준 JWT 만료 타이머
 - `src/routes/PrivateRoute.jsx` / `PublicRoute.jsx` — 라우트 가드
 
 ### API 통신
@@ -54,7 +55,7 @@ npm run lint     # ESLint
 | 목적 | 파일 |
 |------|------|
 | Axios 설정 / 인터셉터 | `src/api/axios.js` |
-| 인증 훅 | `src/hooks/useAuth.js` |
+| 인증 Provider / 훅 | `src/context/AuthContext.jsx`, `src/hooks/useAuth.js` |
 | 전역 가드 / 자동 로그인 | `src/App.jsx` |
 | 전체 라우트 | `src/AppWrapper.jsx` |
 | Tailwind 커스텀 테마 | `src/index.css` |

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GoAlertFill } from "react-icons/go";
 import { AnimatePresence, motion } from "framer-motion";
 import Modal from "../../components/Modal";
@@ -15,16 +15,18 @@ import WeatherWidget from "./Weather/WeatherWidget.jsx";
 import HotSpots from "@/pages/Home/HotSpots/HotSpots.jsx";
 import BannerSection from "@/pages/Home/BannerSection.jsx";
 import IntroModal from "@/components/IntroModal.jsx";
+import LazyVideo from "@/components/LazyVideo.jsx";
+import { useAuth } from "@/hooks/useAuth";
 
 function Home() {
     const navigate = useNavigate();
-    const locationPath = useLocation();
 
     const [location, setLocation] = useState("");
     const [checkIn, setCheckIn] = useState("");
     const [checkOut, setCheckOut] = useState("");
     const [guests, setGuests] = useState(2);
-    const [userInfo, setUserInfo] = useState(null);
+    // 로그인 사용자 정보는 AuthProvider 공유 상태에서 가져온다
+    const { user: userInfo } = useAuth();
 
     const [modalMessage, setModalMessage] = useState("");
     const [showModal, setShowModal] = useState(false);
@@ -42,12 +44,6 @@ function Home() {
 
     const [coords, setCoords] = useState(null);
     const [locationError, setLocationError] = useState(false);
-
-    useEffect(() => {
-        const storedUser =
-            localStorage.getItem("userInfo") || sessionStorage.getItem("userInfo");
-        setUserInfo(storedUser ? JSON.parse(storedUser) : null);
-    }, [locationPath.pathname]);
 
     useEffect(() => {
         if (!navigator.geolocation) return;
@@ -159,12 +155,9 @@ function Home() {
                 <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* 비디오 카드 */}
                     <div className="lg:col-span-8 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-gray-200 h-[400px] md:h-[500px] relative group">
-                        <video
+                        {/* 약 14MB 영상 → 뷰포트에 들어올 때만 로드 (LazyVideo) */}
+                        <LazyVideo
                             src="/videos/video2.mp4"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-8">

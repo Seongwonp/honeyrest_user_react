@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-toastify';
 import api from '@/api/axios';
@@ -7,19 +7,20 @@ import { getOAuthRedirectBase } from '@/config/urls';
 
 function Logout() {
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { user, isLoggedIn, logout } = useAuth();
+    // 진입 시점의 로그인 여부 (비로그인 진입은 기존 PrivateRoute 와 동일하게 401 처리)
+    // logout() 이후 상태가 바뀌어도 안내 메시지·카카오 로그아웃 흐름이 끊기지 않도록 최초 값만 사용
+    const [loggedInOnEnter] = useState(isLoggedIn);
     const [showMessage, setShowMessage] = useState(true);
     const hasLoggedOut = useRef(false);
 
     useEffect(() => {
         const performLogout = async () => {
-            if (hasLoggedOut.current) return;
+            if (!loggedInOnEnter || hasLoggedOut.current) return;
             hasLoggedOut.current = true;
 
-            const rawUser =
-                localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
-            const userInfo = rawUser ? JSON.parse(rawUser) : {};
-            const provider = userInfo?.provider;
+            // logout() 이전에 공유 인증 상태에서 로그인 제공자를 확보
+            const provider = user?.provider;
 
             try {
                 await api.post('/api/auth/logout');
@@ -53,7 +54,12 @@ function Logout() {
         };
 
         performLogout();
-    }, [navigate, logout]);
+        // hasLoggedOut ref 로 1회만 실행되므로 user 변경으로 재실행돼도 무방
+    }, [navigate, logout, user, loggedInOnEnter]);
+
+    if (!loggedInOnEnter) {
+        return <Navigate to="/error/401" replace />;
+    }
 
     return (
         showMessage && (

@@ -100,14 +100,8 @@ function AppWrapper() {
                             </PublicRoute>
                         }
                     />
-                    <Route
-                        path="/logout"
-                        element={
-                            <PrivateRoute>
-                                <Logout />
-                            </PrivateRoute>
-                        }
-                    />
+                    {/* 로그아웃: logout() 직후 PrivateRoute 가 401 로 보내지 않도록 가드는 Logout 내부에서 처리 */}
+                    <Route path="/logout" element={<Logout />} />
                     {/* 인증 관련 */}
                     <Route path="/verify-email" element={<VerifyEmail/>}/>
                     <Route path="/verify" element={<EmailVerifyPage/>}/>

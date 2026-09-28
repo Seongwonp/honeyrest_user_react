@@ -3,12 +3,14 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { SWAL_CONFIRM_OPTIONS } from "@/config/swal";
 import useApiRequest from "/src/api/useApiRequest";
+import { useAuth } from "@/hooks/useAuth";
 
 function GoogleCallback() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const calledRef = useRef(false);
     const { request, isLoading } = useApiRequest();
+    const { loadUser } = useAuth();
 
     useEffect(() => {
         const code = searchParams.get("code");
@@ -32,6 +34,8 @@ function GoogleCallback() {
 
                     storage.setItem("accessToken", accessToken);
                     storage.setItem("userInfo", JSON.stringify(userWithProvider));
+                    // 같은 탭의 Header 등에 로그인 상태를 즉시 반영
+                    loadUser();
 
                     Swal.fire({
                         title: `${user.name}님 환영합니다!`,
@@ -49,7 +53,7 @@ function GoogleCallback() {
                 },
             }
         );
-    }, [searchParams, navigate, request]);
+    }, [searchParams, navigate, request, loadUser]);
 
     return (
         <div className="h-screen flex items-center justify-center bg-white">
