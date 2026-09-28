@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+import { SWAL_CONFIRM_OPTIONS } from "@/config/swal";
 import { useNavigate, Link } from 'react-router-dom';
 import useApiRequest from '@/api/useApiRequest';
 import Header from '@/components/Header';
@@ -34,7 +35,7 @@ function ResetPassword() {
                             text: '비밀번호 재설정 링크가 발송되었습니다.',
                             icon: 'success',
                             confirmButtonText: '확인',
-                            confirmButtonColor: '#FDD835',
+                            ...SWAL_CONFIRM_OPTIONS,
                         }).then(() => navigate('/login'));
                     },
                 }

@@ -335,7 +335,7 @@ export default function Reservation() {
                                     onClick={() => setPaymentMethod(option.value)}
                                     className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/30 ${
                                         paymentMethod === option.value
-                                            ? "bg-honey-yellow text-white border-honey-yellow shadow-lg shadow-honey-yellow/20"
+                                            ? "bg-honey-yellow text-deep-gray border-honey-yellow shadow-lg shadow-honey-yellow/20"
                                             : "bg-white text-deep-gray border-gray-100 hover:border-honey-yellow"
                                     }`}
                                 >

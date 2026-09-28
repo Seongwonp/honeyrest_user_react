@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import api from '@/api/axios';
 import Header from "../../components/Header.jsx";
-import { FaEnvelopeOpenText } from "react-icons/fa";
+import { FaEnvelopeOpenText, FaPaperPlane } from "react-icons/fa";
+import StatusPanel from "@/components/ui/StatusPanel.jsx";
+import Button from "@/components/ui/Button.jsx";
 
 function VerifyEmail() {
     const navigate = useNavigate();
@@ -24,40 +26,30 @@ function VerifyEmail() {
     return (
         <>
             <Header />
-            <div className="bg-white h-screen flex flex-col items-center justify-center px-4">
-                <div className="bg-white border border-gray-200 rounded-lg shadow-md p-8 w-full max-w-md text-center" data-aos="fade-up">
-                    <div className="flex justify-center mb-4 text-yellow-500 text-4xl">
-                        <FaEnvelopeOpenText />
-                    </div>
-
-                    <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                        이메일 인증을 완료해 주세요 📧
-                    </h2>
-
-                    <p className="text-sm text-gray-600 mb-6">
-                        가입하신 이메일 주소로 인증 메일을 보냈습니다.<br />
-                        메일함을 확인하고 인증을 완료해 주세요.
-                    </p>
-
-                    <button
-                        onClick={handleResend}
-                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-2 rounded-lg mb-2"
-                    >
-                        인증 메일 다시 보내기
-                    </button>
-
-                    {resendStatus && (
-                        <p className="text-sm text-gray-700 mt-2">{resendStatus}</p>
-                    )}
-
-                    <button
-                        onClick={() => navigate("/login")}
-                        className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-lg mt-4"
-                    >
-                        로그인 페이지로 이동
-                    </button>
-                </div>
-            </div>
+            <StatusPanel
+                icon={<FaEnvelopeOpenText />}
+                eyebrow="Email Verification"
+                title="이메일 인증을 완료해 주세요"
+                message={"가입하신 이메일 주소로 인증 메일을 보냈습니다.\n메일함을 확인하고 인증을 완료해 주세요."}
+                actions={
+                    <>
+                        <Button onClick={handleResend}>
+                            <FaPaperPlane />
+                            인증 메일 다시 보내기
+                        </Button>
+                        <Button variant="secondary" onClick={() => navigate("/login")}>
+                            로그인 페이지로 이동
+                        </Button>
+                    </>
+                }
+            >
+                {email && (
+                    <p className="mt-4 text-sm font-black text-deep-gray bg-off-white rounded-2xl px-4 py-3 break-all">{email}</p>
+                )}
+                {resendStatus && (
+                    <p role="status" className="mt-4 text-sm font-bold text-gray-500">{resendStatus}</p>
+                )}
+            </StatusPanel>
         </>
     );
 }

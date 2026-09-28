@@ -227,7 +227,7 @@ export default function RoomDetail() {
                                 }
                             }}
                             disabled={reserving}
-                            className="disabled:opacity-60 disabled:cursor-not-allowed bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-lg px-6 py-3 transition focus:outline-none focus:ring-4 focus:ring-yellow-300"
+                            className="disabled:opacity-60 disabled:cursor-not-allowed bg-yellow-400 hover:bg-yellow-500 text-deep-gray font-semibold rounded-lg px-6 py-3 transition focus:outline-none focus:ring-4 focus:ring-yellow-300"
                         >
                             예약하기
                         </button>

@@ -5,6 +5,7 @@ import useApiRequest from "@/api/useApiRequest";
 import PasswordVerifyModal from "@/components/PasswordVerifyModal";
 import PasswordChangeModal from "@/pages/myPage/PasswordChangeModal.jsx";
 import Swal from 'sweetalert2';
+import { SWAL_CONFIRM_OPTIONS } from "@/config/swal";
 import {
     FaUserAlt, FaPhoneAlt, FaEnvelope, FaCamera, FaEdit,
     FaSave, FaLock, FaTrashAlt
@@ -117,7 +118,7 @@ export default function Profile() {
             await request({ method: "DELETE", url: "/api/user/delete-account" }, { label: "accountDeletion" });
             localStorage.clear();
             sessionStorage.clear();
-            await Swal.fire('탈퇴 완료', '회원 탈퇴가 정상적으로 처리되었습니다.', 'success');
+            await Swal.fire({ ...SWAL_CONFIRM_OPTIONS, title: "탈퇴 완료", text: "회원 탈퇴가 정상적으로 처리되었습니다.", icon: "success" });
             window.location.href = "/login";
         } catch (err) {
             console.error("회원 탈퇴 실패:", err);
@@ -181,7 +182,7 @@ export default function Profile() {
                                     type="button"
                                     onClick={() => document.getElementById("profileImageInput").click()}
                                     aria-label="프로필 이미지 변경"
-                                    className="absolute bottom-0 right-0 w-9 h-9 flex items-center justify-center bg-honey-yellow hover:bg-honey-yellow-dark text-white rounded-full shadow-lg shadow-honey-yellow/30 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/40"
+                                    className="absolute bottom-0 right-0 w-9 h-9 flex items-center justify-center bg-honey-yellow hover:bg-honey-yellow-dark text-deep-gray rounded-full shadow-lg shadow-honey-yellow/30 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/40"
                                 >
                                     <FaCamera className="text-sm" />
                                 </button>

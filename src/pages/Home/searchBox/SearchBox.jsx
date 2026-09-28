@@ -127,7 +127,7 @@ function SearchBox({
                 <div className="p-2">
                     <button
                         onClick={handleSearch}
-                        className="w-full md:w-auto h-full px-8 py-4 md:py-0 bg-honey-yellow hover:bg-honey-yellow-dark text-white font-bold rounded-2xl md:rounded-full transition-all flex items-center justify-center gap-2 shadow-lg shadow-honey-yellow/20 active:scale-95"
+                        className="w-full md:w-auto h-full px-8 py-4 md:py-0 bg-honey-yellow hover:bg-honey-yellow-dark text-deep-gray font-bold rounded-2xl md:rounded-full transition-all flex items-center justify-center gap-2 shadow-lg shadow-honey-yellow/20 active:scale-95"
                     >
                         <HiOutlineSearch className="text-xl" />
                         <span className="md:hidden lg:inline">검색하기</span>

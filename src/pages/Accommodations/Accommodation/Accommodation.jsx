@@ -344,7 +344,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                 <p className="md:col-span-2"><strong>주소:</strong> {data.company.address}</p>
                             </div>
                             <div className="pt-6 border-t border-white/10 flex gap-4">
-                                <a href={`tel:${data.company.phone}`} className="flex-1 py-4 bg-honey-yellow text-white rounded-2xl text-center font-black hover:bg-honey-yellow-dark transition-all">전화 문의</a>
+                                <a href={`tel:${data.company.phone}`} className="flex-1 py-4 bg-honey-yellow text-deep-gray rounded-2xl text-center font-black hover:bg-honey-yellow-dark transition-all">전화 문의</a>
                                 <button onClick={() => setShowInquiryModal(true)} className="flex-1 py-4 bg-white/10 backdrop-blur-sm text-white rounded-2xl text-center font-black hover:bg-white/20 transition-all">1:1 문의하기</button>
                             </div>
                         </section>
@@ -452,7 +452,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                             </div>
                             <button
                                 onClick={() => document.getElementById('rooms').scrollIntoView({ behavior: 'smooth' })}
-                                className="px-6 py-4 bg-honey-yellow text-white rounded-2xl font-black shadow-lg shadow-honey-yellow/20 hover:scale-105 active:scale-95 transition-all"
+                                className="px-6 py-4 bg-honey-yellow text-deep-gray rounded-2xl font-black shadow-lg shadow-honey-yellow/20 hover:scale-105 active:scale-95 transition-all"
                             >
                                 Book Now
                             </button>
@@ -494,7 +494,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
 
                                 <button
                                     onClick={() => { setCheckIn(tempCheckIn); setCheckOut(tempCheckOut); setGuests(tempGuests); setShowChangeModal(false); }}
-                                    className="w-full py-4 bg-honey-yellow text-white rounded-2xl font-black shadow-lg shadow-honey-yellow/20 hover:bg-honey-yellow-dark transition-all disabled:opacity-30"
+                                    className="w-full py-4 bg-honey-yellow text-deep-gray rounded-2xl font-black shadow-lg shadow-honey-yellow/20 hover:bg-honey-yellow-dark transition-all disabled:opacity-30"
                                     disabled={!isChangeReady}
                                 >
                                     변경 사항 적용하기

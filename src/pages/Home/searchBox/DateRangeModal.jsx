@@ -211,7 +211,7 @@ function DateRangeModal({ isOpen, onClose, onSelect }) {
                 <div className="sticky bottom-0 bg-white pt-4 pb-6 px-6">
                     <button
                         onClick={onClose}
-                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg transition duration-200"
+                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-deep-gray font-semibold py-2 rounded-lg transition duration-200"
                     >
                         닫기
                     </button>

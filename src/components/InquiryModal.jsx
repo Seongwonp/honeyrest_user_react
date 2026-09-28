@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
 import useApiRequest from "@/api/useApiRequest";
 import { toast } from "react-toastify";
+import Dialog from "@/components/ui/Dialog.jsx";
+import Input from "@/components/ui/Input.jsx";
+import Button from "@/components/ui/Button.jsx";
+import { inputClass, labelClass } from "@/components/ui/styles";
 
 function InquiryModal({ onClose, accommodationId, userId }) {
     const { request, isLoading } = useApiRequest();
@@ -47,64 +51,65 @@ function InquiryModal({ onClose, accommodationId, userId }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl p-6 w-full max-w-xl space-y-5 relative shadow-lg">
-                <button
-                    onClick={onClose}
-                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                    aria-label="Close modal"
-                >
-                    ✖
-                </button>
+        <Dialog
+            onClose={onClose}
+            className="max-w-xl"
+            title={
+                <span className="flex items-center gap-2">
+                    <FaQuestionCircle className="text-honey-yellow-dark" /> 1:1 문의
+                </span>
+            }
+        >
+            <div className="space-y-4">
+                <div>
+                    <label htmlFor="inquiry-category" className={labelClass}>카테고리</label>
+                    <select
+                        id="inquiry-category"
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className={inputClass}
+                    >
+                        {categories.map((cat) => (
+                            <option key={cat} value={cat}>
+                                {cat}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <FaQuestionCircle /> 1:1 문의
-                </h2>
-
-                <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                            {cat}
-                        </option>
-                    ))}
-                </select>
-
-                <input
+                <Input
+                    label="제목"
                     type="text"
                     placeholder="제목"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
 
-                <textarea
-                    placeholder="[문의 내용 작성 예시]\n1. 예약자 이름:\n2. 예약 날짜:\n3. 문의 내용:"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 h-48 resize-none overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div>
+                    <label htmlFor="inquiry-content" className={labelClass}>내용</label>
+                    <textarea
+                        id="inquiry-content"
+                        placeholder="[문의 내용 작성 예시]\n1. 예약자 이름:\n2. 예약 날짜:\n3. 문의 내용:"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        className={`${inputClass} h-48 resize-none overflow-y-auto`}
+                    />
+                </div>
 
-                <button
+                <Button
                     onClick={handleSubmit}
                     disabled={isLoading()}
-                    className={`w-full py-2 rounded-md text-white transition ${
-                        isLoading()
-                            ? "bg-blue-300 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    }`}
+                    size="lg"
+                    fullWidth
                 >
                     {isLoading() ? "등록중..." : "문의 등록"}
-                </button>
+                </Button>
 
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-xs text-gray-400 break-keep">
                     문의하신 내용과 답변은 마이페이지 → 1:1 문의 내역에서 확인 가능합니다.
                 </p>
             </div>
-        </div>
+        </Dialog>
     );
 }
 

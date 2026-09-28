@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { SWAL_CONFIRM_OPTIONS } from "@/config/swal";
 import Header from '@/components/Header';
 import useApiRequest from '@/api/useApiRequest';
 import { FaKey } from 'react-icons/fa';
@@ -30,7 +31,7 @@ function PasswordChange() {
                 text: '비밀번호 재설정 토큰이 유효하지 않습니다.',
                 icon: 'error',
                 confirmButtonText: '확인',
-                confirmButtonColor: '#FDD835',
+                ...SWAL_CONFIRM_OPTIONS,
             }).then(() => navigate('/login'));
         }
     }, [token, navigate]);
@@ -58,7 +59,7 @@ function PasswordChange() {
                             text: '새 비밀번호로 로그인해주세요.',
                             icon: 'success',
                             confirmButtonText: '확인',
-                            confirmButtonColor: '#FDD835',
+                            ...SWAL_CONFIRM_OPTIONS,
                         }).then(() => navigate('/login'));
                     },
                 }
@@ -124,7 +125,7 @@ function PasswordChange() {
                         <button
                             type="submit"
                             disabled={isLoading('passwordChange')}
-                            className={`w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-2 rounded-lg transition ${isLoading('passwordChange') ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`w-full bg-yellow-400 hover:bg-yellow-500 text-deep-gray font-medium py-2 rounded-lg transition ${isLoading('passwordChange') ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {isLoading('passwordChange') ? '처리 중...' : '비밀번호 변경하기'}
                         </button>

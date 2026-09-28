@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { SWAL_CONFIRM_OPTIONS } from "@/config/swal";
 import logo from '/images/logo-Photoroom.png';
 import { FaLock } from 'react-icons/fa';
 import Header from "../../components/Header.jsx";
@@ -71,7 +72,7 @@ function Login() {
                             text: 'HoneyRest에 오신 것을 환영해요 🍯',
                             icon: 'success',
                             confirmButtonText: '확인',
-                            confirmButtonColor: '#FDD835',
+                            ...SWAL_CONFIRM_OPTIONS,
                         }).then(() => {
                             navigate(redirectTo, {
                                 state: reservationInfo || undefined

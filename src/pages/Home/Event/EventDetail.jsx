@@ -46,7 +46,7 @@ function EventDetail() {
                     href={event.targetUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block mt-6 px-6 py-3 bg-yellow-500 text-white font-medium rounded-lg shadow hover:bg-yellow-600 transition"
+                    className="inline-block mt-6 px-6 py-3 bg-yellow-500 text-deep-gray font-medium rounded-lg shadow hover:bg-yellow-600 transition"
                 >
                     자세히 보기
                 </a>

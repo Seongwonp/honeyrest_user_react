@@ -25,3 +25,9 @@
     @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-glass;
   }
 }
+
+/* SweetAlert2 확인 버튼: 노란 배경 위 진한 글자 (명도 대비 4.5:1 이상) */
+.swal2-styled.swal2-confirm.swal-honey-confirm {
+  color: var(--color-deep-gray);
+  font-weight: 800;
+}

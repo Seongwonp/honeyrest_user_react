@@ -22,7 +22,7 @@ function Footer() {
                                 <a 
                                     key={idx} 
                                     href="#" 
-                                    className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-honey-yellow hover:text-white transition-all"
+                                    className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-honey-yellow hover:text-deep-gray transition-all"
                                 >
                                     <Icon size={16} />
                                 </a>

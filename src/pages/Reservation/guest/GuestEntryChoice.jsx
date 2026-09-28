@@ -1,5 +1,9 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FaSignInAlt, FaUserClock } from "react-icons/fa";
+import Button from "@/components/ui/Button.jsx";
+import Card from "@/components/ui/Card.jsx";
+import { eyebrowClass } from "@/components/ui/styles";
 
 export default function GuestEntryChoice() {
     const navigate = useNavigate();
@@ -19,29 +23,29 @@ export default function GuestEntryChoice() {
     };
 
     return (
-        <div className="max-w-md mx-auto py-12 px-6 text-center">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">예약을 진행하시려면</h2>
-            <p className="text-sm text-gray-700 mb-6 leading-relaxed">
-                <strong className="text-yellow-600">로그인하시면</strong> 예약 내역을 마이페이지에서 확인하고<br />
-                쿠폰과 혜택도 함께 받을 수 있어요.
-                <br />
-                <span className="text-xs text-gray-400">(비회원 예약은 예약 번호로만 조회 가능합니다)</span>
-            </p>
+        <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
+            <Card className="w-full max-w-md text-center" padding="p-6 sm:p-10">
+                <p className={`${eyebrowClass} mb-1`}>Reservation</p>
+                <h1 className="text-2xl font-black text-deep-gray mb-3 break-keep">예약을 진행하시려면</h1>
+                <p className="text-sm text-gray-500 leading-relaxed break-keep">
+                    <strong className="font-black text-deep-gray">로그인하시면</strong> 예약 내역을 마이페이지에서 확인하고
+                    쿠폰과 혜택도 함께 받을 수 있어요.
+                </p>
+                <p className="mt-3 text-xs text-gray-400 bg-off-white rounded-2xl px-4 py-3 break-keep">
+                    비회원 예약은 예약 번호로만 조회 가능합니다.
+                </p>
 
-            <div className="flex flex-col gap-4">
-                <button
-                    onClick={handleLogin}
-                    className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 rounded-lg shadow-md"
-                >
-                    로그인하고 더 편리하게 예약하기
-                </button>
-                <button
-                    onClick={handleGuestReserve}
-                    className="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold py-3 rounded-lg"
-                >
-                    비회원으로 예약 계속하기
-                </button>
-            </div>
+                <div className="mt-8 flex flex-col gap-3">
+                    <Button onClick={handleLogin} fullWidth className="break-keep">
+                        <FaSignInAlt />
+                        로그인하고 더 편리하게 예약하기
+                    </Button>
+                    <Button variant="secondary" onClick={handleGuestReserve} fullWidth className="break-keep">
+                        <FaUserClock />
+                        비회원으로 예약 계속하기
+                    </Button>
+                </div>
+            </Card>
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaVolumeMute, FaVolumeUp, FaHandPointRight, FaTimes } from "react-icons/fa";
+import { buttonVariants, buttonSizes } from "@/components/ui/styles";
 
 function IntroModal() {
     const [muted, setMuted] = useState(true);
@@ -25,13 +26,16 @@ function IntroModal() {
     if (!showModal) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={handleClose}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={handleClose}>
             {/* 배경 검정은 바로 나타나도록 */}
-            <div className="absolute inset-0 bg-black/70"></div>
+            <div className="absolute inset-0 bg-deep-gray/70 backdrop-blur-sm"></div>
 
             {/* 모달 콘텐츠만 애니메이션 적용 */}
             <motion.div
-                className="relative w-full max-w-[95vw] sm:max-w-4xl bg-black rounded-xl overflow-hidden shadow-2xl flex flex-col z-10"
+                role="dialog"
+                aria-modal="true"
+                aria-label="HoneyRest 소개 영상"
+                className="relative w-full sm:max-w-4xl bg-black rounded-[2rem] overflow-hidden shadow-2xl flex flex-col z-10"
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 50, opacity: 0 }}
@@ -40,7 +44,7 @@ function IntroModal() {
             >
 
                 {/* 🎥 영상 영역 */}
-                <div className="relative w-full h-[75vh] sm:h-[500px]">
+                <div className="relative w-full h-[65vh] sm:h-[500px]">
                     <video
                         src="/videos/intro.mp4"
                         autoPlay
@@ -48,16 +52,18 @@ function IntroModal() {
                         loop
                         className="w-full h-full object-cover object-center"
                     />
-                    <div className="absolute top-3 left-3 right-3 flex justify-between items-center px-2">
+                    <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
                         <button
-                            className="p-2 bg-gray-900/60 text-white rounded-full shadow hover:bg-gray-800 transition"
+                            type="button"
+                            className="w-10 h-10 flex items-center justify-center bg-black/50 text-white rounded-full backdrop-blur-sm hover:bg-black/70 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/50"
                             onClick={() => setMuted(!muted)}
-                            aria-label="음소거 전환"
+                            aria-label={muted ? "소리 켜기" : "음소거"}
                         >
                             {muted ? <FaVolumeMute /> : <FaVolumeUp />}
                         </button>
                         <button
-                            className="p-2 bg-gray-900/60 text-white rounded-full shadow hover:bg-gray-800 transition"
+                            type="button"
+                            className="w-10 h-10 flex items-center justify-center bg-black/50 text-white rounded-full backdrop-blur-sm hover:bg-black/70 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/50"
                             onClick={handleClose}
                             aria-label="모달 닫기"
                         >
@@ -67,20 +73,21 @@ function IntroModal() {
                 </div>
 
                 {/* 📦 버튼 카드 영역 */}
-                <div className="w-full bg-gray-900/80 backdrop-blur-md px-6 py-5 flex flex-col items-center gap-4 sm:flex-row sm:justify-between sm:items-center">
+                <div className="w-full bg-deep-gray px-6 py-5 flex flex-col items-center gap-4 sm:flex-row sm:justify-between sm:items-center">
                     <button
+                        type="button"
                         onClick={handleClose}
-                        className="flex items-center gap-2 px-5 py-3 bg-yellow-400 text-white text-base font-bold rounded-full shadow hover:bg-yellow-500 transition animate-bounce"
+                        className={`${buttonVariants.primary} ${buttonSizes.lg} motion-safe:animate-bounce`}
                     >
                         예약하러 가기 <FaHandPointRight className="text-lg" />
                     </button>
 
-                    <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
+                    <label className="flex items-center gap-2 text-white/80 text-sm font-medium cursor-pointer">
                         <input
                             type="checkbox"
                             checked={dontShow}
                             onChange={(e) => setDontShow(e.target.checked)}
-                            className="w-4 h-4 rounded accent-yellow-400"
+                            className="w-4 h-4 rounded accent-honey-yellow"
                         />
                         하루 동안 보지 않기
                     </label>

@@ -23,7 +23,7 @@ function MyPageNav() {
                             className={({ isActive }) =>
                                 `block whitespace-nowrap text-sm font-bold px-4 py-2.5 rounded-2xl transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/30 ${
                                     isActive
-                                        ? "bg-honey-yellow text-white shadow-lg shadow-honey-yellow/20"
+                                        ? "bg-honey-yellow text-deep-gray shadow-lg shadow-honey-yellow/20"
                                         : "text-gray-500 hover:bg-honey-yellow/10 hover:text-honey-yellow-dark"
                                 }`
                             }

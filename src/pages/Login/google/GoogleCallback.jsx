@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import { SWAL_CONFIRM_OPTIONS } from "@/config/swal";
 import useApiRequest from "/src/api/useApiRequest";
 
 function GoogleCallback() {
@@ -37,13 +38,13 @@ function GoogleCallback() {
                         text: "HoneyRest에 오신 것을 환영해요 🍯",
                         icon: "success",
                         confirmButtonText: "확인",
-                        confirmButtonColor: "#FDD835",
+                        ...SWAL_CONFIRM_OPTIONS,
                     }).then(() => {
                         navigate("/", { replace: true });
                     });
                 },
                 onError: () => {
-                    Swal.fire("로그인 실패", "구글 로그인 중 오류가 발생했습니다.", "error");
+                    Swal.fire({ ...SWAL_CONFIRM_OPTIONS, title: "로그인 실패", text: "구글 로그인 중 오류가 발생했습니다.", icon: "error" });
                     navigate("/login");
                 },
             }

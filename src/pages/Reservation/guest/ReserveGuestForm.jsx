@@ -7,6 +7,11 @@ import {
 } from "react-icons/fa";
 import SafeImage from "@/components/SafeImage.jsx";
 import { toast } from "react-toastify";
+import { FaChevronDown, FaMapMarkerAlt, FaBed, FaCalendarAlt, FaUsers } from "react-icons/fa";
+import Button from "@/components/ui/Button.jsx";
+import Input from "@/components/ui/Input.jsx";
+import SectionTitle from "@/components/ui/SectionTitle.jsx";
+import { cardClass, inputClass, labelClass, eyebrowClass } from "@/components/ui/styles";
 
 export default function ReserveGuestForm() {
     const navigate = useNavigate();
@@ -131,146 +136,174 @@ export default function ReserveGuestForm() {
     ];
 
     return (
-        <div className="max-w-6xl mx-auto py-10 px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* 좌측: 예약자 정보 입력 */}
-            <div className="bg-white shadow-md rounded-lg p-6 space-y-5">
-                <h2 className="text-lg font-bold text-gray-800">예약자 정보 입력</h2>
+        <div className="max-w-6xl mx-auto px-4 py-10">
+            <SectionTitle eyebrow="Guest Reservation" title="비회원 예약" description="예약자 정보를 입력하고 결제를 진행해 주세요." className="mb-8" />
 
-                {[
-                    { label: "예약자 이름", name: "guestName", required: true },
-                    { label: "연락처", name: "guestPhone", required: true },
-                    { label: "예약 확인용 비밀번호", name: "guestPassword", required: true, placeholder: "숫자 4자리" }
-                ].map(({ label, name, required, placeholder }) => (
-                    <div key={name}>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {label} {required && <span className="text-red-500">*</span>}
-                        </label>
-                        <input
-                            type={name === "guestPassword" ? "password" : "text"}
-                            name={name}
-                            required={required}
-                            value={form[name]}
-                            onChange={handleChange}
-                            placeholder={placeholder || ""}
-                            className="w-full border px-4 py-2 rounded focus:ring-2 focus:ring-yellow-300"
-                        />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* 좌측: 예약자 정보 입력 */}
+                <div className="lg:col-span-2 space-y-6 min-w-0">
+                    <div className={`${cardClass} p-6 space-y-5`}>
+                        <h2 className="text-lg font-black text-deep-gray">예약자 정보 입력</h2>
+
+                        {[
+                            { label: "예약자 이름", name: "guestName", required: true, autoComplete: "name" },
+                            { label: "연락처", name: "guestPhone", required: true, autoComplete: "tel" },
+                            { label: "예약 확인용 비밀번호", name: "guestPassword", required: true, placeholder: "숫자 4자리", autoComplete: "new-password" }
+                        ].map(({ label, name, required, placeholder, autoComplete }) => (
+                            <Input
+                                key={name}
+                                label={<>{label} {required && <span className="text-red-400">*</span>}</>}
+                                type={name === "guestPassword" ? "password" : name === "guestPhone" ? "tel" : "text"}
+                                name={name}
+                                required={required}
+                                value={form[name]}
+                                onChange={handleChange}
+                                placeholder={placeholder || ""}
+                                autoComplete={autoComplete}
+                            />
+                        ))}
+
+                        <div>
+                            <label htmlFor="guest-specialRequest" className={labelClass}>
+                                요청사항 <span className="text-gray-300">(선택)</span>
+                            </label>
+                            <textarea
+                                id="guest-specialRequest"
+                                name="specialRequest"
+                                value={form.specialRequest}
+                                onChange={handleChange}
+                                className={`${inputClass} h-28 resize-none`}
+                            />
+                        </div>
                     </div>
-                ))}
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        요청사항 (선택)
-                    </label>
-                    <textarea
-                        name="specialRequest"
-                        value={form.specialRequest}
-                        onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
-                    />
+                    {/* 결제 수단 */}
+                    <div className={`${cardClass} p-6`}>
+                        <h3 className="text-sm font-black text-deep-gray mb-3">결제 수단 선택</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup" aria-label="결제 수단">
+                            {paymentOptions.map(option => (
+                                <button
+                                    type="button"
+                                    key={option.value}
+                                    role="radio"
+                                    aria-checked={paymentMethod === option.value}
+                                    onClick={() => setPaymentMethod(option.value)}
+                                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/30 ${
+                                        paymentMethod === option.value
+                                            ? "bg-honey-yellow text-deep-gray border-honey-yellow shadow-lg shadow-honey-yellow/20"
+                                            : "bg-white text-deep-gray border-gray-100 hover:border-honey-yellow"
+                                    }`}
+                                >
+                                    {option.icon}
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
-                {/* 결제 수단 */}
-                <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">결제 수단</h3>
-                    <div className="flex gap-3 flex-wrap">
-                        {paymentOptions.map(option => (
-                            <button
-                                key={option.value}
-                                onClick={() => setPaymentMethod(option.value)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded border ${
-                                    paymentMethod === option.value
-                                        ? "bg-yellow-400 text-white"
-                                        : "bg-white text-gray-700"
-                                }`}
-                            >
-                                {option.icon}
-                                {option.label}
-                            </button>
+                {/* 우측: 숙소 정보 카드 + 약관 + 결제 */}
+                <div className="space-y-6 lg:sticky lg:top-24 self-start min-w-0">
+                    <div className={`${cardClass} p-6`}>
+                        <div className="flex items-center gap-4 mb-6">
+                            <SafeImage
+                                src={accommodationThumbnail}
+                                alt="숙소 썸네일"
+                                className="w-16 h-16 shrink-0 object-cover rounded-2xl"
+                            />
+                            <div className="min-w-0">
+                                <h3 className="text-lg font-black text-deep-gray leading-tight break-keep">{accommodationName}</h3>
+                                <p className="text-xs text-gray-400 flex items-start gap-1 mt-1">
+                                    <FaMapMarkerAlt className="shrink-0 mt-0.5" />
+                                    <span className="break-keep">{accommodationAddress}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <dl className="space-y-4">
+                            <div>
+                                <dt className={`${eyebrowClass} flex items-center gap-1.5`}><FaBed /> 객실</dt>
+                                <dd className="text-sm font-bold text-deep-gray mt-1 break-keep">{roomName}</dd>
+                            </div>
+                            <div>
+                                <dt className={`${eyebrowClass} flex items-center gap-1.5`}><FaCalendarAlt /> 날짜</dt>
+                                <dd className="text-sm font-bold text-deep-gray mt-1">{checkIn} ~ {checkOut}</dd>
+                            </div>
+                            <div>
+                                <dt className={`${eyebrowClass} flex items-center gap-1.5`}><FaUsers /> 인원</dt>
+                                <dd className="text-sm font-bold text-deep-gray mt-1">{guests}명</dd>
+                            </div>
+                        </dl>
+                        <div className="border-t border-gray-100 pt-4 mt-6 flex justify-between items-end gap-2">
+                            <span className="font-black text-deep-gray">총 금액</span>
+                            <span className="text-2xl font-black text-deep-gray">{originalPrice.toLocaleString()}원</span>
+                        </div>
+                    </div>
+
+                    {/* 약관 아코디언 */}
+                    <div className={`${cardClass} p-6 space-y-3`}>
+                        {/* 전체 동의 */}
+                        <label className="flex items-center gap-3 cursor-pointer select-none pb-3 border-b border-gray-100">
+                            <input
+                                type="checkbox"
+                                checked={Object.values(agreements).every(Boolean)}
+                                onChange={handleAllAgree}
+                                className="w-4 h-4 shrink-0 accent-leaf-green"
+                            />
+                            <span className="text-sm font-black text-deep-gray">전체 동의</span>
+                        </label>
+
+                        {/* 각 약관 */}
+                        {agreementsData.map(({ key, label, required, content }) => (
+                            <div key={key} className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                    <label className="flex items-center gap-3 cursor-pointer select-none min-w-0">
+                                        <input
+                                            type="checkbox"
+                                            checked={agreements[key]}
+                                            onChange={() =>
+                                                setAgreements(prev => ({ ...prev, [key]: !prev[key] }))
+                                            }
+                                            className="w-4 h-4 shrink-0 accent-leaf-green"
+                                        />
+                                        <span className="text-sm text-gray-600 font-medium break-keep">
+                                            {label}
+                                            {required
+                                                ? <span className="ml-1 text-red-400 font-bold">(필수)</span>
+                                                : <span className="ml-1 text-gray-400">(선택)</span>}
+                                        </span>
+                                    </label>
+
+                                    {/* 자세히보기 버튼 */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setOpen(prev => ({ ...prev, [key]: !prev[key] }))}
+                                        aria-expanded={open[key]}
+                                        aria-label={`${label} ${open[key] ? "상세 닫기" : "상세 보기"}`}
+                                        className="ml-auto shrink-0 p-1 rounded-lg text-gray-400 hover:text-deep-gray hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-honey-yellow/40"
+                                    >
+                                        <FaChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open[key] ? "rotate-180" : ""}`} />
+                                    </button>
+                                </div>
+
+                                {/* 내용 펼치기 */}
+                                {open[key] && (
+                                    <div className="bg-off-white p-4 mt-2 text-xs text-gray-500 leading-relaxed rounded-2xl whitespace-pre-line break-words">
+                                        {content}
+                                    </div>
+                                )}
+                            </div>
                         ))}
                     </div>
+
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={!isFormValid}
+                        size="lg"
+                        fullWidth
+                    >
+                        예약 진행하기 ({originalPrice.toLocaleString()}원)
+                    </Button>
                 </div>
-            </div>
-
-            {/* 우측: 숙소 정보 카드 + 약관 + 결제 */}
-            <div className="space-y-6">
-                <div className="bg-white shadow-md rounded-lg p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                        <SafeImage
-                            src={accommodationThumbnail}
-                            alt="숙소 썸네일"
-                            className="w-16 h-16 object-cover rounded"
-                        />
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800">{accommodationName}</h3>
-                            <p className="text-sm text-gray-500">{accommodationAddress}</p>
-                        </div>
-                    </div>
-                    <p className="text-sm"><strong>객실:</strong> {roomName}</p>
-                    <p className="text-sm"><strong>날짜:</strong> {checkIn} ~ {checkOut}</p>
-                    <p className="text-sm"><strong>인원:</strong> {guests}명</p>
-                    <p className="text-sm font-semibold mt-2 text-yellow-600">
-                        총 금액: {originalPrice.toLocaleString()}원
-                    </p>
-                </div>
-
-                {/* 약관 아코디언 */}
-                <div className="bg-white shadow-sm rounded-lg p-4 space-y-2 text-sm">
-                    {/* 전체 동의 */}
-                    <label className="flex items-center gap-2 font-semibold">
-                        <input
-                            type="checkbox"
-                            checked={Object.values(agreements).every(Boolean)}
-                            onChange={handleAllAgree}
-                        />
-                        전체 동의
-                    </label>
-
-                    {/* 각 약관 */}
-                    {agreementsData.map(({ key, label, required, content }) => (
-                        <div key={key} className="border-b py-2">
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={agreements[key]}
-                                    onChange={() =>
-                                        setAgreements(prev => ({ ...prev, [key]: !prev[key] }))
-                                    }
-                                />
-                                {label} {required && <span className="text-red-500">*</span>}
-                            </label>
-
-                            {/* 자세히보기 버튼 */}
-                            <button
-                                onClick={() => setOpen(prev => ({ ...prev, [key]: !prev[key] }))}
-                                className="text-blue-500 text-xs mt-1 flex items-center gap-1"
-                            >
-                                자세히보기
-                                <span className={`inline-block transition-transform ${open[key] ? "rotate-180" : "rotate-0"}`}>
-                                    ▼
-                                </span>
-                            </button>
-
-                            {/* 내용 펼치기 */}
-                            {open[key] && (
-                                <div className="bg-gray-50 p-2 mt-1 text-xs text-gray-700 rounded whitespace-pre-line">
-                                    {content}
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-
-                <button
-                    onClick={handleSubmit}
-                    disabled={!isFormValid}
-                    className={`w-full mt-2 py-3 rounded font-semibold ${
-                        isFormValid
-                            ? "bg-yellow-400 hover:bg-yellow-500 text-white"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                >
-                    예약 진행하기 ({originalPrice.toLocaleString()}원)
-                </button>
             </div>
         </div>
     );

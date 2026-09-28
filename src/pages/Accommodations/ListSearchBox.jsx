@@ -67,7 +67,7 @@ function ListSearchBox() {
             <div className="flex justify-center mt-6">
                 <button
                     onClick={updateParams}
-                    className="flex items-center gap-2 bg-yellow-500 text-white px-8 py-3 rounded-md text-base font-semibold hover:bg-yellow-600 transition w-full sm:w-auto justify-center"
+                    className="flex items-center gap-2 bg-yellow-500 text-deep-gray px-8 py-3 rounded-md text-base font-semibold hover:bg-yellow-600 transition w-full sm:w-auto justify-center"
                 >
                     <HiOutlineSearch className="text-xl" />
                     검색하기

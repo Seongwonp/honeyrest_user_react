@@ -9,7 +9,7 @@ const buttonBase =
     "inline-flex items-center justify-center gap-2 rounded-2xl font-black transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-4";
 
 export const buttonVariants = {
-    primary: `${buttonBase} bg-honey-yellow text-white shadow-lg shadow-honey-yellow/20 hover:bg-honey-yellow-dark focus-visible:ring-honey-yellow/40`,
+    primary: `${buttonBase} bg-honey-yellow text-deep-gray shadow-lg shadow-honey-yellow/20 hover:bg-honey-yellow-dark focus-visible:ring-honey-yellow/40`,
     secondary: `${buttonBase} bg-white text-deep-gray border border-gray-200 hover:border-honey-yellow hover:text-honey-yellow-dark focus-visible:ring-honey-yellow/30`,
     success: `${buttonBase} bg-leaf-green text-white shadow-lg shadow-leaf-green/20 hover:bg-leaf-green-dark focus-visible:ring-leaf-green/40`,
     dark: `${buttonBase} bg-deep-gray text-white hover:bg-black focus-visible:ring-deep-gray/30`,

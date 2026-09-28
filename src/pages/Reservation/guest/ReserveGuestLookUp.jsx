@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import api from '@/api/axios';
-import { FaClipboardList } from 'react-icons/fa';
+import { FaClipboardList, FaSearch, FaExternalLinkAlt } from 'react-icons/fa';
+import Input from '@/components/ui/Input.jsx';
+import Button from '@/components/ui/Button.jsx';
+import Card from '@/components/ui/Card.jsx';
+import SectionTitle from '@/components/ui/SectionTitle.jsx';
+import { eyebrowClass } from '@/components/ui/styles';
 
 export default function ReserveGuestLookUp() {
     const [form, setForm] = useState({
@@ -32,82 +37,75 @@ export default function ReserveGuestLookUp() {
     };
 
     return (
-        <div className="max-w-xl mx-auto px-4 py-12 space-y-10">
+        <div className="max-w-xl mx-auto px-4 py-12 space-y-8">
             {/* 헤더 */}
-            <div className="text-center space-y-2">
-                <FaClipboardList className="mx-auto text-4xl text-yellow-500" />
-                <h2 className="text-3xl font-bold text-gray-800">비회원 예약 조회</h2>
-                <p className="text-sm text-gray-500">예약번호와 전화번호, 비밀번호를 입력해주세요.</p>
+            <div className="text-center">
+                <div className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-honey-yellow/15 text-honey-yellow-dark flex items-center justify-center text-3xl">
+                    <FaClipboardList />
+                </div>
+                <p className={`${eyebrowClass} mb-1`}>Guest Lookup</p>
+                <h1 className="text-2xl md:text-3xl font-black text-deep-gray break-keep">비회원 예약 조회</h1>
+                <p className="mt-2 text-sm text-gray-400 break-keep">예약번호와 전화번호, 비밀번호를 입력해주세요.</p>
             </div>
 
             {/* 입력 폼 */}
-            <div className="space-y-5">
-                <Input label="예약번호" name="reservationCode" value={form.reservationCode} onChange={handleChange} />
-                <Input label="전화번호" name="guestPhone" value={form.guestPhone} onChange={handleChange} />
-                <Input label="예약 비밀번호" name="guestPassword" value={form.guestPassword} onChange={handleChange} />
+            <Card className="space-y-4" padding="p-6 sm:p-8">
+                <Input label="예약번호" name="reservationCode" value={form.reservationCode} onChange={handleChange} autoComplete="off" />
+                <Input label="전화번호" name="guestPhone" type="tel" value={form.guestPhone} onChange={handleChange} autoComplete="tel" />
+                <Input label="예약 비밀번호" name="guestPassword" value={form.guestPassword} onChange={handleChange} autoComplete="off" />
 
-                <button
-                    onClick={handleLookup}
-                    disabled={loading}
-                    className="w-full px-4 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-lg shadow transition"
-                >
+                <Button onClick={handleLookup} disabled={loading} size="lg" fullWidth className="mt-2">
+                    <FaSearch />
                     {loading ? '조회 중...' : '조회하기'}
-                </button>
+                </Button>
 
-                {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-            </div>
+                {error && (
+                    <p role="alert" className="text-sm font-bold text-red-500 bg-red-50 rounded-2xl px-4 py-3 text-center break-keep">
+                        {error}
+                    </p>
+                )}
+            </Card>
 
             {/* 조회 결과 */}
             {result && (
-                <div className="bg-white border border-yellow-200 rounded-xl shadow-lg p-6 space-y-4">
-                    <h3 className="text-lg font-bold text-gray-900">📋 예약 정보</h3>
-                    <Info label="숙소명" value={result.accommodationName} />
-                    <Info label="객실명" value={result.roomName} />
-                    <Info label="체크인" value={result.checkIn} />
-                    <Info label="체크아웃" value={result.checkOut} />
-                    <Info label="예약자" value={result.guestName} />
-                    <Info label="전화번호" value={result.guestPhone} />
-                    <Info label="예약번호" value={result.reservationCode} />
-                    <Info label="결제 금액" value={`${result.finalPrice?.toLocaleString()}원`} />
-                    <Info label="결제 수단" value={result.paymentMethod || '정보 없음'} />
-                    <Info label="결제 상태" value={result.paymentStatus || '정보 없음'} />
+                <Card padding="p-6 sm:p-8" aria-live="polite">
+                    <SectionTitle eyebrow="Reservation" title="예약 정보" as="h2" className="mb-5" />
+                    <dl className="divide-y divide-gray-100">
+                        <Info label="숙소명" value={result.accommodationName} />
+                        <Info label="객실명" value={result.roomName} />
+                        <Info label="체크인" value={result.checkIn} />
+                        <Info label="체크아웃" value={result.checkOut} />
+                        <Info label="예약자" value={result.guestName} />
+                        <Info label="전화번호" value={result.guestPhone} />
+                        <Info label="예약번호" value={result.reservationCode} />
+                        <Info label="결제 금액" value={`${result.finalPrice?.toLocaleString()}원`} />
+                        <Info label="결제 수단" value={result.paymentMethod || '정보 없음'} />
+                        <Info label="결제 상태" value={result.paymentStatus || '정보 없음'} />
+                    </dl>
                     {result.receiptUrl && (
-                        <div className="text-sm">
-                            <a
-                                href={result.receiptUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline hover:text-blue-800"
-                            >
-                                영수증 보기
-                            </a>
-                        </div>
+                        <Button
+                            as="a"
+                            href={result.receiptUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="secondary"
+                            fullWidth
+                            className="mt-6"
+                        >
+                            영수증 보기 <FaExternalLinkAlt className="text-xs" />
+                        </Button>
                     )}
-                </div>
+                </Card>
             )}
-        </div>
-    );
-}
-
-function Input({ label, name, value, onChange }) {
-    return (
-        <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-            <input
-                type="text"
-                name={name}
-                value={value}
-                onChange={onChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition"
-            />
         </div>
     );
 }
 
 function Info({ label, value }) {
     return (
-        <div className="text-sm text-gray-700">
-            <span className="font-medium text-gray-800">{label}:</span> {value}
+        <div className="flex justify-between gap-4 py-3 text-sm">
+            <dt className="text-gray-400 font-bold shrink-0">{label}</dt>
+            <dd className="text-deep-gray font-bold text-right break-all">{value}</dd>
         </div>
     );
 }

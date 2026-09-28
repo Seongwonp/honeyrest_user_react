@@ -9,6 +9,7 @@ import {
     FaRegGrinTongueWink,
     FaRegSurprise,
 } from "react-icons/fa";
+import { cardClass, eyebrowClass } from "@/components/ui/styles";
 
 function MyPageEasterEgg() {
     const phrases = [
@@ -34,14 +35,14 @@ function MyPageEasterEgg() {
     ];
 
     const icons = [
-        <FaGhost className="text-4xl text-gray-400 animate-bounce" />,
-        <FaRegLaughWink className="text-4xl text-yellow-400 animate-spin" />,
-        <FaUserSecret className="text-4xl text-indigo-500 animate-pulse" />,
-        <FaBug className="text-4xl text-red-400 animate-bounce" />,
-        <FaRegQuestionCircle className="text-4xl text-green-500 animate-ping" />,
-        <FaRegGrinSquint className="text-4xl text-pink-400 animate-pulse" />,
-        <FaRegGrinTongueWink className="text-4xl text-orange-400 animate-spin" />,
-        <FaRegSurprise className="text-4xl text-blue-400 animate-bounce" />,
+        <FaGhost className="text-3xl text-gray-400 animate-bounce" />,
+        <FaRegLaughWink className="text-3xl text-yellow-400 animate-spin" />,
+        <FaUserSecret className="text-3xl text-indigo-500 animate-pulse" />,
+        <FaBug className="text-3xl text-red-400 animate-bounce" />,
+        <FaRegQuestionCircle className="text-3xl text-green-500 animate-ping" />,
+        <FaRegGrinSquint className="text-3xl text-pink-400 animate-pulse" />,
+        <FaRegGrinTongueWink className="text-3xl text-orange-400 animate-spin" />,
+        <FaRegSurprise className="text-3xl text-blue-400 animate-bounce" />,
     ];
 
     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
@@ -52,10 +53,13 @@ function MyPageEasterEgg() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
-            className="text-center text-gray-500 text-sm mt-20 flex flex-col items-center gap-3"
+            className={`${cardClass} text-center py-16 px-6 flex flex-col items-center gap-3`}
         >
-            {randomIcon}
-            <p className="italic">{randomPhrase}</p>
+            <div className="w-16 h-16 rounded-2xl bg-honey-yellow/10 flex items-center justify-center mb-2">
+                {randomIcon}
+            </div>
+            <p className={eyebrowClass}>Easter Egg</p>
+            <p className="text-lg font-black text-deep-gray break-keep">{randomPhrase}</p>
             <motion.div
                 initial={{ rotate: -5 }}
                 animate={{ rotate: 5 }}
