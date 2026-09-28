@@ -17,7 +17,8 @@ function CouponList() {
                 }
             }
         );
-    }, []);
+        // request는 useApiRequest에서 useCallback으로 고정된 참조 → 마운트 시 1회 실행
+    }, [request]);
 
     return (
         <div className="p-6 bg-white rounded-lg shadow-md max-w-4xl mx-auto">

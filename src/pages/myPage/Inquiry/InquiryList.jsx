@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useApiRequest from '@/api/useApiRequest';
 import { FaArrowLeft, FaArrowRight, FaCheckCircle, FaRegClock, FaBuilding, FaCalendarAlt } from 'react-icons/fa';
@@ -9,7 +9,8 @@ const InquiryList = () => {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
-    const fetchInquiries = async (pageNum = 0) => {
+    // request가 고정 참조이므로 fetchInquiries도 한 번만 생성됨
+    const fetchInquiries = useCallback(async (pageNum = 0) => {
         try {
             const data = await request(
                 { url: `/api/user/inquiries/List?page=${pageNum}&size=5`, method: 'GET' }
@@ -20,11 +21,11 @@ const InquiryList = () => {
         } catch (err) {
             console.error(err);
         }
-    };
+    }, [request]);
 
     useEffect(() => {
         fetchInquiries();
-    }, []);
+    }, [fetchInquiries]);
 
     const handlePrev = () => {
         if (page > 0) fetchInquiries(page - 1);

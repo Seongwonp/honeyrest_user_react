@@ -98,7 +98,8 @@ function Accommodation({ accommodationId, sectionRefs }) {
         );
         Object.values(sectionRefs.current).forEach((ref) => { if (ref) observer.observe(ref); });
         return () => observer.disconnect();
-    }, []);
+        // sectionRefs는 부모의 useRef 객체라 참조가 고정 → 마운트 시 1회만 실행됨
+    }, [sectionRefs]);
 
     useEffect(() => {
         if (data?.reviews) {

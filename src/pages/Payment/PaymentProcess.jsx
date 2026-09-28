@@ -1,5 +1,5 @@
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -24,10 +24,12 @@ export default function PaymentProcess() {
         }
     }, [state, navigate]);
 
-    const amount = {
+    // 매 렌더마다 새 객체가 생성되지 않도록 결제 금액 기준으로 메모이제이션
+    const finalPrice = state?.finalPrice || 0;
+    const amount = useMemo(() => ({
         currency: "KRW",
-        value: state?.finalPrice || 0,
-    };
+        value: finalPrice,
+    }), [finalPrice]);
 
     useEffect(() => {
         async function initWidgets() {
@@ -67,7 +69,7 @@ export default function PaymentProcess() {
         }
 
         renderWidgets();
-    }, [widgets]);
+    }, [widgets, amount]);
 
     const handlePayment = async () => {
         if (!state || !widgets || payingRef.current) return;

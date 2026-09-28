@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import qs from "qs";
 import api from "@/api/axios";
 import AccommodationCard from "./AccommodationCard";
@@ -13,6 +13,11 @@ function AccommodationListPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const userId = user?.userId || null;
+    // 검색 요청 시점의 최신 userId만 참조 (userId 변경만으로 재검색하지 않도록 ref 사용)
+    const userIdRef = useRef(userId);
+    useEffect(() => {
+        userIdRef.current = userId;
+    }, [userId]);
 
     const [results, setResults] = useState([]);
     const [totalElements, setTotalElements] = useState(0);
@@ -33,44 +38,48 @@ function AccommodationListPage() {
         { value: "latest", label: "최신순" }
     ];
 
-    const selectedCategories = useMemo(() => searchParams.getAll("selectedCategories"), [searchParams]);
-    const selectedTags = useMemo(() => searchParams.getAll("selectedTags"), [searchParams]);
+    // 배열 내용이 같으면 동일 참조를 유지하도록 문자열 키 기준으로 메모이제이션
+    const categoriesKey = JSON.stringify(searchParams.getAll("selectedCategories"));
+    const tagsKey = JSON.stringify(searchParams.getAll("selectedTags"));
+    const selectedCategories = useMemo(() => JSON.parse(categoriesKey), [categoriesKey]);
+    const selectedTags = useMemo(() => JSON.parse(tagsKey), [tagsKey]);
     const maxPrice = Number(searchParams.get("maxPrice")) || 1000000;
 
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const res = await api.get("/api/accommodations/search", {
-                params: {
-                    location,
-                    checkIn,
-                    checkOut,
-                    guests,
-                    ...(userId && { userId }),
-                    sort,
-                    page,
-                    selectedCategories,
-                    selectedTags,
-                    maxPrice,
-                },
-                paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
-            });
-
-            const data = res.data;
-            setResults(data.content || []);
-            setTotalElements(data.totalElements ?? data.content?.length ?? 0);
-            setTotalPages(data.totalPages || 1);
-        } catch (err) {
-            console.error("❌ 숙소 검색 실패:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        if (checkIn && checkOut) {
-            fetchData();
-        }
+        if (!checkIn || !checkOut) return;
+
+        const fetchData = async () => {
+            const currentUserId = userIdRef.current;
+            setLoading(true);
+            try {
+                const res = await api.get("/api/accommodations/search", {
+                    params: {
+                        location,
+                        checkIn,
+                        checkOut,
+                        guests,
+                        ...(currentUserId && { userId: currentUserId }),
+                        sort,
+                        page,
+                        selectedCategories,
+                        selectedTags,
+                        maxPrice,
+                    },
+                    paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
+                });
+
+                const data = res.data;
+                setResults(data.content || []);
+                setTotalElements(data.totalElements ?? data.content?.length ?? 0);
+                setTotalPages(data.totalPages || 1);
+            } catch (err) {
+                console.error("❌ 숙소 검색 실패:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, [
         location,
         checkIn,
@@ -78,8 +87,8 @@ function AccommodationListPage() {
         guests,
         sort,
         page,
-        JSON.stringify(selectedCategories),
-        JSON.stringify(selectedTags),
+        selectedCategories,
+        selectedTags,
         maxPrice
     ]);
 

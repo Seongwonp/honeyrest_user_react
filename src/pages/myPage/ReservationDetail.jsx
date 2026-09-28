@@ -16,17 +16,20 @@ export default function ReservationDetail() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (reservationId) fetchReservationDetail();
-    }, [reservationId]);
+        if (!reservationId) return;
 
-    const fetchReservationDetail = async () => {
-        try {
-            const res = await api.get(`/api/user/reservations/${reservationId}`);
-            setReservation(res.data);
-        } catch (err) {
-            console.error("❌ 예약 상세 조회 실패:", err);
-        }
-    };
+        // 예약 상세 조회 (effect 내부에 정의해 reservationId 변경 시에만 실행)
+        const fetchReservationDetail = async () => {
+            try {
+                const res = await api.get(`/api/user/reservations/${reservationId}`);
+                setReservation(res.data);
+            } catch (err) {
+                console.error("❌ 예약 상세 조회 실패:", err);
+            }
+        };
+
+        fetchReservationDetail();
+    }, [reservationId]);
 
     if (!reservation) {
         return <p className="text-center text-gray-500">불러오는 중...</p>;

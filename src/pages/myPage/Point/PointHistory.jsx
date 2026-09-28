@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import useApiRequest from "@/api/useApiRequest";
 import { FaArrowLeft, FaArrowRight, FaHistory, FaCoins } from "react-icons/fa";
 
@@ -11,12 +11,18 @@ function PointHistory() {
 
     const { request } = useApiRequest();
 
-    const fetchPointHistory = (pageNumber = 0) => {
+    // size는 응답으로 갱신되므로 ref로 최신값만 참조 (size 변경만으로 재조회하지 않도록)
+    const sizeRef = useRef(size);
+    useEffect(() => {
+        sizeRef.current = size;
+    }, [size]);
+
+    const fetchPointHistory = useCallback((pageNumber = 0) => {
         request(
             {
                 url: "/api/user/point-history",
                 method: "GET",
-                params: { page: pageNumber, size },
+                params: { page: pageNumber, size: sizeRef.current },
             },
             {
                 onSuccess: (data) => {
@@ -29,11 +35,11 @@ function PointHistory() {
                 onError: (err) => console.error("포인트 히스토리 조회 실패:", err),
             }
         );
-    };
+    }, [request]);
 
     useEffect(() => {
         fetchPointHistory();
-    }, []);
+    }, [fetchPointHistory]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 0 && newPage < totalPages) {

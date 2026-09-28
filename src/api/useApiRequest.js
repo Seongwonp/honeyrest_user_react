@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import api from './axios.js';
 import { toast } from 'react-toastify';
 
@@ -6,11 +6,12 @@ const useApiRequest = () => {
     const [loadingMap, setLoadingMap] = useState({});
     const controllerRef = useRef(null);
 
-    const setLoading = (label, value) => {
+    // setState 함수와 ref만 사용하므로 참조를 고정해 useEffect 의존성에 안전하게 넣을 수 있게 함
+    const setLoading = useCallback((label, value) => {
         setLoadingMap(prev => ({ ...prev, [label]: value }));
-    };
+    }, []);
 
-    const request = async (config, options = {}) => {
+    const request = useCallback(async (config, options = {}) => {
         const {
             onSuccess,
             onError,
@@ -69,13 +70,13 @@ const useApiRequest = () => {
 
         setLoading(label, false);
         if (lastError) throw lastError;
-    };
+    }, [setLoading]);
 
-    const abort = () => {
+    const abort = useCallback(() => {
         if (controllerRef.current) {
             controllerRef.current.abort();
         }
-    };
+    }, []);
 
     return {
         request,

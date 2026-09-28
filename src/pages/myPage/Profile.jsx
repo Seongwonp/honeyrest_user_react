@@ -49,7 +49,8 @@ export default function Profile() {
             }
         };
         fetchUserInfo();
-    }, []);
+        // request는 참조가 고정되어 있어 마운트 시 1회만 실행됨
+    }, [request]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

@@ -1,5 +1,7 @@
 # 🐝 HoneyRest – 사용자 예약 프론트엔드
 
+[![CI](https://github.com/Seongwonp/honeyrest_user_react/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Seongwonp/honeyrest_user_react/actions/workflows/ci.yml)
+
 **박성원 (Seongwon Park)** – 사용자(User) 영역 총괄
 
 > 감성 숙소 예약 플랫폼 HoneyRest의 사용자(User) 영역 프론트엔드입니다.  

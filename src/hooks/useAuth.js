@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from '@/api/axios';
 
 export const useAuth = () => {
@@ -8,7 +8,9 @@ export const useAuth = () => {
     //무한루프 방지용 ref
     const isSyncingRef = useRef(false);
 
-    const loadUser = () => {
+    // 아래 함수들은 setState·ref·storage만 사용하므로 useCallback으로 참조를 고정
+    // (사용하는 쪽 useEffect 의존성에 넣어도 재실행되지 않음)
+    const loadUser = useCallback(() => {
         setIsLoadingUser(true);
 
         try {
@@ -39,17 +41,17 @@ export const useAuth = () => {
         } finally {
             setIsLoadingUser(false);
         }
-    };
+    }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem('userInfo');
         localStorage.removeItem('accessToken');
         sessionStorage.removeItem('userInfo');
         sessionStorage.removeItem('accessToken');
         setUser(null);
-    };
+    }, []);
 
-    const syncUserFromServer = async () => {
+    const syncUserFromServer = useCallback(async () => {
         if (isSyncingRef.current) return; // 이미 동기화 중이면 바로 return
         isSyncingRef.current = true;
 
@@ -71,7 +73,7 @@ export const useAuth = () => {
         } finally {
             isSyncingRef.current = false; // 동기화 완료
         }
-    };
+    }, []);
 
     useEffect(() => {
         loadUser();
@@ -80,7 +82,7 @@ export const useAuth = () => {
         return () => {
             window.removeEventListener('storage', loadUser);
         };
-    }, []);
+    }, [loadUser]);
 
     const isLoggedIn = !!user?.userId;
     return { user, isLoggedIn, isLoadingUser, loadUser, syncUserFromServer, logout };

@@ -27,7 +27,7 @@ function MyWishList() {
                 }
             );
         }
-    }, [userId]);
+    }, [userId, request]);
 
     if (!userId) {
         return (

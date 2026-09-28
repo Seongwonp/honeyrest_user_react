@@ -16,6 +16,13 @@ function GlobalGuard() {
     const hasRefreshed = useRef(false);
     const isLoggedOut = useRef(false);
 
+    // navigate는 라우트 이동 시 참조가 바뀔 수 있으므로 ref로 최신값을 보관
+    // (최초 1회 effect가 라우트 이동마다 재실행되지 않도록)
+    const navigateRef = useRef(navigate);
+    useEffect(() => {
+        navigateRef.current = navigate;
+    }, [navigate]);
+
     // 앱 최초 마운트 시 1회: 토큰 재발급 + 만료 타이머
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
@@ -38,7 +45,7 @@ function GlobalGuard() {
                     localStorage.removeItem('accessToken');
                     sessionStorage.removeItem('accessToken');
                     logout();
-                    navigate('/login', { replace: true });
+                    navigateRef.current('/login', { replace: true });
                 });
         }
 
@@ -50,7 +57,7 @@ function GlobalGuard() {
                 const timer = setTimeout(() => {
                     toast.info('세션이 만료되어 자동 로그아웃되었습니다.');
                     logout();
-                    navigate('/login');
+                    navigateRef.current('/login');
                 }, timeout);
 
                 return () => clearTimeout(timer);
@@ -58,7 +65,8 @@ function GlobalGuard() {
         } catch (err) {
             console.error('[GlobalGuard] ❌ JWT 파싱 실패:', err);
         }
-    }, []);
+        // logout·syncUserFromServer는 useAuth에서 useCallback으로 고정된 참조 → 마운트 시 1회만 실행
+    }, [logout, syncUserFromServer]);
 
     // 라우트 이동마다: URL 파라미터 기반 접근 제어
     useEffect(() => {

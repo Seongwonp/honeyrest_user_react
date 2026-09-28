@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import api from "@/api/axios";
 import SafeImage from "@/components/SafeImage.jsx";
@@ -9,14 +9,17 @@ export default function ReservationList() {
     const [pageInfo, setPageInfo] = useState({ page: 0, size: 5, totalPages: 0 });
     const navigate = useNavigate();
 
+    // size는 응답으로 갱신되므로 ref로 최신값만 참조 (size 변경만으로 재조회하지 않도록)
+    const pageSizeRef = useRef(pageInfo.size);
     useEffect(() => {
-        if (user?.userId) fetchReservations(pageInfo.page);
-    }, [user, pageInfo.page]);
+        pageSizeRef.current = pageInfo.size;
+    }, [pageInfo.size]);
 
-    const fetchReservations = async (page) => {
+    // setState·ref만 사용하므로 참조 고정
+    const fetchReservations = useCallback(async (page) => {
         try {
             const res = await api.get("/api/user/reservations", {
-                params: { page, size: pageInfo.size },
+                params: { page, size: pageSizeRef.current },
             });
 
             setReservations(res.data.content);
@@ -28,7 +31,11 @@ export default function ReservationList() {
         } catch (err) {
             console.error("❌ 예약 내역 조회 실패:", err);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (user?.userId) fetchReservations(pageInfo.page);
+    }, [user, pageInfo.page, fetchReservations]);
 
     const handlePageChange = (nextPage) => {
         setPageInfo((prev) => ({ ...prev, page: nextPage }));

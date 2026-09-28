@@ -45,7 +45,19 @@ export default function CancelRequestPage() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (reservationId) fetchReservation();
+        if (!reservationId) return;
+
+        // 예약 상세 조회 (effect 내부에 정의해 reservationId 변경 시에만 실행)
+        const fetchReservation = async () => {
+            try {
+                const res = await api.get(`/api/user/reservations/${reservationId}`);
+                setReservation(res.data);
+            } catch {
+                toast.error('예약 정보를 불러오지 못했습니다.');
+            }
+        };
+
+        fetchReservation();
     }, [reservationId]);
 
     useEffect(() => {
@@ -53,15 +65,6 @@ export default function CancelRequestPage() {
             fetchCancellationPolicies(reservation.accommodationId);
         }
     }, [reservation]);
-
-    const fetchReservation = async () => {
-        try {
-            const res = await api.get(`/api/user/reservations/${reservationId}`);
-            setReservation(res.data);
-        } catch {
-            toast.error('예약 정보를 불러오지 못했습니다.');
-        }
-    };
 
     const fetchCancellationPolicies = async (accommodationId) => {
         try {
