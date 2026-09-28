@@ -1,11 +1,9 @@
-import * as FaIcons from "react-icons/fa";
-import * as RiIcons from "react-icons/ri";
-import * as MdIcons from "react-icons/md";
 import { HiStar, HiLocationMarker, HiCheckCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import WishToggleButton from "@/components/WishToggleButton.jsx";
 import { motion } from "framer-motion";
 import SafeImage from "@/components/SafeImage.jsx";
+import { getTagIcon } from "@/utils/tagIcons";
 
 function AccommodationCard({ item, userId, checkIn, checkOut, guests }) {
     const isSoldOut = item.available === false;
@@ -51,7 +49,7 @@ function AccommodationCard({ item, userId, checkIn, checkOut, guests }) {
                         {/* 태그 */}
                         <div className="flex flex-wrap gap-1.5 pt-2">
                             {item.tags?.slice(0, 3).map((tag, i) => {
-                                const IconComponent = FaIcons[tag.iconName] || RiIcons[tag.iconName] || MdIcons[tag.iconName];
+                                const IconComponent = getTagIcon(tag.iconName);
                                 return (
                                     <span
                                         key={tag.mapId || i}
@@ -63,7 +61,7 @@ function AccommodationCard({ item, userId, checkIn, checkOut, guests }) {
                                 );
                             })}
                             {item.tags?.length > 3 && (
-                                <span className="text-[10px] font-bold text-gray-300 self-center">+${item.tags.length - 3}</span>
+                                <span className="text-[10px] font-bold text-gray-300 self-center">+{item.tags.length - 3}</span>
                             )}
                         </div>
                     </div>

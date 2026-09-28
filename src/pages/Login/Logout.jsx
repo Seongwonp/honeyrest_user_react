@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-toastify';
 import api from '@/api/axios';
+import { getOAuthRedirectBase } from '@/config/urls';
 
 function Logout() {
     const navigate = useNavigate();
@@ -22,7 +23,6 @@ function Logout() {
 
             try {
                 await api.post('/api/auth/logout');
-                console.log('[Logout] ✅ 서버 로그아웃 완료');
             } catch (err) {
                 console.error('[Logout] ❌ 서버 로그아웃 실패:', err);
             }
@@ -41,7 +41,7 @@ function Logout() {
 
             if (provider === 'kakao') {
                 const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
-                const LOGOUT_REDIRECT_URI = 'http://localhost:5173/login';
+                const LOGOUT_REDIRECT_URI = encodeURIComponent(`${getOAuthRedirectBase()}/login`);
                 window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
                 return;
             }

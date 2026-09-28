@@ -15,7 +15,6 @@ function VerifyEmail() {
             setResendStatus("이메일 정보가 없습니다.");
             return;
         }
-        console.log("이메일 정보: " + email);
 
         api.post('/api/user/email/resend', { email })
             .then(() => setResendStatus("인증 메일이 다시 전송되었습니다."))

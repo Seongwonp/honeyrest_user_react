@@ -2,6 +2,7 @@ import Slider from "react-slick";
 import { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion } from "framer-motion";
+import SafeImage from "@/components/SafeImage.jsx";
 
 function HotSpatsList({ userInfo, navigate }) {
     const [popularCities, setPopularCities] = useState([]);
@@ -92,8 +93,8 @@ function HotSpatsList({ userInfo, navigate }) {
                             className="bg-white rounded-[2rem] shadow-sm hover:shadow-2xl hover:shadow-honey-yellow/10 transition-all duration-500 overflow-hidden cursor-pointer border border-gray-50"
                         >
                             <div className="relative h-[240px] overflow-hidden">
-                                <img
-                                    src={city.imgUrl || "/images/default-region.jpg"}
+                                <SafeImage
+                                    src={city.imgUrl}
                                     alt={city.name}
                                     className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
                                 />

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '@/api/axios';
 import { toast } from 'react-toastify';
 import { HiXCircle, HiDocumentText, HiCheckCircle, HiInformationCircle } from 'react-icons/hi';
+import SafeImage from "@/components/SafeImage.jsx";
 
 const mockAgreements = [
     { id: 1, title: '환불 규정을 확인하였으며, 이에 동의합니다.' },
@@ -112,7 +113,7 @@ export default function CancelRequestPage() {
             <div className="border rounded-md p-4 space-y-2 text-sm bg-white shadow text-gray-800">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                     {reservation.thumbnailUrl && (
-                        <img
+                        <SafeImage
                             src={reservation.thumbnailUrl}
                             alt="숙소 썸네일"
                             className="w-full sm:w-20 h-20 object-cover rounded-md border"

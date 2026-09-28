@@ -1,12 +1,17 @@
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function PaymentProcess() {
     const { state } = useLocation();
     const navigate = useNavigate();
     const [widgets, setWidgets] = useState(null);
     const [ready, setReady] = useState(false);
+    const { user } = useAuth();
+
+    // 예약자 이메일: 입력된 이메일 → 로그인 사용자 이메일 순으로 사용 (임의의 더미 이메일은 보내지 않음)
+    const guestEmail = state?.guestEmail || user?.email || "";
 
     // 결제 처리 페이지에 새로고침이나 직접 URL 접근으로 들어오면 location.state가 없어
     // handlePayment 내부에서 state.guestPhone 등을 그대로 참조하다 크래시가 났다(P0-2).
@@ -73,7 +78,7 @@ export default function PaymentProcess() {
             userId: state.userId,
             guestName: state.guestName,
             guestPhone: state.guestPhone,
-            guestEmail: state.guestEmail || "guest@example.com",
+            guestEmail: guestEmail || null,
             accommodationId: state.accommodationId,
             reservationCode: orderId,
             roomId: state.roomId,
@@ -101,7 +106,7 @@ export default function PaymentProcess() {
                 failUrl: `${window.location.origin}/payment/fail`,
                 customerName: state.guestName,
                 customerMobilePhone: state.guestPhone.replaceAll("-", ""),
-                customerEmail: state.guestEmail || "guest@example.com",
+                ...(guestEmail ? { customerEmail: guestEmail } : {}),
             });
         } catch (error) {
             console.error("❌ 결제 요청 실패:", error);
@@ -126,7 +131,7 @@ export default function PaymentProcess() {
                     <Info label="인원" value={`${state?.guests}명`} />
                     <Info label="예약자" value={state?.guestName} />
                     <Info label="전화번호" value={state?.guestPhone} />
-                    <Info label="이메일" value={state?.guestEmail || "미입력"} />
+                    <Info label="이메일" value={guestEmail || "미입력"} />
                     <Info label="유저 ID" value={state?.userId || "비회원"} />
                     <Info label="쿠폰" value={state?.couponName || "미사용"} />
                     <Info label="쿠폰 적용" value={state?.couponId ? "사용됨" : "미사용"} />

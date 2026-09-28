@@ -175,8 +175,7 @@ function Signup() {
         }
 
         try {
-            const res = await api.post("/api/auth/signup", formData);
-            console.log("회원가입 성공:", res.data);
+            await api.post("/api/auth/signup", formData);
             localStorage.setItem('signupEmail', form.email);
             navigate("/verify-email", { state: { email: form.email } });
         } catch (err) {

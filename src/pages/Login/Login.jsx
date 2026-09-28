@@ -8,6 +8,7 @@ import KakaoLoginButton from "./kakao/KaKaoLoginButton.jsx";
 import GoogleLoginButton from "./google/GoogleLoginButton.jsx";
 import useApiRequest from '../../api/useApiRequest';
 import { useAuth } from '@/hooks/useAuth';
+import { getOAuthRedirectBase } from "@/config/urls";
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -81,8 +82,8 @@ function Login() {
         }
     };
 
-    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${import.meta.env.VITE_KAKAO_CLIENT_ID}&redirect_uri=http://localhost:5173/login/kakao/callback&prompt=login`;
-    const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=http://localhost:5173/login/google/callback&response_type=code&scope=openid%20email%20profile&prompt=select_account`;
+    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${import.meta.env.VITE_KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(`${getOAuthRedirectBase()}/login/kakao/callback`)}&prompt=login`;
+    const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(`${getOAuthRedirectBase()}/login/google/callback`)}&response_type=code&scope=openid%20email%20profile&prompt=select_account`;
 
     return (
         <>

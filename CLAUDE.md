@@ -34,7 +34,7 @@ npm run lint     # ESLint
 ### 환경변수
 - Vite 내장 `loadEnv` 사용 (dotenv 미사용)
 - 앱 코드에서는 `import.meta.env.VITE_*` 패턴
-- Firebase 설정도 `VITE_FIREBASE_*`로 분리됨
+- Firebase SDK는 제거됨 (이미지 URL은 백엔드 응답 사용, `SafeImage`로 폴백)
 
 ### 라우트 구조
 - `src/AppWrapper.jsx` — 전체 Route 정의
@@ -57,6 +57,5 @@ npm run lint     # ESLint
 | 인증 훅 | `src/hooks/useAuth.js` |
 | 전역 가드 / 자동 로그인 | `src/App.jsx` |
 | 전체 라우트 | `src/AppWrapper.jsx` |
-| Firebase 초기화 | `src/firebase.js` |
 | Tailwind 커스텀 테마 | `src/index.css` |
 | Vite 설정 | `vite.config.js` |

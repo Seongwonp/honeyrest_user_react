@@ -42,7 +42,6 @@ export const useAuth = () => {
     };
 
     const logout = () => {
-        console.log('[useAuth] 🚪 로그아웃 시작');
         localStorage.removeItem('userInfo');
         localStorage.removeItem('accessToken');
         sessionStorage.removeItem('userInfo');
@@ -64,7 +63,6 @@ export const useAuth = () => {
                 const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
                 storage.setItem('userInfo', JSON.stringify(userInfo));
             } else {
-                console.log('[useAuth] ⚠️ 서버 응답에 userId 없음 → setUser(null)');
                 setUser(null);
             }
         } catch (err) {

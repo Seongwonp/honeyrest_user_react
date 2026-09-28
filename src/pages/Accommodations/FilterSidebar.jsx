@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { MdAttachMoney, MdRefresh } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
 import { motion, AnimatePresence } from "framer-motion";
-import * as RiIcons from "react-icons/ri";
-import * as MdIcons from "react-icons/md";
-import * as FaIcons from "react-icons/fa";
+import { getTagIcon } from "@/utils/tagIcons";
 
 function FilterSidebar({ onFilterChange, openMapSearch }) {
     const [categories, setCategories] = useState([]);
@@ -204,7 +202,7 @@ function FilterSidebar({ onFilterChange, openMapSearch }) {
                             <h3 className="font-semibold mb-2">{category}</h3>
                             <div className="flex flex-wrap gap-2 text-sm">
                                 {visibleTags.map((tag) => {
-                                    const IconComponent = RiIcons[tag.iconName] || MdIcons[tag.iconName] || FaIcons[tag.iconName] || null;
+                                    const IconComponent = getTagIcon(tag.iconName);
                                     return (
                                         <button
                                             key={tag.tagId}

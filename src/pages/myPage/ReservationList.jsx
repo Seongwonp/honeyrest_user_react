@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import api from "@/api/axios";
+import SafeImage from "@/components/SafeImage.jsx";
 
 export default function ReservationList() {
     const { user } = useOutletContext();
@@ -81,7 +82,7 @@ export default function ReservationList() {
                             }
                         >
                             <div className="flex gap-4 items-center p-4">
-                                <img
+                                <SafeImage
                                     src={res.thumbnailUrl}
                                     alt="숙소 썸네일"
                                     className="w-32 h-32 object-cover rounded-md border"

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title">
+  <title id="title">HoneyRest event placeholder</title>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2c4"/><stop offset="1" stop-color="#e3f0d6"/></linearGradient></defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <circle cx="220" cy="140" r="90" fill="#f7d35e" opacity=".35"/>
+  <circle cx="1010" cy="470" r="130" fill="#7fa96c" opacity=".2"/>
+  <rect x="470" y="190" width="260" height="190" rx="18" fill="#f2c85b"/>
+  <rect x="450" y="160" width="300" height="60" rx="14" fill="#e0a82e"/>
+  <rect x="585" y="160" width="30" height="220" fill="#fff" opacity=".85"/>
+  <text x="600" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" font-weight="700" fill="#6b6255">이벤트 이미지 준비 중</text>
+</svg>

@@ -15,6 +15,7 @@ import {
     FaMoneyCheckAlt,
     FaArrowLeft, FaCoins,
 } from "react-icons/fa";
+import SafeImage from "@/components/SafeImage.jsx";
 
 export default function Reservation() {
     const navigate = useNavigate();
@@ -339,7 +340,7 @@ export default function Reservation() {
                     <div className="bg-white shadow rounded-lg p-6">
                         {/* 숙소 썸네일 및 정보 */}
                         <div className="mb-6 flex items-center gap-4">
-                            <img
+                            <SafeImage
                                 src={accommodationThumbnail}
                                 alt="숙소 썸네일"
                                 className="w-16 h-16 object-cover rounded-lg shadow-sm"

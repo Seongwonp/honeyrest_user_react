@@ -1,5 +1,6 @@
 import SearchBox from "./searchBox/SearchBox.jsx";
 import { motion } from "framer-motion";
+import SafeImage from "@/components/SafeImage.jsx";
 
 function BannerSection({
                            randomBanner,
@@ -20,7 +21,7 @@ function BannerSection({
             {/* 배경 이미지 & 그라데이션 오버레이 */}
             <div className="absolute inset-0 overflow-hidden">
                 {randomBanner?.imageUrl ? (
-                    <img
+                    <SafeImage
                         src={randomBanner.imageUrl}
                         alt={randomBanner.title || "Banner"}
                         className="w-full h-full object-cover"

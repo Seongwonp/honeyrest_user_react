@@ -8,6 +8,7 @@ import {
     HiXCircle,
 } from "react-icons/hi";
 import { FaCreditCard, FaInfoCircle, FaPen } from "react-icons/fa";
+import SafeImage from "@/components/SafeImage.jsx";
 
 export default function ReservationDetail() {
     const { reservationId } = useParams();
@@ -87,7 +88,7 @@ function InfoBlock({ reservation }) {
         <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-gray-700">
             <div className="flex items-center gap-3 col-span-2">
                 {reservation.thumbnailUrl && (
-                    <img
+                    <SafeImage
                         src={reservation.thumbnailUrl}
                         alt="숙소 썸네일"
                         className="w-24 h-24 object-cover rounded-md border"
