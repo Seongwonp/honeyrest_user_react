@@ -17,6 +17,7 @@ Vite 7 + React 19 + Tailwind CSS 4 기반 SPA. Next.js 없음 (순수 Vite SPA).
 npm run dev      # 개발 서버 (localhost:5173)
 npm run build    # 프로덕션 빌드
 npm run lint     # ESLint
+npm run test:e2e # Playwright 사용자 여정 E2E (API e2e 프로필 + 개발 서버 자동 기동, ../honeyRest_user 필요)
 ```
 
 ## 아키텍처 핵심
@@ -26,7 +27,7 @@ npm run lint     # ESLint
 - `src/hooks/useAuth.js` — `useContext(AuthContext)` 래퍼 (API: `user, isLoggedIn, isLoadingUser, loadUser, syncUserFromServer, logout`). 컴포넌트에서 storage 의 `userInfo` 를 직접 읽지 말 것
 - `src/api/axios.js` — JWT 자동 주입 + 401 시 토큰 재발급 인터셉터. `refreshAccessToken()` 은 single-flight(진행 중 Promise 공유), 재발급 요청은 Bearer 없이 전용 인스턴스로 전송, 늦은 401 은 이미 갱신된 토큰으로 재시도. 토큰 조회는 `getAccessToken()`
 - `src/App.jsx` (GlobalGuard) — 앱 마운트 시 1회 `refreshAccessToken()` + 새 토큰 기준 JWT 만료 타이머
-- `src/routes/PrivateRoute.jsx` / `PublicRoute.jsx` — 라우트 가드
+- `src/routes/PrivateRoute.jsx` / `PublicRoute.jsx` — 라우트 가드. PrivateRoute 는 비로그인 시 `/login` 으로 보내며 `state.redirectTo` 로 원래 경로를 넘긴다(로그인 후 복귀)
 
 ### API 통신
 - `src/api/axios.js` — baseURL은 `VITE_BACKEND_URL`, 프록시는 vite.config.js에서 `/api` 경로 설정
@@ -36,6 +37,13 @@ npm run lint     # ESLint
 - Vite 내장 `loadEnv` 사용 (dotenv 미사용)
 - 앱 코드에서는 `import.meta.env.VITE_*` 패턴
 - Firebase SDK는 제거됨 (이미지 URL은 백엔드 응답 사용, `SafeImage`로 폴백)
+- `VITE_E2E` — **E2E 전용 플래그.** `'true'` 일 때만 `src/pages/Payment/PaymentProcess.jsx` 가 토스 위젯 대신 "테스트 결제" 버튼(`data-testid="e2e-test-payment"`)을 렌더링해 가짜 paymentKey 로 `/payment/success` 에 진입한다(승인은 API e2e 프로필의 토스 스텁). Playwright `webServer` 만 설정하며 `.env`·운영 빌드에 넣지 말 것. 빌드 시 상수 치환이라 미설정 번들에는 버튼 코드가 남지 않는다
+
+### E2E (Playwright)
+- `playwright.config.js` — `webServer` 로 사용자 API(`E2E_API_DIR`, 기본 `../honeyRest_user`, `bootRun --spring.profiles.active=e2e`, 8080)와 `npm run dev`(5173, `VITE_E2E=true`)를 함께 띄운다. 포트는 백엔드 CORS 때문에 고정
+- `e2e/user-journey.spec.js` — 가입·검색·예약·결제·409·취소 요청·리뷰·로그아웃 시나리오 (직렬 실행, 같은 DB 상태를 이어 씀)
+- `e2e/support/` — 시드 상수(`seed.js`, API 의 `db/e2e-seed.sql` 과 동기화), 날짜(Asia/Seoul), `/e2e/**` 보조 API 호출, 화면 조작 도우미
+- 선택자는 라벨/역할/텍스트 우선. 화면 문구를 바꾸면 E2E 도 함께 확인할 것
 
 ### 라우트 구조
 - `src/AppWrapper.jsx` — 전체 Route 정의
@@ -60,3 +68,4 @@ npm run lint     # ESLint
 | 전체 라우트 | `src/AppWrapper.jsx` |
 | Tailwind 커스텀 테마 | `src/index.css` |
 | Vite 설정 | `vite.config.js` |
+| E2E 설정 / 시나리오 | `playwright.config.js`, `e2e/` |

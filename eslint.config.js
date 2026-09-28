@@ -28,4 +28,17 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^(motion|[A-Z_])' }],
     },
   },
+  // Playwright E2E (Node 에서 실행): React 규칙 대신 Node 전역을 쓴다.
+  // 픽스처 인자 구조 분해({})와 fixture 의 use() 호출이 React 규칙에 걸리지 않도록 끈다.
+  {
+    files: ['e2e/**/*.js', 'playwright.config.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+      'react-refresh/only-export-components': 'off',
+      'no-empty-pattern': 'off',
+    },
+  },
 ])

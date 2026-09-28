@@ -143,6 +143,7 @@ npm run dev           # http://localhost:5173
 | `VITE_APP_GOOGLE_MAPS_KEY`, `VITE_GOOGLE_MAP_ID` | Google Maps |
 | `VITE_TOSS_WIDGET_CLIENT_KEY` | 토스 결제 위젯 클라이언트 키 (테스트 키 사용 권장) |
 | `VITE_HOLIDAY_API_KEY` | 공휴일 API |
+| `VITE_E2E` | **E2E 전용.** `true` 이면 결제 페이지에 "테스트 결제" 버튼 표시 (Playwright `webServer` 가 설정, `.env` 에 넣지 말 것) |
 
 - 백엔드: [User API](https://github.com/Seongwonp/honeyRest_user)를 `8080`에서 실행해야 합니다. 로컬 저장소 모드(`app.storage.type=local`)와 데이터 시드 방법은 해당 README의 "실행 방법"을 참고하세요.
 - 데모 계정: 사용자는 회원가입으로 생성합니다. 관리자 데모 계정은 관리자 저장소의 `local-demo` 프로필에서 [`DataInitializer`](https://github.com/Seongwonp/honeyRest_host/blob/main/src/main/java/com/honeyrest/honeyrest_host/config/DataInitializer.java)가 생성합니다.
@@ -157,9 +158,39 @@ npm run lint      # ESLint
 
 ## 테스트 & CI
 
-- 자동화된 단위·E2E 테스트는 아직 없습니다. 품질 게이트는 **ESLint(0 오류 0 경고)와 프로덕션 빌드**이며, 핵심 흐름은 브라우저 회귀 점검으로 확인했습니다([STABILIZATION.md](docs/STABILIZATION.md)).
-- **CI**: [GitHub Actions](.github/workflows/ci.yml) — `master` push/PR마다 `.nvmrc` 기준 Node로 `npm ci` → `npm run lint` → `npm run build`
-- 결제·재고·권한 로직의 자동 테스트는 백엔드 저장소에 있습니다(User API 77개, 관리자 52개).
+### 사용자 여정 E2E (Playwright)
+
+```bash
+# 사용자 API 저장소가 옆 디렉터리(../honeyRest_user)에 있어야 한다. 다른 위치면 E2E_API_DIR 로 지정
+npm run test:e2e           # API(e2e 프로필) + 개발 서버(VITE_E2E=true)를 띄우고 e2e/ 실행
+npm run test:e2e:report    # 마지막 HTML 리포트 열기
+```
+
+- **무엇을 띄우나**: `playwright.config.js` 의 `webServer` 가 두 서버를 함께 기동한다.
+  1. 사용자 API `./gradlew bootRun --args='--spring.profiles.active=e2e'` (8080) — H2 인메모리 DB + 시드(`db/e2e-seed.sql`), 인메모리 Redis, 메일 미발송, 토스 결제 스텁. MySQL·Redis·Firebase·시크릿 파일이 필요 없다.
+  2. `npm run dev -- --port 5173 --strictPort` — `VITE_E2E=true`, `VITE_BACKEND_URL=http://localhost:8080`
+  - 백엔드 CORS 허용 출처에 맞춰 포트는 5173/8080 고정. 매 실행이 새 DB 에서 시작하도록 이미 떠 있는 서버는 재사용하지 않는다(`E2E_REUSE_SERVER=1` 로 재사용 가능 — 이때는 API 를 새로 띄운 직후여야 함).
+- **시나리오** (`e2e/user-journey.spec.js`)
+
+  | | 시나리오 | 확인 내용 |
+  |---|---|---|
+  | a | 회원가입 → 인증 → 로그인 | 가입 후 e2e 전용 `GET /e2e/verification-token` 으로 토큰을 받아 `/verify` 인증, 로그인 |
+  | b | 검색 → 상세 → 객실 → 예약 → 결제 | 홈에서 지역·달력 날짜 검색, 1실 한정 객실 예약, **테스트 결제**, 마이페이지 예약 목록 |
+  | c | 같은 날짜 재예약 | (b) 결제 전에 열어 둔 다른 탭에서 결제 → 409 "예약 가능한 객실이 없습니다", 보상 취소 없음 |
+  | d | 취소 요청 | 예약 상세 → 취소 요청 → 상태 배지 "취소 요청" |
+  | e | 리뷰 | 이용 완료 전 작성 시 서버 안내 토스트로 차단 → `POST /e2e/reservations/{id}/complete` → 리뷰 작성 → 숙소 상세에 노출 |
+  | f | 로그아웃 | 보호 라우트(`/user/mypage/**`) 접근 시 로그인 페이지로 이동, 재로그인 시 원래 경로로 복귀 |
+
+- **결제(테스트 결제)**: 헤드리스 브라우저에서는 토스 위젯을 띄울 수 없어, `VITE_E2E=true` 일 때만 결제 페이지(`PaymentProcess`)에 "테스트 결제" 버튼이 렌더링된다. 가짜 `paymentKey` 로 `/payment/success` 에 진입하고, 서버의 토스 스텁이 승인한다(금액·재고·중복 검증은 실제와 동일). `VITE_E2E` 가 없는 개발/운영 번들에는 이 버튼이 포함되지 않는다.
+- **브라우저**: `npx playwright install chromium`. 미리 설치된 브라우저를 쓰려면 `PLAYWRIGHT_BROWSERS_PATH`(예: `/opt/pw-browsers`)를 지정하고, Playwright 와 리비전이 다르면 `E2E_CHROMIUM_PATH` 로 실행 파일을 직접 지정한다.
+- **시드 값**: 회원 `e2e.user@honeyrest.test` / `Honey1234!`, 숙소·객실·쿠폰은 [`e2e/support/seed.js`](e2e/support/seed.js) 와 API 저장소의 `src/main/resources/db/e2e-seed.sql` 참고.
+
+### CI
+
+- [GitHub Actions](.github/workflows/ci.yml) — `master` push/PR 마다
+  - **build**: `.nvmrc` 기준 Node 로 `npm ci` → `npm run lint`(0 오류 0 경고) → `npm run build`
+  - **e2e**: 사용자 API 저장소(`Seongwonp/honeyRest_user`, `main`)를 옆 디렉터리에 체크아웃(서브모듈 불필요) → JDK 17 + Node → `npx playwright install --with-deps chromium` → `npm run test:e2e`. 실패 시 `playwright-report/`·`test-results/`(트레이스·스크린샷·영상)를 아티팩트로 업로드. API 저장소가 비공개라면 `E2E_API_REPO_TOKEN` 시크릿에 읽기 토큰을 등록한다.
+- 단위 테스트는 없다. 결제·재고·권한 로직의 자동 테스트는 백엔드 저장소에 있다. 수동 회귀 점검 기록은 [STABILIZATION.md](docs/STABILIZATION.md).
 
 ---
 

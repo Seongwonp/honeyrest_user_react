@@ -8,6 +8,16 @@ import Card from "@/components/ui/Card.jsx";
 import Button from "@/components/ui/Button.jsx";
 import { eyebrowClass } from "@/components/ui/styles";
 
+// E2E 전용 결제 경로 (VITE_E2E=true 일 때만).
+// 헤드리스 브라우저에서는 토스 결제 위젯을 띄울 수 없으므로, e2e 모드에서는 위젯 대신 "테스트 결제" 버튼이
+// 가짜 paymentKey 로 결제 성공 라우트(/payment/success)에 바로 진입한다. 승인은 백엔드 e2e 프로필의
+// 토스 스텁(E2eTossClient)이 처리하고, 금액·재고 검증은 실제와 동일하게 서버가 수행한다.
+// 빌드 시 상수로 치환되므로 VITE_E2E 가 없는 개발/운영 번들에는 이 버튼이 렌더링되지 않는다.
+const IS_E2E_PAYMENT = import.meta.env.VITE_E2E === "true";
+
+// 주문번호: 비밀번호/개인정보를 절대 포함하지 않는다.
+const createOrderId = () => "HR-" + crypto.randomUUID().slice(0, 8).toUpperCase();
+
 export default function PaymentProcess() {
     const { state } = useLocation();
     const navigate = useNavigate();
@@ -45,7 +55,7 @@ export default function PaymentProcess() {
             setWidgets(widgetsInstance);
         }
 
-        if (state?.paymentMethod === "TOSS") {
+        if (state?.paymentMethod === "TOSS" && !IS_E2E_PAYMENT) {
             initWidgets();
         }
     }, [state]);
@@ -76,16 +86,8 @@ export default function PaymentProcess() {
         renderWidgets();
     }, [widgets, amount]);
 
-    const handlePayment = async () => {
-        if (!state || !widgets || payingRef.current) return;
-        payingRef.current = true;
-        setPaying(true);
-
-        const baseCode = "HR-" + crypto.randomUUID().slice(0, 8).toUpperCase();
-        // 주문번호에는 비밀번호/개인정보를 절대 포함하지 않는다.
-        const orderId = baseCode;
-
-        // ✅ 예약 정보 저장
+    // 결제 성공 페이지(PaymentSuccess)가 승인 요청에 사용할 예약 정보를 저장한다.
+    const saveReservationDraft = (orderId) => {
         sessionStorage.setItem("reservationInfo", JSON.stringify({
             userId: state.userId,
             guestName: state.guestName,
@@ -109,6 +111,33 @@ export default function PaymentProcess() {
             accommodationName: state.accommodationName,
             roomName: state.roomName,
         }));
+    };
+
+    // e2e 전용: 토스 결제창 대신 가짜 paymentKey 로 성공 라우트에 진입 (IS_E2E_PAYMENT 참고)
+    const handleTestPayment = () => {
+        if (!IS_E2E_PAYMENT || !state || payingRef.current) return;
+        payingRef.current = true;
+        setPaying(true);
+
+        const orderId = createOrderId();
+        saveReservationDraft(orderId);
+        const params = new URLSearchParams({
+            paymentKey: `e2e_${crypto.randomUUID()}`,
+            orderId,
+            amount: String(finalPrice),
+        });
+        navigate(`/payment/success?${params.toString()}`);
+    };
+
+    const handlePayment = async () => {
+        if (!state || !widgets || payingRef.current) return;
+        payingRef.current = true;
+        setPaying(true);
+
+        const orderId = createOrderId();
+
+        // ✅ 예약 정보 저장
+        saveReservationDraft(orderId);
 
         try {
             await widgets.requestPayment({
@@ -182,6 +211,24 @@ export default function PaymentProcess() {
                 <div id="payment-method" />
                 <div id="agreement" />
             </Card>
+
+            {IS_E2E_PAYMENT && (
+                <Card className="space-y-3 border-2 border-dashed border-honey-yellow">
+                    <p className="text-sm font-bold text-deep-gray">
+                        E2E 테스트 모드: 토스 결제창 없이 테스트 결제로 진행합니다.
+                    </p>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        fullWidth
+                        disabled={paying}
+                        onClick={handleTestPayment}
+                        data-testid="e2e-test-payment"
+                    >
+                        테스트 결제
+                    </Button>
+                </Card>
+            )}
 
             <Button
                 id="payment-button"

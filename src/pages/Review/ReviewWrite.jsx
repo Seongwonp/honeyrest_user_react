@@ -63,6 +63,7 @@ export default function ReviewWrite() {
 
         setLoading(true);
         try {
+            // 작성 불가(이용 완료 전·중복 작성 등)는 에러 페이지로 보내지 않고 서버 안내 메시지를 토스트로 보여 준다.
             await api.post("/api/review/write", {
                 reservationId,
                 rating,
@@ -72,10 +73,11 @@ export default function ReviewWrite() {
                 serviceRating,
                 facilitiesRating,
                 locationRating,
-            });
+            }, { skipRedirect: true });
+            toast.success("리뷰가 등록되었습니다.");
             navigate("/user/mypage/reservations");
-        } catch {
-            toast.error("리뷰 등록에 실패했습니다.");
+        } catch (err) {
+            toast.error(err?.response?.data?.message || "리뷰 등록에 실패했습니다.");
         } finally {
             setLoading(false);
         }

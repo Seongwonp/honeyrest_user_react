@@ -13,7 +13,8 @@ import PageLoader from "@/components/PageLoader.jsx";
 import Card from "@/components/ui/Card.jsx";
 import Button from "@/components/ui/Button.jsx";
 import ErrorState from "@/components/ui/ErrorState.jsx";
-import { eyebrowClass } from "@/components/ui/styles";
+import { eyebrowClass, badgeClass } from "@/components/ui/styles";
+import { getReservationStatusMeta } from "./reservationStatus";
 
 export default function ReservationDetail() {
     const { reservationId } = useParams();
@@ -58,10 +59,13 @@ export default function ReservationDetail() {
     cancelDeadline.setDate(cancelDeadline.getDate() - 1);
 
     const isConfirmed = reservation.status === "CONFIRMED";
+    const isCompleted = reservation.status === "COMPLETED";
     const isStayCompleted = checkOutDate < today;
     const isBeforeCancelDeadline = today < cancelDeadline;
 
-    const showReviewButton = isConfirmed && isStayCompleted && !reservation.reviewed;
+    // 서버는 이용 완료(COMPLETED) 예약에만 리뷰를 허용한다. 체크아웃이 지난 확정 예약도 버튼은 보여 주되,
+    // 아직 완료 처리 전이면 작성 화면에서 서버 안내 메시지(토스트)로 알린다.
+    const showReviewButton = (isCompleted || (isConfirmed && isStayCompleted)) && !reservation.reviewed;
     const showCancelButton = isConfirmed && isBeforeCancelDeadline;
 
     return (
@@ -125,6 +129,7 @@ function InfoBlock({ reservation }) {
                     </div>
                 )}
                 <div className="min-w-0 space-y-1">
+                    <StatusBadge status={reservation.status} />
                     <p className="text-xl font-black text-deep-gray leading-tight break-keep">{reservation.accommodationName}</p>
                     <p className="text-sm font-bold text-gray-400">{reservation.roomName}</p>
                 </div>
@@ -146,6 +151,15 @@ function InfoBlock({ reservation }) {
                 />
             </dl>
         </div>
+    );
+}
+
+function StatusBadge({ status }) {
+    const meta = getReservationStatusMeta(status);
+    return (
+        <span data-testid="reservation-status" className={`${badgeClass} ${meta.className}`}>
+            {meta.label}
+        </span>
     );
 }
 

@@ -11,14 +11,7 @@ import ErrorState from "@/components/ui/ErrorState.jsx";
 import Pagination from "@/components/ui/Pagination.jsx";
 import Button from "@/components/ui/Button.jsx";
 import { cardClass, badgeClass, eyebrowClass } from "@/components/ui/styles";
-
-// 예약 상태별 라벨 / 배지 색상
-const STATUS_META = {
-    CONFIRMED: { label: "예약 완료", className: "bg-leaf-green/10 text-leaf-green-dark" },
-    CANCEL_REQUEST: { label: "환불 처리 중", className: "bg-honey-yellow/15 text-honey-yellow-dark" },
-    CANCELLED: { label: "예약 취소됨", className: "bg-red-50 text-red-500" },
-    REJECTED: { label: "취소 거절됨", className: "bg-gray-100 text-gray-500" },
-};
+import { getReservationStatusMeta } from "./reservationStatus";
 
 export default function ReservationList() {
     const { user } = useOutletContext();
@@ -83,7 +76,7 @@ export default function ReservationList() {
             ) : (
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {reservations.map((res, index) => {
-                        const meta = STATUS_META[res.status] || { label: res.status, className: "bg-gray-100 text-gray-500" };
+                        const meta = getReservationStatusMeta(res.status);
                         return (
                             <motion.li
                                 key={res.reservationId}

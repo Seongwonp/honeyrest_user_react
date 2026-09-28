@@ -27,3 +27,9 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Playwright E2E 산출물
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
