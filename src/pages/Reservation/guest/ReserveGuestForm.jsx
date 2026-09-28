@@ -5,6 +5,7 @@ import {
     FaMobileAlt,
     FaMoneyCheckAlt
 } from "react-icons/fa";
+import SafeImage from "@/components/SafeImage.jsx";
 
 export default function ReserveGuestForm() {
     const navigate = useNavigate();
@@ -193,7 +194,7 @@ export default function ReserveGuestForm() {
             <div className="space-y-6">
                 <div className="bg-white shadow-md rounded-lg p-6">
                     <div className="flex items-center gap-4 mb-4">
-                        <img
+                        <SafeImage
                             src={accommodationThumbnail}
                             alt="숙소 썸네일"
                             className="w-16 h-16 object-cover rounded"

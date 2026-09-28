@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '/public/images/logo-Photoroom.png';
-import defaultProfile from '/public/images/default-profile.png';
+import SafeImage from '@/components/SafeImage.jsx';
+import { ADMIN_URL } from '@/config/urls';
 import {
     FaUserCircle, FaSignInAlt, FaSignOutAlt,
     FaUserPlus, FaBars, FaTimes, FaClipboardList
@@ -14,7 +15,8 @@ function Header() {
     const [scrolled, setScrolled] = useState(false);
     const navigate = useNavigate();
     const { user, isLoggedIn } = useAuth();
-    const isAdmin = isLoggedIn && user.role?.includes('ADMIN');
+    // 관리자 URL 이 설정된 경우에만 관리자 버튼 노출
+    const isAdmin = isLoggedIn && user.role?.includes('ADMIN') && Boolean(ADMIN_URL);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -45,7 +47,7 @@ function Header() {
 
     const handleAdminClick = () => {
         setMenuOpen(false);
-        window.open('http://localhost:8082/', '_blank');
+        window.open(`${ADMIN_URL}/`, '_blank', 'noopener');
     };
 
     return (
@@ -97,8 +99,9 @@ function Header() {
                                 <p className="text-xs text-gray-400">Welcome</p>
                                 <p className="text-sm font-bold text-deep-gray">{user.name}님</p>
                             </div>
-                            <img
-                                src={user.profileImage?.trim() ? user.profileImage : defaultProfile}
+                            <SafeImage
+                                kind="profile"
+                                src={user.profileImage}
                                 alt="프로필"
                                 className="w-10 h-10 rounded-full object-cover ring-2 ring-honey-yellow/20"
                             />
@@ -146,8 +149,9 @@ function Header() {
                             <div className="flex-1 overflow-y-auto p-6 space-y-2">
                                 {isLoggedIn && (
                                     <div className="flex items-center gap-4 p-4 rounded-2xl bg-honey-yellow/5 mb-6">
-                                        <img
-                                            src={user.profileImage?.trim() ? user.profileImage : defaultProfile}
+                                        <SafeImage
+                                            kind="profile"
+                                            src={user.profileImage}
                                             alt="프로필"
                                             className="w-12 h-12 rounded-full object-cover border-2 border-honey-yellow/30"
                                         />

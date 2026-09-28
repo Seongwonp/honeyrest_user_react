@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
+import SafeImage from "@/components/SafeImage.jsx";
 
 export default function ImageModal({ images, onClose }) {
     const [current, setCurrent] = useState(0);
@@ -28,7 +29,7 @@ export default function ImageModal({ images, onClose }) {
 
             {/* 이미지 슬라이더 */}
             <div className="relative w-full max-w-3xl h-[70vh] flex items-center justify-center">
-                <img
+                <SafeImage kind="room"
                     src={images[current]}
                     alt={`room-${current}`}
                     className="object-contain max-h-full max-w-full rounded-lg shadow-xl"

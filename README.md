@@ -23,7 +23,6 @@
 | **다이얼로그** | SweetAlert2 | 11 | 확인/취소 모달 처리 |
 | **지도** | @vis.gl/react-google-maps | 1.8 | 숙소 위치 마커, 지도 검색 |
 | **결제** | Toss Payments SDK | 2.7 | 카드·간편결제·가상계좌 PG 연동 |
-| **분석** | Firebase Analytics | 12 | 사용자 행동 분석 |
 | **아이콘** | React Icons | 5 | FA, HI, RI, MD, FI, BS 계열 아이콘 |
 | **날짜** | date-fns + dayjs | 4 / 1.11 | 날짜 계산 및 포맷 |
 | **캘린더** | react-date-range | 2 | 체크인/아웃 날짜 범위 선택 |
@@ -60,14 +59,26 @@ cp .env.example .env
 # 백엔드 URL (예: http://localhost:8080)
 VITE_BACKEND_URL=
 
-# Firebase (Firebase 콘솔 > 프로젝트 설정 > 앱에서 확인)
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_FIREBASE_MEASUREMENT_ID=
+# 관리자 페이지 URL (예: http://localhost:8082, 미설정 시 헤더의 관리자 버튼 숨김)
+VITE_ADMIN_URL=
+
+# OAuth 콜백/로그아웃 리다이렉트 기준 URL (예: http://localhost:5173)
+# 미설정 시 window.location.origin 사용. 뒤에 /login/kakao/callback 등의 경로가 붙음
+VITE_OAUTH_REDIRECT_URI=
+
+# 소셜 로그인
+VITE_KAKAO_CLIENT_ID=
+VITE_GOOGLE_CLIENT_ID=
+
+# Google Maps
+VITE_APP_GOOGLE_MAPS_KEY=
+VITE_GOOGLE_MAP_ID=
+
+# Toss Payments
+VITE_TOSS_WIDGET_CLIENT_KEY=
+
+# 공휴일 API
+VITE_HOLIDAY_API_KEY=
 ```
 
 ### 4. 개발 서버 실행
@@ -98,7 +109,7 @@ src/
 │   ├── InquiryModal.jsx
 │   ├── PasswordVerifyModal.jsx
 │   ├── WishToggleButton.jsx
-│   └── ImageLoader.jsx
+│   └── SafeImage.jsx       # 이미지 로딩 실패 시 대체 이미지 표시
 │
 ├── hooks/
 │   └── useAuth.js          # 인증 상태 관리 (로그인/로그아웃/서버 동기화)
@@ -150,7 +161,6 @@ src/
 │   │
 │   └── Error/              # 에러 페이지 (400/401/403/404/408/422/429/500/503)
 │
-├── firebase.js             # Firebase 초기화 (Analytics)
 ├── App.jsx                 # BrowserRouter + 전역 인증 가드 (GlobalGuard)
 ├── AppWrapper.jsx          # Route 정의 전체
 └── main.jsx                # React 진입점

@@ -1,6 +1,7 @@
 import { APIProvider, Map, AdvancedMarker, InfoWindow } from "@vis.gl/react-google-maps";
 import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SafeImage from "@/components/SafeImage.jsx";
 
 function GoogleMapSearchBox({ initialCenter, onCenterChange, markers = [] }) {
     const mapRef = useRef(null);
@@ -51,7 +52,7 @@ function GoogleMapSearchBox({ initialCenter, onCenterChange, markers = [] }) {
                                 onCloseClick={() => setSelectedId(null)}
                             >
                                 <div className="w-64">
-                                    <img
+                                    <SafeImage
                                         src={item.image}
                                         alt={item.title}
                                         className="w-full h-32 object-cover rounded"

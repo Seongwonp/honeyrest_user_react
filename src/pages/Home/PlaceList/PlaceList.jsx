@@ -4,6 +4,7 @@ import { HiLocationMarker, HiStar } from "react-icons/hi";
 import api from "@/api/axios";
 import CategorySelector from "./CategorySelector";
 import { motion, AnimatePresence } from "framer-motion";
+import SafeImage from "@/components/SafeImage.jsx";
 
 function PlaceList() {
     const [categories, setCategories] = useState([]);
@@ -66,7 +67,7 @@ function PlaceList() {
                         >
                             <div className="bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-leaf-green/10 transition-all duration-500 h-full flex flex-col">
                                 <div className="relative h-64 overflow-hidden">
-                                    <img 
+                                    <SafeImage 
                                         src={place.image} 
                                         alt={place.title} 
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"

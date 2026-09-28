@@ -1,5 +1,6 @@
 import Slider from "react-slick";
 import { FaUserCircle, FaStar } from "react-icons/fa";
+import SafeImage from "@/components/SafeImage.jsx";
 
 function ReviewSlider({ reviews }) {
     const settings = {
@@ -53,7 +54,7 @@ function ReviewSlider({ reviews }) {
                         {images.length > 0 && (
                             <div className="mt-3 flex gap-2 overflow-x-auto">
                                 {images.map((url, i) => (
-                                    <img
+                                    <SafeImage kind="room"
                                         key={i}
                                         src={url}
                                         alt={`리뷰 이미지 ${i + 1}`}

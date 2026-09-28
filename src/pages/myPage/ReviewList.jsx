@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import api from "@/api/axios";
 import {FaStar, FaTrash, FaPen, FaCommentDots} from "react-icons/fa";
+import SafeImage from "@/components/SafeImage.jsx";
 
 export default function ReviewList() {
     const [reviews, setReviews] = useState([]);
@@ -71,7 +72,7 @@ export default function ReviewList() {
                             {r.imageUrls && r.imageUrls.length > 0 && (
                                 <div className="flex gap-2 flex-wrap pt-2">
                                     {r.imageUrls.map((url, idx) => (
-                                        <img
+                                        <SafeImage kind="room"
                                             key={idx}
                                             src={url}
                                             alt={`리뷰 이미지 ${idx + 1}`}
@@ -220,7 +221,7 @@ export default function ReviewList() {
                             <div className="flex gap-2 flex-wrap">
                                 {editingReview.imageUrls?.map((url, idx) => (
                                     <div key={idx} className="relative">
-                                        <img
+                                        <SafeImage kind="room"
                                             src={url}
                                             alt={`이미지 ${idx + 1}`}
                                             className="w-20 h-20 object-cover rounded border"

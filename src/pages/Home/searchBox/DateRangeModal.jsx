@@ -92,11 +92,6 @@ function DateRangeModal({ isOpen, onClose, onSelect }) {
     }, [selection.startDate, selection.endDate, serviceKey]);
 
     const handleSelect = ({ selection: newSelection }) => {
-        console.log("🖱️ handleSelect 진입:", {
-            start: format(newSelection.startDate, "yyyy-MM-dd"),
-            end: format(newSelection.endDate, "yyyy-MM-dd")
-        });
-
         const start = newSelection.startDate;
         const end = newSelection.endDate;
 

@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '@/api/axios';
+import SafeImage from "@/components/SafeImage.jsx";
 
 function EventDetail() {
     const { id } = useParams();
@@ -27,7 +28,7 @@ function EventDetail() {
                 ← 뒤로가기
             </button>
             <h1 className="text-3xl font-extrabold mb-6 text-gray-900">{event.title}</h1>
-            <img src={event.imageUrl} alt={event.title} className="w-full  rounded-lg mb-6 shadow-sm" />
+            <SafeImage kind="event" src={event.imageUrl} alt={event.title} className="w-full  rounded-lg mb-6 shadow-sm" />
 
             {/* 문단별로 출력 */}
             <div className="text-gray-700 space-y-6 leading-relaxed">

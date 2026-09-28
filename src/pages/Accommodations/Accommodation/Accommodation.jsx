@@ -15,9 +15,6 @@ import {
     FaUserFriends,
 } from "react-icons/fa";
 import { HiLocationMarker, HiStar, HiInformationCircle, HiChevronRight, HiOutlineArrowNarrowLeft } from "react-icons/hi";
-import * as FaIcons from "react-icons/fa";
-import * as RiIcons from "react-icons/ri";
-import * as MdIcons from "react-icons/md";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import WishToggleButton from "@/components/WishToggleButton.jsx";
@@ -28,6 +25,7 @@ import {FiCalendar} from "react-icons/fi";
 import InquiryModal from "@/components/InquiryModal.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import SafeImage from "@/components/SafeImage.jsx";
+import { getTagIcon } from "@/utils/tagIcons";
 
 const MotionDiv = motion.div;
 
@@ -212,8 +210,8 @@ function Accommodation({ accommodationId, sectionRefs }) {
                         <div className="flex flex-wrap gap-2 pt-4">
                             {data.tags.map((tag, i) => (
                                 <span key={i} className="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl flex items-center gap-2 text-xs font-bold text-gray-500">
-                                    {tag.iconName && (FaIcons[tag.iconName] || RiIcons[tag.iconName] || MdIcons[tag.iconName]) &&
-                                        React.createElement(FaIcons[tag.iconName] || RiIcons[tag.iconName] || MdIcons[tag.iconName], { className: "text-honey-yellow" })}
+                                    {getTagIcon(tag.iconName) &&
+                                        React.createElement(getTagIcon(tag.iconName), { className: "text-honey-yellow" })}
                                     {tag.name}
                                 </span>
                             ))}

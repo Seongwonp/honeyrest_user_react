@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import useApiRequest from "@/api/useApiRequest";
 import WishToggleButton from "@/components/WishToggleButton";
 import { useAuth } from "@/hooks/useAuth"; // ✅ 인증 훅 추가
+import SafeImage from "@/components/SafeImage.jsx";
 
 function MyWishList() {
     const { user } = useAuth(); // ✅ 사용자 정보 가져오기
@@ -52,7 +53,7 @@ function MyWishList() {
                             key={item.id}
                             className="flex items-center gap-4 border rounded-lg p-3 hover:shadow transition"
                         >
-                            <img
+                            <SafeImage
                                 src={item.thumbnail}
                                 alt={item.name}
                                 className="w-24 h-20 object-cover rounded-md flex-shrink-0"

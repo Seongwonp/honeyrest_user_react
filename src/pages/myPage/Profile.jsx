@@ -9,6 +9,7 @@ import {
     FaUserAlt, FaPhoneAlt, FaEnvelope, FaCamera, FaEdit,
     FaSave, FaLock, FaTrashAlt
 } from "react-icons/fa";
+import SafeImage from "@/components/SafeImage.jsx";
 
 export default function Profile() {
     const { user, syncUserFromServer } = useAuth();
@@ -158,8 +159,8 @@ export default function Profile() {
                 {/* 프로필 이미지 */}
                 <div className="flex flex-col items-center md:items-start md:w-1/3">
                     <div className="relative">
-                        <img
-                            src={user?.profileImage || "/images/default-profile.png"}
+                        <SafeImage kind="profile"
+                            src={user?.profileImage}
                             alt="프로필"
                             className="w-24 h-24 rounded-full object-cover border-2 border-yellow-400 shadow-md"
                         />

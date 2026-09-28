@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">HoneyRest profile placeholder</title>
+  <rect width="200" height="200" fill="#fdf3d3"/>
+  <circle cx="100" cy="78" r="38" fill="#f2c85b"/>
+  <path d="M30 190c6-45 36-70 70-70s64 25 70 70z" fill="#f2c85b"/>
+</svg>
