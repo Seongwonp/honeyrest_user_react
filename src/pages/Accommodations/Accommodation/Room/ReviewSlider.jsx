@@ -55,7 +55,7 @@ function ReviewSlider({ reviews }) {
                             <div className="mt-3 flex gap-2 overflow-x-auto">
                                 {images.map((url, i) => (
                                     <SafeImage kind="room"
-                                        key={i}
+                                        key={url || i}
                                         src={url}
                                         alt={`리뷰 이미지 ${i + 1}`}
                                         className="w-20 h-20 object-cover rounded border"

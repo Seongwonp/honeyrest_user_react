@@ -15,7 +15,11 @@ import {
     FaMoneyCheckAlt,
     FaArrowLeft, FaCoins,
 } from "react-icons/fa";
+import { toast } from "react-toastify";
 import SafeImage from "@/components/SafeImage.jsx";
+import SectionTitle from "@/components/ui/SectionTitle.jsx";
+import Button from "@/components/ui/Button.jsx";
+import { cardClass, inputClass, eyebrowClass } from "@/components/ui/styles";
 
 export default function Reservation() {
     const navigate = useNavigate();
@@ -134,12 +138,12 @@ export default function Reservation() {
     const handlePayment = () => {
         if (submittingRef.current) return;
         if (!form.guestName.trim() || !form.guestPhone.trim()) {
-            alert("예약자 이름과 전화번호는 필수입니다.");
+            toast.error("예약자 이름과 전화번호는 필수입니다.");
             return;
         }
 
         if (!paymentMethod) {
-            alert("결제 수단을 선택해주세요.");
+            toast.error("결제 수단을 선택해주세요.");
             return;
         }
 
@@ -185,82 +189,83 @@ export default function Reservation() {
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-10">
-            <div className="mb-6">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center text-gray-600 hover:text-gray-800 mb-4"
-                >
-                    <FaArrowLeft className="mr-2"/> 이전으로
-                </button>
-                <h2 className="text-2xl font-bold">예약 정보 입력 및 결제</h2>
+            <div className="mb-8">
+                <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 -ml-2">
+                    <FaArrowLeft /> 이전으로
+                </Button>
+                <SectionTitle eyebrow="Reservation" title="예약 정보 입력 및 결제" className="mb-0" />
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {/* 좌측 영역 */}
-                <div className="lg:col-span-2 space-y-8">
+                <div className="lg:col-span-2 space-y-6 min-w-0">
 
                     {/* 예약자 이름 */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <label className="font-semibold mb-1 flex items-center gap-2">
-                            <FaUserAlt className="text-gray-500" />
-                            예약자 이름 <span className="text-red-500">*</span>
+                    <div className={`${cardClass} p-6`}>
+                        <label htmlFor="reservation-guestName" className="text-sm font-black text-deep-gray mb-3 flex items-center gap-2">
+                            <FaUserAlt className="text-honey-yellow-dark" />
+                            예약자 이름 <span className="text-red-400">*</span>
                         </label>
                         <input
                             type="text"
+                            id="reservation-guestName"
                             name="guestName"
                             value={form.guestName}
                             onChange={handleChange}
-                            className="w-full border px-3 py-2 rounded"
+                            className={inputClass}
                             placeholder="홍길동"
                             required
                         />
                     </div>
 
                     {/* 전화번호 */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <label className="font-semibold mb-1 flex items-center gap-2">
-                            <FaPhoneAlt className="text-gray-500" />
-                            전화번호 <span className="text-red-500">*</span>
+                    <div className={`${cardClass} p-6`}>
+                        <label htmlFor="reservation-guestPhone" className="text-sm font-black text-deep-gray mb-3 flex items-center gap-2">
+                            <FaPhoneAlt className="text-honey-yellow-dark" />
+                            전화번호 <span className="text-red-400">*</span>
                         </label>
                         <input
                             type="text"
+                            id="reservation-guestPhone"
                             name="guestPhone"
                             value={form.guestPhone}
                             onChange={handleChange}
-                            className="w-full border px-3 py-2 rounded"
+                            className={inputClass}
                             placeholder="01012345678"
                             required
                         />
-                        <div className="text-xs text-gray-400 mt-1">
+                        <div className="text-xs text-gray-400 mt-2">
                             ※ 하이픈(-) 없이 숫자만 입력해주세요.
                         </div>
                     </div>
 
                     {/* 특별 요청사항 */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <label className="font-semibold mb-1 flex items-center gap-2">
-                            <FaStickyNote className="text-gray-500" /> 특별 요청사항
+                    <div className={`${cardClass} p-6`}>
+                        <label htmlFor="reservation-specialRequest" className="text-sm font-black text-deep-gray mb-3 flex items-center gap-2">
+                            <FaStickyNote className="text-honey-yellow-dark" /> 특별 요청사항
                         </label>
                         <textarea
+                            id="reservation-specialRequest"
                             name="specialRequest"
                             value={form.specialRequest}
                             onChange={handleChange}
-                            className="w-full border px-3 py-2 rounded"
+                            className={inputClass}
                             placeholder="예: 창가 자리 부탁드려요"
                         />
                     </div>
 
                     {/* 쿠폰 선택 */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <label className="font-semibold mb-1 flex items-center gap-2">
-                            <FaTicketAlt className="text-gray-500" /> 쿠폰 선택 (선택)
+                    <div className={`${cardClass} p-6`}>
+                        <label htmlFor="reservation-couponId" className="text-sm font-black text-deep-gray mb-3 flex items-center gap-2">
+                            <FaTicketAlt className="text-honey-yellow-dark" /> 쿠폰 선택 <span className="text-gray-300 font-bold text-xs">(선택)</span>
                         </label>
                         {availableCoupons.length > 0 ? (
                             <select
+                                id="reservation-couponId"
                                 name="couponId"
                                 value={form.couponId}
                                 onChange={handleChange}
-                                className="w-full border px-3 py-2 rounded"
+                                className={inputClass}
                             >
                                 <option value="">쿠폰을 선택하세요</option>
                                 {availableCoupons.map((coupon) => (
@@ -272,44 +277,45 @@ export default function Reservation() {
                                 ))}
                             </select>
                         ) : (
-                            <p className="text-sm text-gray-500">사용 가능한 쿠폰이 없습니다.</p>
+                            <p className="text-sm text-gray-400 bg-off-white rounded-2xl px-4 py-3">사용 가능한 쿠폰이 없습니다.</p>
                         )}
                     </div>
 
                     {/* 포인트 사용 */}
                     {availablePoints !== null && (
-                        <div className="bg-white shadow rounded-lg p-6">
-                            <label className="font-semibold mb-1 flex items-center gap-2">
-                                <FaCoins className="text-yellow-500" />
-                                포인트 사용 <span className="text-gray-400 text-sm">(선택)</span>
+                        <div className={`${cardClass} p-6`}>
+                            <label htmlFor="reservation-usedPoint" className="text-sm font-black text-deep-gray mb-3 flex items-center gap-2">
+                                <FaCoins className="text-honey-yellow-dark" />
+                                포인트 사용 <span className="text-gray-300 font-bold text-xs">(선택)</span>
                             </label>
                             <div className="text-sm text-gray-500 mb-2">
-                                사용 가능한 포인트: <span className="font-semibold text-yellow-500">{availablePoints.toLocaleString()}P</span>
+                                사용 가능한 포인트: <span className="font-black text-honey-yellow-dark">{availablePoints.toLocaleString()}P</span>
                             </div>
                             <input
                                 type="number"
+                                id="reservation-usedPoint"
                                 name="usedPoint"
                                 value={form.usedPoint}
                                 onChange={handleChange}
-                                className="w-full border px-3 py-2 rounded"
+                                className={inputClass}
                                 placeholder="사용할 포인트 입력"
                                 min={0}
                                 max={availablePoints}
                             />
-                            <div className="text-xs text-gray-400 mt-1">
+                            <div className="text-xs text-gray-400 mt-2">
                                 ※ 최대 {availablePoints.toLocaleString()}P까지 사용 가능
                             </div>
                         </div>
                     )}
 
                     {/* 취소 정책 */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                            <FaShieldAlt className="text-gray-500" /> 취소 정책
+                    <div className={`${cardClass} p-6`}>
+                        <h3 className="text-sm font-black text-deep-gray mb-3 flex items-center gap-2">
+                            <FaShieldAlt className="text-leaf-green" /> 취소 정책
                         </h3>
-                        <ul className="list-disc list-inside text-sm text-gray-600">
+                        <ul className="list-disc list-inside text-sm text-gray-500 space-y-1">
                             {cancellationPolicy.map((policy, idx) => (
-                                <li key={idx}>
+                                <li key={policy.policyId ?? `policy-${idx}`}>
                                     <strong>{policy.policyName}</strong>: {policy.detail}
                                 </li>
                             ))}
@@ -317,17 +323,20 @@ export default function Reservation() {
                     </div>
 
                     {/* 결제 수단 선택 */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <h3 className="font-semibold text-lg mb-3">결제 수단 선택</h3>
-                        <div className="flex gap-3 flex-wrap">
+                    <div className={`${cardClass} p-6`}>
+                        <h3 className="text-sm font-black text-deep-gray mb-3">결제 수단 선택</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup" aria-label="결제 수단">
                             {paymentOptions.map((option) => (
                                 <button
+                                    type="button"
                                     key={option.value}
+                                    role="radio"
+                                    aria-checked={paymentMethod === option.value}
                                     onClick={() => setPaymentMethod(option.value)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded border transition ${
+                                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/30 ${
                                         paymentMethod === option.value
-                                            ? "bg-yellow-400 text-white border-yellow-400"
-                                            : "bg-white text-gray-700 hover:bg-gray-100"
+                                            ? "bg-honey-yellow text-white border-honey-yellow shadow-lg shadow-honey-yellow/20"
+                                            : "bg-white text-deep-gray border-gray-100 hover:border-honey-yellow"
                                     }`}
                                 >
                                     {option.icon}
@@ -337,7 +346,7 @@ export default function Reservation() {
                         </div>
 
                         {paymentMethod && (
-                            <p className="mt-3 text-sm text-gray-600 flex items-center gap-2">
+                            <p className="mt-3 text-sm text-gray-500 flex items-center gap-2">
                                 선택된 결제 방식: <strong>{paymentOptions.find(opt => opt.value === paymentMethod)?.label}</strong>
                             </p>
                         )}
@@ -345,49 +354,49 @@ export default function Reservation() {
                 </div>
 
                 {/* 우측 영역 */}
-                <div className="space-y-6 sticky top-6">
+                <div className="space-y-6 lg:sticky lg:top-24 self-start min-w-0">
                     {/* 숙소 및 객실 정보 요약 카드 */}
-                    <div className="bg-white shadow rounded-lg p-6">
+                    <div className={`${cardClass} p-6`}>
                         {/* 숙소 썸네일 및 정보 */}
                         <div className="mb-6 flex items-center gap-4">
                             <SafeImage
                                 src={accommodationThumbnail}
                                 alt="숙소 썸네일"
-                                className="w-16 h-16 object-cover rounded-lg shadow-sm"
+                                className="w-16 h-16 shrink-0 object-cover rounded-2xl"
                             />
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-800">{accommodationName}</h3>
-                                <p className="text-sm text-gray-500 flex items-center gap-1">
-                                    <FaMapMarkerAlt/> {accommodationAddress}
+                            <div className="min-w-0">
+                                <h3 className="text-lg font-black text-deep-gray leading-tight break-keep">{accommodationName}</h3>
+                                <p className="text-xs text-gray-400 flex items-start gap-1 mt-1">
+                                    <FaMapMarkerAlt className="shrink-0 mt-0.5"/> <span className="break-keep">{accommodationAddress}</span>
                                 </p>
                             </div>
                         </div>
 
                         {/* 객실 정보 */}
                         <div className="mb-4">
-                            <p className="text-gray-700 font-semibold flex items-center gap-2">
-                                <FaBed className="text-gray-500"/> 객실명
+                            <p className={`${eyebrowClass} flex items-center gap-1.5`}>
+                                <FaBed /> 객실명
                             </p>
-                            <p>{roomName}</p>
+                            <p className="text-sm font-bold text-deep-gray mt-1">{roomName}</p>
                         </div>
 
                         <div className="mb-4">
-                            <p className="text-gray-700 font-semibold flex items-center gap-2">
-                                <FaCalendarAlt className="text-gray-500"/> 체크인 / 체크아웃
+                            <p className={`${eyebrowClass} flex items-center gap-1.5`}>
+                                <FaCalendarAlt /> 체크인 / 체크아웃
                             </p>
-                            <p>{checkIn} ~ {checkOut}</p>
+                            <p className="text-sm font-bold text-deep-gray mt-1">{checkIn} ~ {checkOut}</p>
                         </div>
 
                         <div className="mb-4">
-                            <p className="text-gray-700 font-semibold flex items-center gap-2">
-                                <FaUserFriends className="text-gray-500"/> 인원
+                            <p className={`${eyebrowClass} flex items-center gap-1.5`}>
+                                <FaUserFriends /> 인원
                             </p>
-                            <p>{guests}명</p>
+                            <p className="text-sm font-bold text-deep-gray mt-1">{guests}명</p>
                         </div>
                     </div>
 
                     {/* 동의 항목 UI (카드 형태) */}
-                    <div className="bg-white shadow rounded-lg p-6 mb-4">
+                    <div className={`${cardClass} p-6`}>
                         <div className="space-y-3">
                             {/* 전체 동의 체크박스 */}
                             <label className="flex items-center cursor-pointer select-none">
@@ -402,9 +411,9 @@ export default function Reservation() {
                                             email: checked
                                         });
                                     }}
-                                    className="mr-3 accent-yellow-400"
+                                    className="mr-3 w-4 h-4 shrink-0 accent-leaf-green"
                                 />
-                                <span className="text-sm text-gray-800 font-semibold">전체 동의</span>
+                                <span className="text-sm text-deep-gray font-black">전체 동의</span>
                             </label>
                             {[
                                 {
@@ -412,11 +421,11 @@ export default function Reservation() {
                                     label: "개인정보 수집 및 이용 동의",
                                     required: true,
                                     detail: (
-                                        <div className="bg-gray-50 p-3 rounded text-xs text-gray-600 mt-2">
+                                        <div className="bg-off-white p-4 rounded-2xl text-xs text-gray-500 leading-relaxed mt-2 break-words">
                                             - 수집 항목: 예약자 이름, 전화번호 등<br />
                                             - 이용 목적: 예약 진행 및 확인, 고객 상담 등<br />
                                             - 보유 기간: 관련 법령에 따라 일정 기간 보관 후 파기<br />
-                                            자세한 내용은 <a href="/privacy" className="underline text-blue-600" target="_blank" rel="noopener noreferrer">개인정보 처리방침</a>을 참고하세요.
+                                            자세한 내용은 <a href="/privacy" className="underline font-bold text-leaf-green-dark" target="_blank" rel="noopener noreferrer">개인정보 처리방침</a>을 참고하세요.
                                         </div>
                                     )
                                 },
@@ -425,16 +434,16 @@ export default function Reservation() {
                                     label: "취소/환불 정책 동의",
                                     required: true,
                                     detail: (
-                                        <div className="bg-gray-50 p-3 rounded text-xs text-gray-600 mt-2">
+                                        <div className="bg-off-white p-4 rounded-2xl text-xs text-gray-500 leading-relaxed mt-2 break-words">
                                             <div className="mb-2">
                                                 숙소의 취소 및 환불 정책을 충분히 숙지하신 후 동의해 주세요.<br />
                                                 아래 각 정책은 예약 취소 시 적용되는 조건, 환불 가능 여부, 환불 금액 산정 방식 등을 상세히 안내합니다.<br />
                                                 예약 확정 이후에는 해당 정책에 따라 취소 및 환불이 처리되며, 일부 시점 이후에는 환불이 불가할 수 있습니다.<br />
-                                                <span className="font-semibold text-gray-700">아래 정책을 반드시 확인하시고, 궁금한 점은 고객센터로 문의해 주세요.</span>
+                                                <span className="font-bold text-deep-gray">아래 정책을 반드시 확인하시고, 궁금한 점은 고객센터로 문의해 주세요.</span>
                                             </div>
                                             <ul className="list-disc list-inside space-y-2">
                                                 {cancellationPolicy.map((policy, idx) => (
-                                                    <li key={idx} className="mb-1">
+                                                    <li key={policy.policyId ?? `policy-${idx}`} className="mb-1">
                                                         <strong>{policy.policyName}</strong>:<br />
                                                         {policy.detail}<br />
                                                         <span className="text-gray-500">
@@ -473,7 +482,7 @@ export default function Reservation() {
                                     label: "결제 정보 이메일 전송 동의",
                                     required: false,
                                     detail: (
-                                        <div className="bg-gray-50 p-3 rounded text-xs text-gray-600 mt-2">
+                                        <div className="bg-off-white p-4 rounded-2xl text-xs text-gray-500 leading-relaxed mt-2 break-words">
                                             - 결제 완료 시, 현재 계정에 등록된 이메일 주소로 결제 내역(예약 정보, 결제 금액 등)이 자동 전송됩니다.<br />
                                             - 결제 내역 이메일은 예약 확인 및 증빙 자료로 활용하실 수 있습니다.<br />
                                             - 이메일 전송 동의는 선택 사항이며, 동의하지 않으실 경우 결제 내역 이메일이 발송되지 않습니다.<br />
@@ -488,18 +497,19 @@ export default function Reservation() {
                                             type="checkbox"
                                             checked={agreements[item.key]}
                                             onChange={e => setAgreements(prev => ({...prev, [item.key]: e.target.checked}))}
-                                            className="mr-3 accent-yellow-400"
+                                            className="mr-3 w-4 h-4 shrink-0 accent-leaf-green"
                                         />
-                                        <span className="text-sm text-gray-700 font-medium">
+                                        <span className="text-sm text-gray-600 font-medium">
                                             {item.label}
                                             {item.required
-                                                ? <span className="ml-1 text-red-500 font-bold">(필수)</span>
+                                                ? <span className="ml-1 text-red-400 font-bold">(필수)</span>
                                                 : <span className="ml-1 text-gray-400">(선택)</span>}
                                         </span>
                                         <button
                                             type="button"
-                                            className="ml-2 text-gray-500 hover:text-gray-800 focus:outline-none"
-                                            aria-label={expanded[item.key] ? "상세 닫기" : "상세 보기"}
+                                            className="ml-auto p-1 rounded-lg text-gray-400 hover:text-deep-gray hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-honey-yellow/40"
+                                            aria-label={`${item.label} ${expanded[item.key] ? "상세 닫기" : "상세 보기"}`}
+                                            aria-expanded={!!expanded[item.key]}
                                             onClick={() => toggleDetail(item.key)}
                                         >
                                             <svg
@@ -517,33 +527,33 @@ export default function Reservation() {
                     </div>
 
                     {/* 결제 요약 및 버튼 카드 */}
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <h3 className="font-semibold text-lg mb-2">결제 정보</h3>
-                        <hr className="mb-4"/>
-                        <div className="mb-6 text-sm text-gray-700 space-y-2">
+                    <div className={`${cardClass} p-6`}>
+                        <p className={`${eyebrowClass} mb-1`}>Payment</p>
+                        <h3 className="text-lg font-black text-deep-gray mb-4">결제 정보</h3>
+                        <div className="mb-6 text-sm text-gray-500 space-y-2">
                             <div className="flex justify-between">
-                                <span>{roomName}</span>
-                                <span>{originalPrice.toLocaleString()}원</span>
+                                <span className="break-keep">{roomName}</span>
+                                <span className="font-bold text-deep-gray whitespace-nowrap">{originalPrice.toLocaleString()}원</span>
                             </div>
                             {selectedCoupon && (
-                                <div className="flex justify-between text-yellow-500">
+                                <div className="flex justify-between gap-2 text-honey-yellow-dark font-bold">
                                     <span>{selectedCoupon.name}</span>
                                     <span>-{discountAmount.toLocaleString()}원</span>
                                 </div>
                             )}
-                            {availablePoints && form.usedPoint > 0 && (
-                                <div className="flex justify-between text-blue-500">
+                            {availablePoints > 0 && form.usedPoint > 0 && (
+                                <div className="flex justify-between gap-2 text-leaf-green-dark font-bold">
                                     <span>포인트 사용</span>
                                     <span>-{form.usedPoint.toLocaleString()}원</span>
                                 </div>
                             )}
-                            <div className="border-t pt-2 mt-2 flex justify-between font-bold text-lg">
-                                <span>총 금액</span>
-                                <span className="text-red-400">{finalPrice.toLocaleString()}원</span>
+                            <div className="border-t border-gray-100 pt-4 mt-4 flex justify-between items-end">
+                                <span className="font-black text-deep-gray">총 금액</span>
+                                <span className="text-2xl font-black text-deep-gray">{finalPrice.toLocaleString()}원</span>
                             </div>
                         </div>
 
-                        <button
+                        <Button
                             onClick={handlePayment}
                             disabled={
                                 !form.guestName.trim() ||
@@ -552,14 +562,11 @@ export default function Reservation() {
                                 !agree ||
                                 submitting
                             }
-                            className={`w-full font-bold py-3 rounded transition ${
-                                !form.guestName.trim() || !form.guestPhone.trim() || !paymentMethod || !agree || submitting
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-yellow-400 hover:bg-yellow-500 text-white"
-                            }`}
+                            size="lg"
+                            fullWidth
                         >
                             결제하고 예약하기
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

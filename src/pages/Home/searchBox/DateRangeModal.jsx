@@ -3,6 +3,7 @@ import { format, differenceInCalendarDays, addDays } from "date-fns";
 import { ko } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const formatDate = (locdate) => {
     const str = locdate.toString();
@@ -111,7 +112,7 @@ function DateRangeModal({ isOpen, onClose, onSelect }) {
 
         const nights = Math.max(1, differenceInCalendarDays(end, start));
         if (nights > 30) {
-            alert(`최대 30박까지만 선택 가능합니다. 현재 ${nights}박 선택됨.`);
+            toast.info(`최대 30박까지만 선택 가능합니다. 현재 ${nights}박 선택됨.`);
             return;
         }
 

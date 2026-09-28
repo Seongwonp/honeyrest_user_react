@@ -10,6 +10,10 @@ import {
     FaSave, FaLock, FaTrashAlt
 } from "react-icons/fa";
 import SafeImage from "@/components/SafeImage.jsx";
+import SectionTitle from "@/components/ui/SectionTitle.jsx";
+import Card from "@/components/ui/Card.jsx";
+import Button from "@/components/ui/Button.jsx";
+import { inputClass, badgeClass, eyebrowClass } from "@/components/ui/styles";
 
 export default function Profile() {
     const { user, syncUserFromServer } = useAuth();
@@ -140,38 +144,46 @@ export default function Profile() {
         }
     };
 
-    return (
-        <div className="max-w-4xl mx-auto p-6">
-            {/* 타이틀 + 탈퇴 버튼 */}
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-extrabold text-gray-900">👤 내 정보</h2>
-                <button
-                    onClick={onDeleteClick}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-gray-700 text-white text-xs rounded-md hover:bg-gray-800 transition"
-                    aria-label="회원 탈퇴"
-                    title="회원 탈퇴 시 모든 정보가 삭제됩니다"
-                >
-                    <FaTrashAlt className="text-sm" />
-                    탈퇴
-                </button>
-            </div>
+    const isSaving = isLoading("profileUpdate") || isLoading("emailChangeRequest");
 
-            <div className="bg-white shadow-lg rounded-xl p-6 flex flex-col md:flex-row gap-8">
+    return (
+        <section>
+            {/* 타이틀 + 탈퇴 버튼 */}
+            <SectionTitle
+                eyebrow="Profile"
+                title="내 정보"
+                action={
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={onDeleteClick}
+                        aria-label="회원 탈퇴"
+                        title="회원 탈퇴 시 모든 정보가 삭제됩니다"
+                    >
+                        <FaTrashAlt />
+                        탈퇴
+                    </Button>
+                }
+            />
+
+            <Card className="flex flex-col md:flex-row gap-8">
                 {/* 프로필 이미지 */}
-                <div className="flex flex-col items-center md:items-start md:w-1/3">
+                <div className="flex flex-col items-center text-center md:w-1/3 md:border-r md:border-gray-50 md:pr-8">
                     <div className="relative">
                         <SafeImage kind="profile"
                             src={user?.profileImage}
                             alt="프로필"
-                            className="w-24 h-24 rounded-full object-cover border-2 border-yellow-400 shadow-md"
+                            className="w-28 h-28 rounded-full object-cover ring-4 ring-honey-yellow/20 shadow-lg"
                         />
                         {!isSocialLogin && (
                             <>
                                 <button
+                                    type="button"
                                     onClick={() => document.getElementById("profileImageInput").click()}
-                                    className="absolute bottom-0 right-0 bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full shadow-lg transition"
+                                    aria-label="프로필 이미지 변경"
+                                    className="absolute bottom-0 right-0 w-9 h-9 flex items-center justify-center bg-honey-yellow hover:bg-honey-yellow-dark text-white rounded-full shadow-lg shadow-honey-yellow/30 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/40"
                                 >
-                                    <FaCamera className="text-base" />
+                                    <FaCamera className="text-sm" />
                                 </button>
                                 <input
                                     type="file"
@@ -183,37 +195,43 @@ export default function Profile() {
                             </>
                         )}
                     </div>
-                    <h3 className="mt-4 text-xl font-semibold text-gray-800">{form.name || user?.name}</h3>
-                    <p className="text-gray-600 mt-1 text-sm">{form.email || user?.email}</p>
-                    <p className="text-xs text-gray-400 mt-2">로그인 방식: <span className="font-medium">{user?.provider === "local" ? "일반 회원" : user?.provider?.toUpperCase() || "알 수 없음"}</span></p>
+                    <h3 className="mt-4 text-xl font-black text-deep-gray break-keep">{form.name || user?.name}</h3>
+                    <p className="text-gray-400 mt-1 text-sm break-all">{form.email || user?.email}</p>
+                    <span className={`${badgeClass} mt-3 bg-gray-50 text-gray-500`}>
+                        {user?.provider === "local" ? "일반 회원" : user?.provider?.toUpperCase() || "알 수 없음"}
+                    </span>
                 </div>
 
                 {/* 상세 정보 */}
-                <div className="flex-1 flex flex-col justify-between">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {[
-                            { label: "이름", name: "name", icon: <FaUserAlt className="text-yellow-500" /> },
-                            { label: "연락처", name: "phone", icon: <FaPhoneAlt className="text-yellow-500" /> },
-                            { label: "이메일", name: "email", icon: <FaEnvelope className="text-yellow-500" /> }
+                            { label: "이름", name: "name", icon: <FaUserAlt /> },
+                            { label: "연락처", name: "phone", icon: <FaPhoneAlt /> },
+                            { label: "이메일", name: "email", icon: <FaEnvelope /> }
                         ].map(({ label, name, icon }) => (
-                            <div key={name} className="flex flex-col">
-                                <label className="flex items-center gap-2 text-gray-700 font-semibold mb-1">
-                                    {icon}
+                            <div key={name} className="flex flex-col min-w-0">
+                                <label
+                                    htmlFor={isEditing ? `profile-${name}` : undefined}
+                                    className="flex items-center gap-2 text-xs font-bold text-gray-500 mb-2"
+                                >
+                                    <span className="text-honey-yellow-dark">{icon}</span>
                                     <span>{label}</span>
                                 </label>
                                 {isEditing ? (
                                     <input
+                                        id={`profile-${name}`}
                                         type="text"
                                         name={name}
                                         value={form[name]}
                                         onChange={handleChange}
                                         disabled={isSocialLogin}
-                                        className="w-full rounded-md border px-4 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                        className={inputClass}
                                         placeholder="정보를 입력하세요"
                                     />
                                 ) : (
-                                    <div className="w-full rounded-md border border-gray-200 bg-gray-50 px-4 py-2 text-gray-700 min-h-[38px] flex items-center">
-                                        {form[name] || "정보 없음"}
+                                    <div className="w-full rounded-2xl bg-off-white px-4 py-3 text-sm font-bold text-deep-gray min-h-[46px] flex items-center break-all">
+                                        {form[name] || <span className="text-gray-300 font-medium">정보 없음</span>}
                                     </div>
                                 )}
                             </div>
@@ -221,67 +239,50 @@ export default function Profile() {
                     </div>
 
                     {/* 추가 정보 섹션 */}
-                    <div className="mt-6 bg-yellow-50 rounded-lg p-4 shadow-inner grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-800 font-semibold">
-                        <div className="flex items-center gap-2">
-                            <span className="text-yellow-600 font-bold">포인트:</span>
-                            <span className="text-yellow-800">{additionalInfo.point}</span>
+                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="rounded-2xl bg-honey-yellow/10 px-4 py-3">
+                            <p className={eyebrowClass}>포인트</p>
+                            <p className="text-lg font-black text-honey-yellow-dark">{additionalInfo.point}</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-yellow-600 font-bold">이메일 인증:</span>
+                        <div className="rounded-2xl bg-off-white px-4 py-3">
+                            <p className={eyebrowClass}>이메일 인증</p>
                             {additionalInfo.isVerified ? (
-                                <span className="text-green-600 bg-green-100 rounded-full px-3 py-1 text-xs font-medium">인증 완료</span>
+                                <span className={`${badgeClass} mt-1 bg-leaf-green/10 text-leaf-green-dark`}>인증 완료</span>
                             ) : (
-                                <span className="text-red-600 bg-red-100 rounded-full px-3 py-1 text-xs font-medium">미인증</span>
+                                <span className={`${badgeClass} mt-1 bg-red-50 text-red-500`}>미인증</span>
                             )}
                         </div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-yellow-600 font-bold">가입일:</span>
-                            <span className="text-yellow-800">{additionalInfo.createdAt ? new Date(additionalInfo.createdAt).toLocaleDateString() : "정보 없음"}</span>
+                        <div className="rounded-2xl bg-off-white px-4 py-3">
+                            <p className={eyebrowClass}>가입일</p>
+                            <p className="text-sm font-black text-deep-gray mt-1">{additionalInfo.createdAt ? new Date(additionalInfo.createdAt).toLocaleDateString() : "정보 없음"}</p>
                         </div>
                     </div>
 
                     {/* 버튼 그룹 */}
                     <div className="mt-6 flex flex-wrap justify-end gap-3">
                         {!isSocialLogin && (
-                            <button
-                                onClick={() => setShowPasswordChange(true)}
-                                className="flex items-center gap-2 px-4 py-2 rounded-md bg-red-600 text-white text-sm font-semibold shadow hover:bg-red-700 transition"
-                                type="button"
-                            >
+                            <Button variant="secondary" onClick={() => setShowPasswordChange(true)}>
                                 <FaLock />
                                 비밀번호 변경
-                            </button>
+                            </Button>
                         )}
 
                         {!isSocialLogin && (
                             isEditing ? (
-                                <button
-                                    onClick={handleSubmit}
-                                    disabled={isLoading("profileUpdate") || isLoading("emailChangeRequest")}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold shadow transition ${
-                                        isLoading("profileUpdate") || isLoading("emailChangeRequest")
-                                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                            : "bg-yellow-400 hover:bg-yellow-500 text-white"
-                                    }`}
-                                    type="button"
-                                >
+                                <Button onClick={handleSubmit} disabled={isSaving}>
                                     <FaSave />
-                                    {isLoading("profileUpdate") || isLoading("emailChangeRequest") ? "처리 중..." : "저장하기"}
-                                </button>
+                                    {isSaving ? "처리 중..." : "저장하기"}
+                                </Button>
                             ) : (
-                                <button
-                                    onClick={() => setShowPasswordModal(true)}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 transition"
-                                    type="button"
-                                >
+                                <Button variant="dark" onClick={() => setShowPasswordModal(true)}>
                                     <FaEdit />
                                     수정하기
-                                </button>
+                                </Button>
                             )
                         )}
                     </div>
                 </div>
-            </div>
+            </Card>
 
             {/* 모달들 */}
             {showPasswordModal && (
@@ -303,6 +304,6 @@ export default function Profile() {
                     }}
                 />
             )}
-        </div>
+        </section>
     );
 }

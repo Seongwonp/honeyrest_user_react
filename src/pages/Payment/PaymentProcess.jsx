@@ -2,6 +2,11 @@ import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { HiCreditCard } from "react-icons/hi";
+import SectionTitle from "@/components/ui/SectionTitle.jsx";
+import Card from "@/components/ui/Card.jsx";
+import Button from "@/components/ui/Button.jsx";
+import { eyebrowClass } from "@/components/ui/styles";
 
 export default function PaymentProcess() {
     const { state } = useLocation();
@@ -130,13 +135,15 @@ export default function PaymentProcess() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">
-            <h2 className="text-3xl font-bold text-gray-900">💳 결제 정보 확인</h2>
+        <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
+            <SectionTitle eyebrow="Checkout" title="결제 정보 확인" className="mb-2" />
 
-            <div className="bg-white border border-gray-200 rounded-lg shadow p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700">
-                    <Info label="숙소명" value={state?.accommodationName} />
-                    <Info label="객실명" value={state?.roomName} />
+            <Card className="space-y-6">
+                <div>
+                    <p className="text-xl font-black text-deep-gray leading-tight break-keep">{state?.accommodationName}</p>
+                    <p className="text-sm font-bold text-gray-400">{state?.roomName}</p>
+                </div>
+                <dl className="grid grid-cols-2 gap-3">
                     <Info label="체크인" value={state?.checkIn} />
                     <Info label="체크아웃" value={state?.checkOut} />
                     <Info label="인원" value={`${state?.guests}명`} />
@@ -145,41 +152,65 @@ export default function PaymentProcess() {
                     <Info label="이메일" value={guestEmail || "미입력"} />
                     <Info label="유저 ID" value={state?.userId || "비회원"} />
                     <Info label="쿠폰" value={state?.couponName || "미사용"} />
-                    <Info label="쿠폰 적용" value={state?.couponId ? "사용됨" : "미사용"} />
-                    <Info label="원가" value={state?.originalPrice ? `${state.originalPrice.toLocaleString()}원` : "-"} />
-                    <Info label="할인 금액" value={state?.discountAmount ? `-${state.discountAmount.toLocaleString()}원` : "0원"} />
-                    <Info label="사용한 포인트" value={state?.usedPoint ? `-${state.usedPoint.toLocaleString()}P` : "0P"} />
+                </dl>
+
+                <dl className="divide-y divide-gray-50 border-t border-gray-50 pt-2">
+                    <Row label="쿠폰 적용" value={state?.couponId ? "사용됨" : "미사용"} />
+                    <Row label="원가" value={state?.originalPrice ? `${state.originalPrice.toLocaleString()}원` : "-"} />
+                    <Row label="할인 금액" value={state?.discountAmount ? `-${state.discountAmount.toLocaleString()}원` : "0원"} />
+                    <Row label="사용한 포인트" value={state?.usedPoint ? `-${state.usedPoint.toLocaleString()}P` : "0P"} />
+                </dl>
+
+                <div className="bg-deep-gray rounded-3xl p-5 sm:p-6 text-white flex items-end justify-between gap-4">
+                    <div>
+                        <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Total</p>
+                        <p className="text-sm font-bold text-white/80">최종 결제 금액</p>
+                        {state?.usedPoint > 0 && (
+                            <p className="text-xs text-white/50 mt-1">
+                                포인트 사용: -{state.usedPoint.toLocaleString()}P
+                            </p>
+                        )}
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-honey-yellow whitespace-nowrap">
+                        {amount.value.toLocaleString()}원
+                    </p>
                 </div>
+            </Card>
 
-                <div className="text-right text-lg font-semibold text-blue-600">
-                    최종 결제 금액: {amount.value.toLocaleString()}원
-                    {state?.usedPoint > 0 && (
-                        <div className="text-sm text-gray-500 mt-1">
-                            포인트 사용: -{state.usedPoint.toLocaleString()}P
-                        </div>
-                    )}
-                </div>
-            </div>
+            {/* 토스 결제 위젯 렌더링 영역 */}
+            <Card padding="p-2 sm:p-4" className="overflow-hidden">
+                <div id="payment-method" />
+                <div id="agreement" />
+            </Card>
 
-            <div id="payment-method" className="mt-6" />
-            <div id="agreement" className="mt-4" />
-
-            <button
+            <Button
                 id="payment-button"
-                className="mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded w-full transition disabled:opacity-60 disabled:cursor-not-allowed"
+                size="lg"
+                fullWidth
                 disabled={!ready || paying}
                 onClick={handlePayment}
             >
+                <HiCreditCard />
                 {paying ? "결제 진행 중..." : "결제하기"}
-            </button>
+            </Button>
         </div>
     );
 }
 
 function Info({ label, value }) {
     return (
-        <div>
-            <span className="font-medium">{label}:</span> {value}
+        <div className="rounded-2xl bg-off-white px-4 py-3 min-w-0">
+            <dt className={eyebrowClass}>{label}</dt>
+            <dd className="mt-0.5 text-sm font-bold text-deep-gray break-all">{value}</dd>
+        </div>
+    );
+}
+
+function Row({ label, value }) {
+    return (
+        <div className="flex items-center justify-between gap-4 py-2.5 text-sm">
+            <dt className="text-gray-400 font-bold">{label}</dt>
+            <dd className="text-deep-gray font-bold text-right">{value}</dd>
         </div>
     );
 }

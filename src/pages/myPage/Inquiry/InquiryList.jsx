@@ -1,16 +1,26 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useApiRequest from '@/api/useApiRequest';
-import { FaArrowLeft, FaArrowRight, FaCheckCircle, FaRegClock, FaBuilding, FaCalendarAlt } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { FaCheckCircle, FaRegClock, FaBuilding, FaCalendarAlt, FaRegCommentDots } from 'react-icons/fa';
+import SectionTitle from '@/components/ui/SectionTitle.jsx';
+import ListSkeleton from '@/components/ui/ListSkeleton.jsx';
+import EmptyState from '@/components/ui/EmptyState.jsx';
+import ErrorState from '@/components/ui/ErrorState.jsx';
+import Pagination from '@/components/ui/Pagination.jsx';
+import { cardClass, badgeClass, eyebrowClass } from '@/components/ui/styles';
 
 const InquiryList = () => {
-    const { request, isLoading } = useApiRequest();
+    const { request } = useApiRequest();
+    // loading | error | ready
+    const [status, setStatus] = useState('loading');
     const [inquiries, setInquiries] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
     // request가 고정 참조이므로 fetchInquiries도 한 번만 생성됨
     const fetchInquiries = useCallback(async (pageNum = 0) => {
+        setStatus('loading');
         try {
             const data = await request(
                 { url: `/api/user/inquiries/List?page=${pageNum}&size=5`, method: 'GET' }
@@ -18,8 +28,10 @@ const InquiryList = () => {
             setInquiries(data.content);
             setPage(data.page);
             setTotalPages(data.totalPages);
+            setStatus('ready');
         } catch (err) {
             console.error(err);
+            setStatus('error');
         }
     }, [request]);
 
@@ -49,66 +61,78 @@ const InquiryList = () => {
     const repliedCount = inquiries.filter(i => i.isReplied).length;
     const pendingCount = totalCount - repliedCount;
 
-    return (
-        <div className="p-6 max-w-5xl mx-auto bg-white rounded-lg shadow-md">
-            <h2 className="text-3xl font-bold mb-6 border-b border-gray-300 pb-4">내 문의 내역</h2>
+    // 페이지 번호 버튼 이동 (이전/다음 포함)
+    const handlePageChange = (next) => {
+        if (next === page - 1) return handlePrev();
+        if (next === page + 1) return handleNext();
+        if (next >= 0 && next < totalPages) fetchInquiries(next);
+    };
 
-            <div className="flex flex-wrap gap-6 mb-8 text-sm font-semibold text-gray-700">
-                <div className="flex items-center gap-1"><FaRegClock /> 총 문의: {totalCount}</div>
-                <div className="flex items-center gap-1 text-yellow-500"><FaCheckCircle /> 답변 완료: {repliedCount}</div>
-                <div className="flex items-center gap-1 text-yellow-400"><FaRegClock /> 미답변: {pendingCount}</div>
+    const summary = [
+        { label: '총 문의', value: totalCount, className: 'bg-gray-50 text-deep-gray' },
+        { label: '답변 완료', value: repliedCount, className: 'bg-leaf-green/10 text-leaf-green-dark' },
+        { label: '미답변', value: pendingCount, className: 'bg-honey-yellow/10 text-honey-yellow-dark' },
+    ];
+
+    return (
+        <section>
+            <SectionTitle eyebrow="Inquiries" title="내 문의 내역" />
+
+            <div className="grid grid-cols-3 gap-3 mb-6">
+                {summary.map((s) => (
+                    <div key={s.label} className={`rounded-2xl px-3 sm:px-5 py-3 sm:py-4 ${s.className}`}>
+                        <p className="text-[10px] sm:text-xs font-bold opacity-70">{s.label}</p>
+                        <p className="text-xl sm:text-2xl font-black">{s.value}</p>
+                    </div>
+                ))}
             </div>
 
-            {isLoading('default') ? (
-                <p className="text-center text-gray-500 text-lg">로딩 중...</p>
+            {status === 'loading' ? (
+                <ListSkeleton rows={3} height="h-24" />
+            ) : status === 'error' ? (
+                <ErrorState title="문의 내역을 불러오지 못했습니다." onRetry={() => fetchInquiries(page)} />
             ) : inquiries.length === 0 ? (
-                <p className="text-center text-gray-400 text-lg">문의 내역이 없습니다.</p>
+                <EmptyState icon={<FaRegCommentDots />} title="문의 내역이 없습니다." description="숙소 상세 페이지에서 궁금한 점을 문의해 보세요." />
             ) : (
-                <div className="space-y-4">
-                    {inquiries.map((inq) => (
-                        <Link
-                            key={inq.inquiryId}
-                            to={`/user/mypage/inquiries/${inq.inquiryId}`}
-                            className={`border rounded-lg p-5 shadow-sm hover:shadow-lg transition flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white ${
-                                inq.isReplied ? 'border-yellow-500' : 'border-gray-300'
-                            }`}
-                        >
-                            <div className="flex-1">
-                                <h3 className={`text-lg font-semibold mb-1 ${inq.isReplied ? 'text-yellow-500' : 'text-gray-900'}`}>{inq.title}</h3>
-                                <p className="text-sm text-gray-500 flex items-center gap-2"><FaBuilding /> {inq.accommodationName}</p>
-                            </div>
-                            <div className="flex items-center gap-6 text-sm sm:text-base text-gray-600 flex-wrap sm:flex-nowrap">
-                                <div className={`flex items-center gap-2 font-semibold ${
-                                    inq.isReplied ? 'text-yellow-500' : 'text-yellow-400'
-                                }`}>
-                                    {inq.isReplied ? <FaCheckCircle /> : <FaRegClock />}
-                                    <span>{inq.isReplied ? '답변 완료' : '미답변'}</span>
-                                </div>
-                                <div className="whitespace-nowrap text-gray-500 flex items-center gap-1">
-                                    <FaCalendarAlt /> {formatDateTime(inq.createdAt)}
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                    <div className="flex justify-between mt-8">
-                        <button
-                            onClick={handlePrev}
-                            disabled={page === 0}
-                            className="flex items-center gap-2 px-5 py-2 bg-yellow-500 text-white rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-yellow-600 transition"
-                        >
-                            <FaArrowLeft /> 이전
-                        </button>
-                        <button
-                            onClick={handleNext}
-                            disabled={page + 1 >= totalPages}
-                            className="flex items-center gap-2 px-5 py-2 bg-yellow-500 text-white rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-yellow-600 transition"
-                        >
-                            다음 <FaArrowRight />
-                        </button>
-                    </div>
-                </div>
+                <>
+                    <ul className="space-y-4">
+                        {inquiries.map((inq, index) => (
+                            <motion.li
+                                key={inq.inquiryId}
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                            >
+                                <Link
+                                    to={`/user/mypage/inquiries/${inq.inquiryId}`}
+                                    className={`${cardClass} group p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 hover:shadow-2xl hover:shadow-leaf-green/5 transition-all duration-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/30`}
+                                >
+                                    <div className="flex-1 min-w-0 space-y-1">
+                                        <p className={`${eyebrowClass} flex items-center gap-1`}>
+                                            <FaBuilding className="shrink-0" />
+                                            <span className="truncate">{inq.accommodationName}</span>
+                                        </p>
+                                        <h3 className="text-lg font-black text-deep-gray leading-tight truncate group-hover:text-leaf-green transition-colors">
+                                            {inq.title}
+                                        </h3>
+                                    </div>
+                                    <div className="flex items-center gap-3 flex-wrap text-xs">
+                                        <span className={`${badgeClass} ${inq.isReplied ? 'bg-leaf-green/10 text-leaf-green-dark' : 'bg-honey-yellow/15 text-honey-yellow-dark'}`}>
+                                            {inq.isReplied ? <FaCheckCircle /> : <FaRegClock />}
+                                            {inq.isReplied ? '답변 완료' : '미답변'}
+                                        </span>
+                                        <span className="whitespace-nowrap text-gray-400 flex items-center gap-1">
+                                            <FaCalendarAlt /> {formatDateTime(inq.createdAt)}
+                                        </span>
+                                    </div>
+                                </Link>
+                            </motion.li>
+                        ))}
+                    </ul>
+                    <Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
+                </>
             )}
-        </div>
+        </section>
     );
 };
 

@@ -1,6 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { FaHistory, FaCoins } from "react-icons/fa";
 import useApiRequest from "@/api/useApiRequest";
-import { FaArrowLeft, FaArrowRight, FaHistory, FaCoins } from "react-icons/fa";
+import SectionTitle from "@/components/ui/SectionTitle.jsx";
+import Card from "@/components/ui/Card.jsx";
+import ListSkeleton from "@/components/ui/ListSkeleton.jsx";
+import EmptyState from "@/components/ui/EmptyState.jsx";
+import ErrorState from "@/components/ui/ErrorState.jsx";
+import Pagination from "@/components/ui/Pagination.jsx";
+import { eyebrowClass } from "@/components/ui/styles";
 
 function PointHistory() {
     const [currentPoint, setCurrentPoint] = useState(0);
@@ -8,6 +16,8 @@ function PointHistory() {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [size, setSize] = useState(10);
+    // loading | error | ready
+    const [status, setStatus] = useState("loading");
 
     const { request } = useApiRequest();
 
@@ -18,6 +28,7 @@ function PointHistory() {
     }, [size]);
 
     const fetchPointHistory = useCallback((pageNumber = 0) => {
+        setStatus("loading");
         request(
             {
                 url: "/api/user/point-history",
@@ -31,10 +42,11 @@ function PointHistory() {
                     setTotalPages(data.totalPages);
                     setPage(data.page);
                     setSize(data.size);
+                    setStatus("ready");
                 },
                 onError: (err) => console.error("포인트 히스토리 조회 실패:", err),
             }
-        );
+        ).catch(() => setStatus("error"));
     }, [request]);
 
     useEffect(() => {
@@ -48,97 +60,72 @@ function PointHistory() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h1 className="text-3xl font-extrabold mb-6 flex items-center gap-3 text-yellow-600">
-                <FaCoins /> 포인트 현황
-            </h1>
+        <section className="space-y-8">
+            <SectionTitle eyebrow="Points" title="포인트 현황" />
 
-            <div className="bg-yellow-50 p-5 rounded-lg mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-inner border border-yellow-300">
-                <span className="text-lg font-medium">현재 포인트:</span>
-                <span className="font-extrabold text-3xl text-yellow-600">{currentPoint.toLocaleString()}</span>
+            {/* 현재 포인트 요약 */}
+            <div className="bg-deep-gray rounded-[2rem] p-6 md:p-8 text-white shadow-2xl flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-12 h-12 shrink-0 rounded-2xl bg-honey-yellow/20 text-honey-yellow flex items-center justify-center text-xl">
+                        <FaCoins />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Current Point</p>
+                        <p className="text-sm font-bold text-white/80">현재 포인트</p>
+                    </div>
+                </div>
+                <p className="text-3xl md:text-4xl font-black text-honey-yellow truncate">
+                    {currentPoint.toLocaleString()}
+                    <span className="text-base font-bold text-white/60 ml-1">P</span>
+                </p>
             </div>
 
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2 text-gray-700">
-                <FaHistory /> 포인트 내역
-            </h2>
+            <div>
+                <h3 className="flex items-center gap-2 text-lg font-black text-deep-gray mb-4">
+                    <FaHistory className="text-gray-400" /> 포인트 내역
+                </h3>
 
-            {history.length === 0 ? (
-                <p className="text-gray-500 text-center py-10">포인트 내역이 없습니다.</p>
-            ) : (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full border-collapse rounded-lg overflow-hidden shadow-sm border border-gray-200">
-                        <thead className="bg-yellow-100 border-b border-yellow-300">
-                            <tr>
-                                <th className="text-left px-6 py-3 font-semibold text-yellow-700 uppercase tracking-wide">내역</th>
-                                <th className="text-center px-6 py-3 font-semibold text-yellow-700 uppercase tracking-wide">포인트</th>
-                                <th className="text-center px-6 py-3 font-semibold text-yellow-700 uppercase tracking-wide">잔액</th>
-                                <th className="text-center px-6 py-3 font-semibold text-yellow-700 uppercase tracking-wide">날짜 및 시간</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                {status === "loading" ? (
+                    <ListSkeleton rows={4} height="h-16" />
+                ) : status === "error" ? (
+                    <ErrorState title="포인트 내역을 불러오지 못했습니다." onRetry={() => fetchPointHistory(page)} />
+                ) : history.length === 0 ? (
+                    <EmptyState icon={<FaCoins />} title="포인트 내역이 없습니다." />
+                ) : (
+                    <Card padding="p-2 sm:p-4">
+                        <ul className="divide-y divide-gray-50">
                             {history.map((item, idx) => (
-                                <tr
-                                    key={idx}
-                                    className={`${idx % 2 === 0 ? "bg-white" : "bg-yellow-50"} transition-colors duration-200`}
+                                <motion.li
+                                    // 내역 항목에 고유 id 가 없어 생성 시각 + 순번으로 키 구성
+                                    key={`${item.createdAt}-${idx}`}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: idx * 0.03 }}
+                                    className="flex items-center justify-between gap-4 px-3 sm:px-4 py-4"
                                 >
-                                    <td className="px-6 py-4 border-b border-gray-100 text-gray-800">{item.reason}</td>
-                                    <td
-                                        className={`px-6 py-4 border-b border-gray-100 text-center font-semibold ${
-                                            item.amount > 0 ? "text-red-600" : "text-blue-600"
-                                        }`}
-                                    >
-                                        {item.amount > 0 ? `+${item.amount.toLocaleString()}` : item.amount.toLocaleString()}
-                                    </td>
-                                    <td className="px-6 py-4 border-b border-gray-100 text-center text-gray-700 font-medium">
-                                        {item.balance.toLocaleString()}
-                                    </td>
-                                    <td className="px-6 py-4 border-b border-gray-100 text-center text-gray-600">
-                                        {new Date(item.createdAt).toLocaleString()}
-                                    </td>
-                                </tr>
+                                    <div className="min-w-0">
+                                        <p className="font-bold text-deep-gray break-keep">{item.reason}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">
+                                            {new Date(item.createdAt).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <p className={`font-black ${item.amount > 0 ? "text-leaf-green-dark" : "text-red-400"}`}>
+                                            {item.amount > 0 ? `+${item.amount.toLocaleString()}` : item.amount.toLocaleString()}
+                                        </p>
+                                        <p className={eyebrowClass}>잔액 {item.balance.toLocaleString()}</p>
+                                    </div>
+                                </motion.li>
                             ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+                        </ul>
+                    </Card>
+                )}
 
-            {totalPages > 1 && (
-                <div className="flex flex-wrap justify-center gap-3 mt-6">
-                    <button
-                        className="flex items-center gap-1 px-4 py-2 rounded-md bg-yellow-200 text-yellow-800 hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                        onClick={() => handlePageChange(page - 1)}
-                        disabled={page === 0}
-                        aria-label="이전 페이지"
-                    >
-                        <FaArrowLeft />
-                        이전
-                    </button>
-                    {Array.from({ length: totalPages }).map((_, idx) => (
-                        <button
-                            key={idx}
-                            className={`px-4 py-2 rounded-md font-semibold transition ${
-                                idx === page
-                                    ? "bg-yellow-500 text-white shadow-lg"
-                                    : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                            }`}
-                            onClick={() => handlePageChange(idx)}
-                            aria-current={idx === page ? "page" : undefined}
-                        >
-                            {idx + 1}
-                        </button>
-                    ))}
-                    <button
-                        className="flex items-center gap-1 px-4 py-2 rounded-md bg-yellow-200 text-yellow-800 hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                        onClick={() => handlePageChange(page + 1)}
-                        disabled={page === totalPages - 1}
-                        aria-label="다음 페이지"
-                    >
-                        다음
-                        <FaArrowRight />
-                    </button>
-                </div>
-            )}
-        </div>
+                {status === "ready" && (
+                    <Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
+                )}
+            </div>
+        </section>
     );
 }
 

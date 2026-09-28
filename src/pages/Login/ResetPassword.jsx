@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import useApiRequest from '@/api/useApiRequest';
 import Header from '@/components/Header';
 import { FaUnlockAlt } from 'react-icons/fa';
+import Input from '@/components/ui/Input.jsx';
+import Button from '@/components/ui/Button.jsx';
+import AuthCard from '@/components/ui/AuthCard.jsx';
 
 function ResetPassword() {
     const [email, setEmail] = useState('');
@@ -44,48 +47,43 @@ function ResetPassword() {
     return (
         <>
             <Header />
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
-                <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-8 space-y-6">
-                    <h2 className="text-xl font-semibold text-center text-gray-800 flex items-center justify-center gap-2">
-                        <FaUnlockAlt className="text-yellow-500" />
-                        비밀번호 재설정 요청
-                    </h2>
+            <AuthCard
+                eyebrow="Reset Password"
+                title="비밀번호 재설정 요청"
+                description="가입한 이메일로 비밀번호 재설정 링크를 보내드립니다."
+            >
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <Input
+                            label="이메일 주소"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            autoComplete="email"
+                            aria-invalid={submitted && !email.trim() ? true : undefined}
+                        />
+                        {submitted && !email.trim() && (
+                            <p role="alert" className="text-red-500 text-xs font-bold mt-1.5">이메일을 입력해주세요.</p>
+                        )}
+                    </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-sm text-gray-600 mb-1">이메일 주소</label>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@example.com"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                            />
-                            {submitted && !email.trim() && (
-                                <p className="text-red-500 text-sm mt-1">이메일을 입력해주세요.</p>
-                            )}
-                        </div>
+                    <Button type="submit" disabled={isLoading('resetPassword')} size="lg" fullWidth>
+                        <FaUnlockAlt />
+                        {isLoading('resetPassword') ? '처리 중...' : '비밀번호 초기화 메일 보내기'}
+                    </Button>
+                </form>
 
-                        <button
-                            type="submit"
-                            disabled={isLoading('resetPassword')}
-                            className={`w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-2 rounded-lg transition ${isLoading('resetPassword') ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            {isLoading('resetPassword') ? '처리 중...' : '비밀번호 초기화 메일 보내기'}
-                        </button>
-                    </form>
-
-                    <p className="text-sm text-center text-gray-600 mt-4">
-                        로그인 페이지로 돌아가기{' '}
-                        <span
-                            className="text-blue-600 hover:underline cursor-pointer"
-                            onClick={() => navigate('/login')}
-                        >
-                            로그인
-                        </span>
-                    </p>
-                </div>
-            </div>
+                <p className="mt-8 text-sm text-center text-gray-400">
+                    로그인 페이지로 돌아가기{' '}
+                    <Link
+                        to="/login"
+                        className="font-black text-honey-yellow-dark hover:underline underline-offset-4 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-honey-yellow/40"
+                    >
+                        로그인
+                    </Link>
+                </p>
+            </AuthCard>
         </>
     );
 }

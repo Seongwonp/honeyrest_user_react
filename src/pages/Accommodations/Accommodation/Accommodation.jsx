@@ -160,7 +160,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                 <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-gray-200">
                     <Slider {...sliderSettings}>
                         {data.images.map((src, i) => (
-                            <div key={i} className="h-[400px] md:h-[600px]">
+                            <div key={src || i} className="h-[400px] md:h-[600px]">
                                 <SafeImage
                                     src={src}
                                     alt={`Gallery ${i + 1}`}
@@ -210,7 +210,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
 
                         <div className="flex flex-wrap gap-2 pt-4">
                             {data.tags.map((tag, i) => (
-                                <span key={i} className="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl flex items-center gap-2 text-xs font-bold text-gray-500">
+                                <span key={tag.mapId ?? tag.tagId ?? tag.name ?? i} className="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl flex items-center gap-2 text-xs font-bold text-gray-500">
                                     {getTagIcon(tag.iconName) &&
                                         React.createElement(getTagIcon(tag.iconName), { className: "text-honey-yellow" })}
                                     {tag.name}
@@ -234,10 +234,21 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                 const imageUrl = room.images?.find((img) => img.includes("s_")) || room.images?.[0];
                                 return (
                                     <MotionDiv
-                                        key={i}
+                                        key={room.roomId ?? i}
                                         whileHover={isAvailable ? { y: -5 } : {}}
                                         onClick={() => isAvailable && navigate(`/room/${room.roomId}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`)}
-                                        className={`flex flex-col md:flex-row gap-6 p-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm transition-all duration-300 ${isAvailable ? "hover:shadow-2xl hover:shadow-leaf-green/5 cursor-pointer" : "opacity-40 grayscale pointer-events-none"}`}
+                                        // 키보드 접근: Enter / Space 로 객실 상세 이동
+                                        role="link"
+                                        tabIndex={isAvailable ? 0 : -1}
+                                        aria-disabled={!isAvailable || undefined}
+                                        onKeyDown={(e) => {
+                                            if (!isAvailable) return;
+                                            if (e.key === "Enter" || e.key === " ") {
+                                                e.preventDefault();
+                                                navigate(`/room/${room.roomId}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`);
+                                            }
+                                        }}
+                                        className={`flex flex-col md:flex-row gap-6 p-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm transition-all duration-300 ${isAvailable ? "hover:shadow-2xl hover:shadow-leaf-green/5 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-leaf-green/30" : "opacity-40 grayscale pointer-events-none"}`}
                                     >
                                         <div className="w-full md:w-56 h-40 overflow-hidden rounded-2xl">
                                             <SafeImage src={imageUrl} alt={room.name} className="w-full h-full object-cover" />
@@ -356,7 +367,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                     const isLiked = state?.isLiked ?? false;
                                     const likeCount = state?.likeCount ?? 0;
                                     return (
-                                        <div key={i} className="p-8 bg-white rounded-[2rem] border border-gray-50 shadow-sm space-y-6">
+                                        <div key={r.reviewId ?? i} className="p-8 bg-white rounded-[2rem] border border-gray-50 shadow-sm space-y-6">
                                             <div className="flex justify-between items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 rounded-full bg-honey-yellow/10 flex items-center justify-center font-black text-honey-yellow-dark">
@@ -378,7 +389,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
                                             {r.images?.length > 0 && (
                                                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                                                     {r.images.map((url, idx) => (
-                                                        <SafeImage key={idx} src={url} alt="Review" className="w-24 h-24 rounded-2xl object-cover border border-gray-100" />
+                                                        <SafeImage key={url || idx} src={url} alt="Review" className="w-24 h-24 rounded-2xl object-cover border border-gray-100" />
                                                     ))}
                                                 </div>
                                             )}

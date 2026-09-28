@@ -48,20 +48,24 @@ function HotPlacesSection({ isDropdownOpen, setIsDropdownOpen, verticalSliderSet
                     <div className="h-6 overflow-hidden">
                         <Slider {...verticalSliderSettings}>
                             {hotList.map((place, idx) => (
-                                <div
-                                    key={idx}
-                                    className="text-sm font-bold text-deep-gray cursor-pointer hover:text-honey-yellow-dark transition-colors"
+                                <button
+                                    type="button"
+                                    key={place.name ?? idx}
+                                    className="block w-full text-left text-sm font-bold text-deep-gray cursor-pointer hover:text-honey-yellow-dark transition-colors"
                                     onClick={() => handlePlaceClick(place.name)}
                                 >
                                     {idx + 1}. {place.name}
-                                </div>
+                                </button>
                             ))}
                         </Slider>
                     </div>
                 </div>
 
                 <button
+                    type="button"
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    aria-label={isDropdownOpen ? "인기 검색어 목록 닫기" : "인기 검색어 목록 열기"}
+                    aria-expanded={isDropdownOpen}
                     className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-400"
                 >
                     {isDropdownOpen ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
@@ -79,14 +83,16 @@ function HotPlacesSection({ isDropdownOpen, setIsDropdownOpen, verticalSliderSet
                         <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-4 max-h-64 overflow-y-auto">
                             <ul className="space-y-1">
                                 {hotList.map((place, idx) => (
-                                    <li
-                                        key={idx}
-                                        className="flex items-center gap-4 p-3 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer group"
-                                        onClick={() => handlePlaceClick(place.name)}
-                                    >
-                                        <span className="w-6 text-sm font-black text-gray-300 group-hover:text-honey-yellow transition-colors">{idx + 1}</span>
-                                        <span className="flex-1 text-sm font-bold text-deep-gray">{place.name}</span>
-                                        <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">{place.searchCount} searches</span>
+                                    <li key={place.name ?? idx}>
+                                        <button
+                                            type="button"
+                                            className="w-full text-left flex items-center gap-4 p-3 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-honey-yellow/40"
+                                            onClick={() => handlePlaceClick(place.name)}
+                                        >
+                                            <span className="w-6 text-sm font-black text-gray-300 group-hover:text-honey-yellow transition-colors">{idx + 1}</span>
+                                            <span className="flex-1 min-w-0 text-sm font-bold text-deep-gray">{place.name}</span>
+                                            <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">{place.searchCount} searches</span>
+                                        </button>
                                     </li>
                                 ))}
                             </ul>

@@ -62,10 +62,12 @@ function EventSlider({ events }) {
 
             <Slider {...sliderSettings} className="event-slider">
                 {events.map((event) => (
-                    <div
+                    <a
                         key={event.eventId}
-                        className="px-3 py-4 cursor-pointer focus:outline-none"
-                        onClick={() => window.open(`/events/${event.eventId}`, '_blank')}
+                        href={`/events/${event.eventId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-3 py-4 cursor-pointer rounded-[2rem] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/30"
                     >
                         <motion.div 
                             whileHover={{ y: -8 }}
@@ -85,7 +87,7 @@ function EventSlider({ events }) {
                                 </h3>
                             </div>
                         </motion.div>
-                    </div>
+                    </a>
                 ))}
             </Slider>
         </section>

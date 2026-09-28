@@ -4,6 +4,11 @@ import api from '@/api/axios';
 import { toast } from 'react-toastify';
 import { HiXCircle, HiDocumentText, HiCheckCircle, HiInformationCircle } from 'react-icons/hi';
 import SafeImage from "@/components/SafeImage.jsx";
+import PageLoader from "@/components/PageLoader.jsx";
+import SectionTitle from "@/components/ui/SectionTitle.jsx";
+import Card from "@/components/ui/Card.jsx";
+import Button from "@/components/ui/Button.jsx";
+import { inputClass, labelClass, eyebrowClass } from "@/components/ui/styles";
 
 const mockAgreements = [
     { id: 1, title: '환불 규정을 확인하였으며, 이에 동의합니다.' },
@@ -22,15 +27,15 @@ const mockReasons = [
 
 function AgreementItem({ item, checked, onToggle }) {
     return (
-        <div className="py-2 flex items-center gap-2 text-gray-800">
+        <label className="py-2 flex items-start gap-3 text-sm text-deep-gray cursor-pointer">
             <input
                 type="checkbox"
                 checked={checked}
                 onChange={() => onToggle(item.id)}
-                className="mt-1"
+                className="mt-0.5 w-4 h-4 shrink-0 accent-leaf-green"
             />
-            <span className="font-medium">{item.title}</span>
-        </div>
+            <span className="font-medium break-keep">{item.title}</span>
+        </label>
     );
 }
 
@@ -104,43 +109,47 @@ export default function CancelRequestPage() {
         }
     };
 
-    if (!reservation) return <p className="text-center text-gray-500">예약 정보를 불러오는 중...</p>;
+    if (!reservation) return <PageLoader />;
 
     return (
         <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <HiXCircle className="text-red-500" />
-                예약 취소 요청
-            </h2>
+            <SectionTitle eyebrow="Cancel Request" title="예약 취소 요청" className="mb-0" />
 
-            <div className="border rounded-md p-4 space-y-2 text-sm bg-white shadow text-gray-800">
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <Card padding="p-5 sm:p-6">
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
                     {reservation.thumbnailUrl && (
-                        <SafeImage
-                            src={reservation.thumbnailUrl}
-                            alt="숙소 썸네일"
-                            className="w-full sm:w-20 h-20 object-cover rounded-md border"
-                        />
+                        <div className="w-full sm:w-28 h-32 sm:h-28 shrink-0 overflow-hidden rounded-2xl">
+                            <SafeImage
+                                src={reservation.thumbnailUrl}
+                                alt="숙소 썸네일"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
                     )}
-                    <div className="space-y-1 text-sm sm:text-base">
-                        <p><strong>{reservation.accommodationName}</strong> - {reservation.roomName}</p>
-                        <p>예약번호: <span className="font-mono text-blue-700">{reservation.reservationCode}</span></p>
-                        <p>체크인: {reservation.checkIn} / 체크아웃: {reservation.checkOut}</p>
-                        <p>인원: {reservation.guests}명</p>
-                        <p>예약자: {reservation.guestName} / 연락처: {reservation.guestPhone}</p>
-                        <p>결제: {reservation.paymentMethod} / {reservation.paymentStatus === 'DONE' ? '완료' : '실패'}</p>
-                        <p>결제 금액: <strong className="text-red-500">{reservation.finalPrice.toLocaleString()}원</strong></p>
+                    <div className="min-w-0 w-full space-y-2 text-sm">
+                        <div>
+                            <p className="text-lg font-black text-deep-gray leading-tight break-keep">{reservation.accommodationName}</p>
+                            <p className="text-xs font-bold text-gray-400">{reservation.roomName}</p>
+                        </div>
+                        <p className="text-gray-500"><span className={eyebrowClass}>No.</span> <span className="font-mono text-leaf-green-dark break-all">{reservation.reservationCode}</span></p>
+                        <p className="text-gray-500">체크인 {reservation.checkIn} / 체크아웃 {reservation.checkOut}</p>
+                        <p className="text-gray-500">인원 {reservation.guests}명 · 예약자 {reservation.guestName} / {reservation.guestPhone}</p>
+                        <p className="text-gray-500">결제 {reservation.paymentMethod} / {reservation.paymentStatus === 'DONE' ? '완료' : '실패'}</p>
+                        <div className="flex items-center justify-between rounded-2xl bg-honey-yellow/10 px-4 py-3">
+                            <span className="font-black text-deep-gray">결제 금액</span>
+                            <strong className="text-lg font-black text-deep-gray">{reservation.finalPrice.toLocaleString()}원</strong>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </Card>
 
             {/* 취소 안내사항 */}
-            <div className="bg-gray-50 border rounded-md p-4 space-y-2 text-sm text-gray-600">
-                <div className="flex items-center gap-2 font-semibold text-gray-700">
-                    <HiInformationCircle className="text-gray-500" />
+            <div className="bg-white/60 border border-gray-100 rounded-3xl p-5 space-y-2 text-sm text-gray-500">
+                <div className="flex items-center gap-2 font-black text-deep-gray">
+                    <HiInformationCircle className="text-honey-yellow-dark" />
                     <span>취소 안내사항</span>
                 </div>
-                <ul className="list-disc list-inside space-y-1">
+                <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm">
                     <li>환불은 카드사 처리 일정에 따라 다소 지연될 수 있습니다.</li>
                     <li>체크인 3일 전까지 취소 시 전액 환불이 가능합니다.</li>
                     <li>체크인 2일 전 취소 시 50% 환불이 적용됩니다.</li>
@@ -152,80 +161,79 @@ export default function CancelRequestPage() {
             </div>
 
             {policies.length > 0 && (
-                <div className="bg-gray-50 border rounded-md p-4 space-y-2 text-sm text-gray-800">
-                    <div className="flex items-center gap-2 font-semibold text-gray-800">
-                        <HiDocumentText className="text-gray-600" />
+                <div className="bg-white/60 border border-gray-100 rounded-3xl p-5 space-y-2 text-sm text-gray-500">
+                    <div className="flex items-center gap-2 font-black text-deep-gray">
+                        <HiDocumentText className="text-honey-yellow-dark" />
                         <span>숙소 취소 규정</span>
                     </div>
-                    <ul className="list-disc list-inside space-y-1">
+                    <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm">
                         {policies.map((policy, index) => (
                             <li key={policy.policyId ?? `policy-${index}`}>
-                                <strong>{policy.policyName}</strong>: {policy.detail}
+                                <strong className="text-deep-gray">{policy.policyName}</strong>: {policy.detail}
                             </li>
                         ))}
                     </ul>
                 </div>
             )}
 
-            <div className="flex flex-col gap-2">
-                <label className="font-medium text-gray-800 flex items-center gap-2">
-                    <HiDocumentText className="text-gray-600" />
-                    취소 사유
-                </label>
-                <select
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
-                >
-                    <option value="">선택해주세요</option>
-                    {mockReasons.map((r, idx) => (
-                        <option key={idx} value={r}>{r}</option>
-                    ))}
-                </select>
-                {reason === '기타' && (
-                    <textarea
-                        rows={4}
-                        placeholder="취소 사유를 입력해주세요..."
-                        value={customReason}
-                        onChange={(e) => setCustomReason(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-300 mt-1"
-                    />
-                )}
-            </div>
-
-            <div className="space-y-2">
-                <div className="flex items-center gap-2 font-semibold text-gray-800">
-                    <HiCheckCircle className="text-gray-600" />
-                    <span>동의 항목</span>
+            <Card padding="p-5 sm:p-6" className="space-y-6">
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="cancel-reason" className="text-xs font-bold text-gray-500 flex items-center gap-2">
+                        <HiDocumentText className="text-honey-yellow-dark" />
+                        취소 사유
+                    </label>
+                    <select
+                        id="cancel-reason"
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        className={inputClass}
+                    >
+                        <option value="">선택해주세요</option>
+                        {mockReasons.map((r) => (
+                            <option key={r} value={r}>{r}</option>
+                        ))}
+                    </select>
+                    {reason === '기타' && (
+                        <textarea
+                            rows={4}
+                            placeholder="취소 사유를 입력해주세요..."
+                            aria-label="기타 취소 사유"
+                            value={customReason}
+                            onChange={(e) => setCustomReason(e.target.value)}
+                            className={`${inputClass} mt-1 resize-none`}
+                        />
+                    )}
                 </div>
-                {mockAgreements.map((item) => (
-                    <AgreementItem
-                        key={item.id}
-                        item={item}
-                        checked={agreements[item.id] || false}
-                        onToggle={handleAgreementToggle}
-                    />
-                ))}
-            </div>
 
-            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="px-4 py-2 rounded-md text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 w-full sm:w-auto"
-                >
+                <fieldset>
+                    <legend className={`${labelClass} flex items-center gap-2`}>
+                        <HiCheckCircle className="text-leaf-green" />
+                        <span>동의 항목</span>
+                    </legend>
+                    {mockAgreements.map((item) => (
+                        <AgreementItem
+                            key={item.id}
+                            item={item}
+                            checked={agreements[item.id] || false}
+                            onToggle={handleAgreementToggle}
+                        />
+                    ))}
+                </fieldset>
+            </Card>
+
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+                <Button variant="secondary" onClick={() => navigate(-1)} className="w-full sm:w-auto">
                     돌아가기
-                </button>
-                <button
+                </Button>
+                <Button
+                    variant="dangerSolid"
                     onClick={handleSubmit}
                     disabled={loading || !allAgreed}
-                    className={`px-4 py-2 rounded-md text-sm font-semibold w-full sm:w-auto ${
-                        loading || !allAgreed
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-red-500 hover:bg-red-600 text-white'
-                    }`}
+                    className="w-full sm:w-auto"
                 >
+                    <HiXCircle />
                     {loading ? '처리 중...' : '요청하기'}
-                </button>
+                </Button>
             </div>
         </div>
     );

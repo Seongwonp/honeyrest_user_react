@@ -1,8 +1,9 @@
 function GoogleLoginButton({ onClick }) {
     return (
         <button
+            type="button"
             onClick={onClick}
-            className="w-full flex items-center justify-center gap-2 bg-white border border-[#DADCE0] hover:bg-gray-100 text-gray-800 font-medium py-2 rounded-lg transition"
+            className="w-full flex items-center justify-center gap-2 bg-white border border-[#DADCE0] hover:bg-gray-100 text-gray-800 font-bold text-sm py-3 rounded-2xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-200"
             style={{ fontFamily: 'Roboto, sans-serif' }}
         >
             <svg

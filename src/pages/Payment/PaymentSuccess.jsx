@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { HiXCircle } from "react-icons/hi";
 import api from "@/api/axios";
+import StatusPanel from "@/components/ui/StatusPanel.jsx";
+import Button from "@/components/ui/Button.jsx";
 
 // 결제 승인 결과를 저장하는 sessionStorage 키 접두사
 const CONFIRM_KEY_PREFIX = "paymentConfirm:";
@@ -164,36 +167,38 @@ export default function PaymentSuccess() {
     if (outcome && !outcome.ok) {
         const reservationsPath = outcome.isMember ? "/user/mypage/reservations" : "/reservation/lookup";
         return (
-            <div className="max-w-xl mx-auto px-4 py-20 text-center">
-                <h2 className="text-2xl font-bold text-red-600 mb-4">결제 승인에 실패했습니다</h2>
-                <p className="text-gray-700 text-sm whitespace-pre-line mb-2">{outcome.message}</p>
+            <StatusPanel
+                role="alert"
+                icon={<HiXCircle />}
+                tone="red"
+                eyebrow="Payment Failed"
+                title="결제 승인에 실패했습니다"
+                message={outcome.message}
+                actions={
+                    <>
+                        <Button onClick={() => navigate(reservationsPath, { replace: true })}>
+                            예약 내역으로
+                        </Button>
+                        <Button variant="secondary" onClick={() => navigate("/", { replace: true })}>
+                            홈으로
+                        </Button>
+                    </>
+                }
+            >
                 {outcome.httpStatus && (
-                    <p className="text-gray-400 text-xs mb-6">오류 코드: {outcome.httpStatus}</p>
+                    <p className="mt-3 text-xs font-bold text-gray-300">오류 코드: {outcome.httpStatus}</p>
                 )}
-                <div className="flex justify-center gap-3 mt-6">
-                    <button
-                        type="button"
-                        onClick={() => navigate(reservationsPath, { replace: true })}
-                        className="px-5 py-2 rounded bg-yellow-400 hover:bg-yellow-500 text-white font-semibold"
-                    >
-                        예약 내역으로
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => navigate("/", { replace: true })}
-                        className="px-5 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50"
-                    >
-                        홈으로
-                    </button>
-                </div>
-            </div>
+            </StatusPanel>
         );
     }
 
     return (
-        <div className="max-w-xl mx-auto px-4 py-20 text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">결제 승인 중입니다...</h2>
-            <p className="text-gray-600 text-sm">잠시만 기다려주세요. 예약 정보를 확인하고 있습니다.</p>
-        </div>
+        <StatusPanel
+            role="status"
+            icon={<div className="w-10 h-10 border-4 border-honey-yellow/20 border-t-honey-yellow rounded-full animate-spin" />}
+            eyebrow="Processing"
+            title="결제 승인 중입니다..."
+            message="잠시만 기다려주세요. 예약 정보를 확인하고 있습니다."
+        />
     );
 }

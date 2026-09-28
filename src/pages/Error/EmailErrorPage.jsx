@@ -1,93 +1,16 @@
-import { Link} from 'react-router-dom';
 import { FaEnvelopeOpenText } from 'react-icons/fa';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-import { useEffect } from 'react';
+import ErrorLayout from './ErrorLayout.jsx';
 
-const EmailErrorPage = () => {
-
-    useEffect(() => {
-        AOS.init({ duration: 800, once: true });
-    }, []);
-
-    return (
-        <div style={{
-            backgroundColor: '#ffffff',
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            padding: '2rem',
-            fontFamily: 'Apple SD Gothic Neo, sans-serif'
-        }}>
-            <div data-aos="zoom-in" style={{ fontSize: '4rem', fontWeight: 'bold', color: '#FB8C00' }}>
-                401
-            </div>
-            <div
-                data-aos="zoom-in"
-                style={{
-                    backgroundColor: '#FFF3E0',
-                    borderRadius: '50%',
-                    padding: '1rem',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    marginTop: '0.5rem',
-                    animation: 'shake 1.2s infinite'
-                }}
-            >
-                <FaEnvelopeOpenText size={100} color="#FB8C00" />
-            </div>
-            <h2 data-aos="fade-up" style={{ marginTop: '1rem', fontSize: '1.8rem', color: '#4E342E' }}>
-                이메일 인증에 실패했습니다 😥
-            </h2>
-            <p data-aos="fade-up" style={{ marginTop: '0.5rem', color: '#6D4C41', fontSize: '1rem' }}>
-                인증 링크가 만료되었거나 유효하지 않습니다.
-            </p>
-            <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-                <Link to="/signup" style={{
-                    padding: '0.6rem 1.2rem',
-                    backgroundColor: '#FB8C00',
-                    color: '#fff',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    fontWeight: 'bold',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                    transition: 'background-color 0.3s'
-                }} data-aos="fade-up" className="hover-signup">회원가입 페이지로 이동</Link>
-                <Link to="/" style={{
-                    padding: '0.6rem 1.2rem',
-                    backgroundColor: '#FFB74D',
-                    color: '#fff',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    fontWeight: 'bold',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                    transition: 'background-color 0.3s'
-                }} data-aos="fade-up" className="hover-home">홈으로 돌아가기</Link>
-            </div>
-
-            <style>
-                {`
-                @keyframes shake {
-                    0% { transform: rotate(0deg); }
-                    25% { transform: rotate(3deg); }
-                    50% { transform: rotate(-3deg); }
-                    75% { transform: rotate(3deg); }
-                    100% { transform: rotate(0deg); }
-                }
-
-                .hover-signup:hover {
-                    background-color: #EF6C00 !important;
-                }
-
-                .hover-home:hover {
-                    background-color: #FFA726 !important;
-                }
-                `}
-            </style>
-        </div>
-    );
-};
+const EmailErrorPage = () => (
+    <ErrorLayout
+        code="401"
+        icon={<FaEnvelopeOpenText />}
+        tone="honey"
+        title="이메일 인증에 실패했습니다"
+        message={'인증 링크가 만료되었거나 유효하지 않습니다.'}
+        primary={{ to: '/signup', label: '회원가입 페이지로 이동' }}
+        secondary={{ to: '/', label: '홈으로 돌아가기' }}
+    />
+);
 
 export default EmailErrorPage;

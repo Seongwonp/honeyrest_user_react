@@ -52,33 +52,37 @@ function SearchBox({
                 </div>
 
                 {/* 날짜 선택 */}
-                <div 
+                <button
+                    type="button"
                     onClick={() => setShowCalendar(true)}
-                    className="flex-1 flex items-center gap-3 px-6 py-3 md:py-0 md:border-r border-gray-100 cursor-pointer hover:bg-gray-50/50 transition-colors group"
+                    aria-haspopup="dialog"
+                    className="flex-1 text-left flex items-center gap-3 px-6 py-3 md:py-0 md:border-r border-gray-100 cursor-pointer hover:bg-gray-50/50 transition-colors group"
                 >
                     <FiCalendar className="text-honey-yellow text-2xl shrink-0 group-hover:scale-110 transition-transform" />
-                    <div className="flex-1">
-                        <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-0.5">Check-in / Out</p>
-                        <p className={`text-sm md:text-base font-semibold ${checkIn ? 'text-deep-gray' : 'text-gray-300'}`}>
+                    <span className="flex-1 block">
+                        <span className="block text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-0.5">Check-in / Out</span>
+                        <span className={`block text-sm md:text-base font-semibold ${checkIn ? 'text-deep-gray' : 'text-gray-300'}`}>
                             {checkIn && checkOut ? `${checkIn} - ${checkOut} (${nights}박)` : '날짜를 선택하세요'}
-                        </p>
-                    </div>
-                </div>
+                        </span>
+                    </span>
+                </button>
 
                 {/* 인원 선택 */}
                 <div className="flex-1 relative">
-                    <div 
+                    <button
+                        type="button"
                         onClick={() => setIsGuestOpen(!isGuestOpen)}
-                        className="h-full flex items-center gap-3 px-6 py-3 md:py-0 cursor-pointer hover:bg-gray-50/50 transition-colors group"
+                        aria-expanded={isGuestOpen}
+                        className="w-full h-full text-left flex items-center gap-3 px-6 py-3 md:py-0 cursor-pointer hover:bg-gray-50/50 transition-colors group"
                     >
                         <FiUsers className="text-honey-yellow text-2xl shrink-0 group-hover:scale-110 transition-transform" />
-                        <div className="flex-1">
-                            <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-0.5">Guests</p>
-                            <p className="text-sm md:text-base font-semibold text-deep-gray">
+                        <span className="flex-1 block">
+                            <span className="block text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-0.5">Guests</span>
+                            <span className="block text-sm md:text-base font-semibold text-deep-gray">
                                 {guests}명
-                            </p>
-                        </div>
-                    </div>
+                            </span>
+                        </span>
+                    </button>
 
                     <AnimatePresence>
                         {isGuestOpen && (

@@ -1,60 +1,94 @@
-import { useEffect, useState } from 'react';
-import useApiRequest from '@/api/useApiRequest';
+import { useCallback, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { FaTicketAlt } from 'react-icons/fa';
+import useApiRequest from '@/api/useApiRequest';
+import SectionTitle from '@/components/ui/SectionTitle.jsx';
+import ListSkeleton from '@/components/ui/ListSkeleton.jsx';
+import EmptyState from '@/components/ui/EmptyState.jsx';
+import ErrorState from '@/components/ui/ErrorState.jsx';
+import { cardClass, badgeClass, eyebrowClass } from '@/components/ui/styles';
 
 function CouponList() {
-    const { request, isLoading } = useApiRequest();
+    const { request } = useApiRequest();
     const [coupons, setCoupons] = useState([]);
     const [pageInfo, setPageInfo] = useState({ page: 0, totalPages: 0 });
+    // loading | error | ready
+    const [status, setStatus] = useState('loading');
 
-    useEffect(() => {
+    // request는 useApiRequest에서 useCallback으로 고정된 참조
+    const fetchCoupons = useCallback(() => {
+        setStatus('loading');
         request(
             { url: '/api/user/coupons', method: 'GET' },
             {
                 onSuccess: data => {
                     setCoupons(data.content);
                     setPageInfo({ page: data.page, totalPages: data.totalPages });
+                    setStatus('ready');
                 }
             }
-        );
-        // request는 useApiRequest에서 useCallback으로 고정된 참조 → 마운트 시 1회 실행
+        ).catch(() => setStatus('error'));
     }, [request]);
 
+    // 마운트 시 1회 실행
+    useEffect(() => {
+        fetchCoupons();
+    }, [fetchCoupons]);
+
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6 text-yellow-500">내 쿠폰 내역</h2>
-            {isLoading() ? (
-                <p>로딩중...</p>
+        <section>
+            <SectionTitle eyebrow="Coupons" title="내 쿠폰 내역" />
+            {status === 'loading' ? (
+                <ListSkeleton rows={3} height="h-28" />
+            ) : status === 'error' ? (
+                <ErrorState title="쿠폰 목록을 불러오지 못했습니다." onRetry={fetchCoupons} />
             ) : coupons.length === 0 ? (
-                <p className="text-gray-500">사용 가능한 쿠폰이 없습니다.</p>
+                <EmptyState
+                    icon={<FaTicketAlt />}
+                    title="사용 가능한 쿠폰이 없습니다."
+                    description="이벤트와 프로모션을 통해 쿠폰을 받아 보세요."
+                />
             ) : (
-                <ul className="space-y-4">
-                    {coupons.map(coupon => (
-                        <li key={coupon.userCouponId} className="flex flex-col sm:flex-row items-start sm:items-center p-4 border rounded-lg hover:shadow-lg transition bg-gray-50">
-                            <FaTicketAlt className="text-yellow-500 text-3xl mr-4 mb-2 sm:mb-0" />
-                            <div className="flex-1">
-                                <p className="font-semibold text-lg">{coupon.name}</p>
-                                <p className="text-sm text-gray-500">코드: {coupon.code}</p>
-                                <p className="text-sm text-gray-500">
-                                    할인: {coupon.discountType === 'FIXED' ? `${coupon.discountValue}원` : `${coupon.discountValue}%`}
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {coupons.map((coupon, index) => (
+                        <motion.li
+                            key={coupon.userCouponId}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className={`${cardClass} flex items-stretch overflow-hidden ${coupon.used ? 'opacity-60' : ''}`}
+                        >
+                            {/* 쿠폰 좌측 할인 영역 */}
+                            <div className={`w-24 sm:w-28 shrink-0 flex flex-col items-center justify-center gap-1 border-r-2 border-dashed border-gray-100 ${coupon.used ? 'bg-gray-50 text-gray-400' : 'bg-honey-yellow/10 text-honey-yellow-dark'}`}>
+                                <FaTicketAlt className="text-xl" />
+                                <span className="text-lg font-black">
+                                    {coupon.discountType === 'FIXED' ? `${coupon.discountValue}원` : `${coupon.discountValue}%`}
+                                </span>
+                            </div>
+                            <div className="flex-1 min-w-0 p-4 sm:p-5 space-y-1">
+                                <div className="flex items-start justify-between gap-2">
+                                    <p className="font-black text-deep-gray leading-tight break-keep">{coupon.name}</p>
+                                    <span className={`${badgeClass} shrink-0 ${coupon.used ? 'bg-gray-100 text-gray-400' : 'bg-leaf-green/10 text-leaf-green-dark'}`}>
+                                        {coupon.used ? '사용됨' : '사용 가능'}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-gray-500 truncate">
+                                    <span className={eyebrowClass}>Code</span> <span className="font-mono">{coupon.code}</span>
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-xs text-gray-400">
                                     유효기간: {coupon.validFrom} ~ {coupon.validTo}
                                 </p>
                             </div>
-                            <span className={`mt-2 sm:mt-0 ml-0 sm:ml-4 font-bold ${coupon.used ? 'text-gray-400' : 'text-green-500'}`}>
-                                {coupon.used ? '사용됨' : '사용 가능'}
-                            </span>
-                        </li>
+                        </motion.li>
                     ))}
                 </ul>
             )}
-            {pageInfo.totalPages > 1 && (
-                <div className="mt-4 flex justify-center text-sm text-gray-500">
+            {status === 'ready' && pageInfo.totalPages > 1 && (
+                <p className="mt-6 text-center text-xs font-bold text-gray-400">
                     페이지 {pageInfo.page + 1} / {pageInfo.totalPages}
-                </div>
+                </p>
             )}
-        </div>
+        </section>
     );
 }
 

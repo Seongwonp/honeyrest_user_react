@@ -10,6 +10,7 @@ import RoomImageViewer from "./RoomImageViewer";
 import ReviewSlider from "./ReviewSlider";
 import { useAuth } from "@/hooks/useAuth"; // 추가
 import SafeImage from "@/components/SafeImage.jsx";
+import { toast } from "react-toastify";
 
 export default function RoomDetail() {
     const navigate = useNavigate();
@@ -219,7 +220,7 @@ export default function RoomDetail() {
                                     });
                                 } catch (err) {
                                     console.error("예약 정보 불러오기 실패:", err);
-                                    alert("예약 정보를 불러오는 데 문제가 발생했습니다. 다시 시도해주세요.");
+                                    toast.error("예약 정보를 불러오는 데 문제가 발생했습니다. 다시 시도해주세요.");
                                     // 실패한 경우에만 다시 누를 수 있게 한다 (성공 시에는 페이지 이동)
                                     reservingRef.current = false;
                                     setReserving(false);

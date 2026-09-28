@@ -83,10 +83,12 @@ function HotSpatsList({ userInfo, navigate }) {
         <div className="relative" data-aos="fade-up">
             <Slider {...sliderSettings}>
                 {popularCities.map((city, idx) => (
-                    <div
+                    <button
+                        type="button"
                         key={city.regionId || idx}
-                        className="px-3 py-4"
+                        className="block w-full text-left px-3 py-4 rounded-[2rem] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/30"
                         onClick={() => handleClick(city.name)}
+                        aria-label={`${city.name} 숙소 보기`}
                     >
                         <motion.div 
                             whileHover={{ y: -10 }}
@@ -105,7 +107,7 @@ function HotSpatsList({ userInfo, navigate }) {
                                 </div>
                             </div>
                         </motion.div>
-                    </div>
+                    </button>
                 ))}
             </Slider>
         </div>

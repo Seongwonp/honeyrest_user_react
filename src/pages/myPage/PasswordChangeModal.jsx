@@ -3,6 +3,9 @@ import { toast } from 'react-toastify';
 import useApiRequest from '@/api/useApiRequest';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import Dialog from '@/components/ui/Dialog.jsx';
+import Input from '@/components/ui/Input.jsx';
+import Button from '@/components/ui/Button.jsx';
 
 export default function PasswordChangeModal({ isOpen, onClose, onSuccess }) {
     const { request, isLoading } = useApiRequest();
@@ -77,17 +80,11 @@ export default function PasswordChangeModal({ isOpen, onClose, onSuccess }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-                onClick={onClose}
-            />
-            <div className="relative z-10 bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-5">
-                <h2 className="text-xl font-bold text-gray-800">🔐 비밀번호 변경</h2>
-
+        <Dialog onClose={onClose} title="비밀번호 변경" className="max-w-md" closeOnBackdrop>
+            <div className="space-y-5">
                 {/* ✅ 조건 설명 */}
-                <div className="text-sm text-gray-600 space-y-1">
-                    <p>🧾 비밀번호 조건:</p>
+                <div className="bg-off-white rounded-2xl p-4 space-y-2">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">비밀번호 조건</p>
                     <ul className="list-disc list-inside text-xs text-gray-500 space-y-1">
                         <li>8자 이상 20자 이하로 입력해주세요.</li>
                         <li>영문 대소문자, 숫자, 특수문자 중 2가지 이상 조합이 권장됩니다.</li>
@@ -97,78 +94,68 @@ export default function PasswordChangeModal({ isOpen, onClose, onSuccess }) {
                 </div>
 
                 <div className="space-y-4">
-                    <input
+                    <Input
+                        label="현재 비밀번호"
                         type="password"
                         placeholder="현재 비밀번호"
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                        autoComplete="current-password"
                     />
-                    <input
+                    <Input
+                        label="새 비밀번호"
                         type="password"
                         placeholder="새 비밀번호"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                        autoComplete="new-password"
                     />
 
                     {/* ✅ 강도 시각화 */}
-                    <div className="space-y-1 text-sm text-gray-600">
-                        <div>
+                    <div className="space-y-1.5 text-xs text-gray-500" aria-live="polite">
+                        <div className="font-bold">
                             비밀번호 강도:{' '}
                             <span className={
-                                strengthLevel.label === '매우 강함' ? 'text-green-600' :
-                                    strengthLevel.label === '강함' ? 'text-lime-500' :
-                                        strengthLevel.label === '보통' ? 'text-yellow-500' :
-                                            strengthLevel.label === '약함' ? 'text-orange-500' :
-                                                'text-red-500'
+                                strengthLevel.level >= 4 ? 'text-leaf-green-dark' :
+                                    strengthLevel.level === 3 ? 'text-honey-yellow-dark' :
+                                        'text-red-500'
                             }>
                                 {strengthLevel.label}
                             </span>
                         </div>
-                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                             <div
-                                className={`h-full transition-all duration-300 ${
-                                    strengthLevel.level === 1 ? 'bg-red-500 w-1/5' :
-                                        strengthLevel.level === 2 ? 'bg-orange-500 w-2/5' :
-                                            strengthLevel.level === 3 ? 'bg-yellow-500 w-3/5' :
-                                                strengthLevel.level === 4 ? 'bg-lime-500 w-4/5' :
-                                                    strengthLevel.level === 5 ? 'bg-green-500 w-full' : 'w-0'
+                                className={`h-full rounded-full transition-all duration-300 ${
+                                    strengthLevel.level === 1 ? 'bg-red-400 w-1/5' :
+                                        strengthLevel.level === 2 ? 'bg-red-300 w-2/5' :
+                                            strengthLevel.level === 3 ? 'bg-honey-yellow w-3/5' :
+                                                strengthLevel.level === 4 ? 'bg-leaf-green w-4/5' :
+                                                    strengthLevel.level === 5 ? 'bg-leaf-green-dark w-full' : 'w-0'
                                 }`}
                             />
                         </div>
-                        <p className="text-xs text-gray-400">{strengthLevel.description}</p>
+                        <p className="text-gray-400">{strengthLevel.description}</p>
                     </div>
 
-                    <input
+                    <Input
+                        label="새 비밀번호 확인"
                         type="password"
                         placeholder="새 비밀번호 확인"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                        autoComplete="new-password"
                     />
                 </div>
 
-                <div className="flex justify-end gap-3 pt-2">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 rounded-md text-sm bg-gray-200 hover:bg-gray-300 text-gray-700"
-                    >
+                <div className="flex justify-end gap-2 pt-2">
+                    <Button variant="secondary" onClick={onClose}>
                         취소
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isLoading('passwordChange')}
-                        className={`px-4 py-2 rounded-md text-sm font-semibold ${
-                            isLoading('passwordChange')
-                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                : 'bg-yellow-400 hover:bg-yellow-500 text-white'
-                        }`}
-                    >
+                    </Button>
+                    <Button onClick={handleSubmit} disabled={isLoading('passwordChange')}>
                         {isLoading('passwordChange') ? '처리 중...' : '변경하기'}
-                    </button>
+                    </Button>
                 </div>
             </div>
-        </div>
+        </Dialog>
     );
 }

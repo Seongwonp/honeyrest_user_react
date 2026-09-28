@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from 'sweetalert2';
 import logo from '/images/logo-Photoroom.png';
 import { FaLock } from 'react-icons/fa';
@@ -9,6 +9,9 @@ import GoogleLoginButton from "./google/GoogleLoginButton.jsx";
 import useApiRequest from '../../api/useApiRequest';
 import { useAuth } from '@/hooks/useAuth';
 import { getOAuthRedirectBase } from "@/config/urls";
+import Input from '@/components/ui/Input.jsx';
+import Button from '@/components/ui/Button.jsx';
+import AuthCard from '@/components/ui/AuthCard.jsx';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -88,95 +91,83 @@ function Login() {
     return (
         <>
             <Header />
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
-                <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-8 space-y-6">
-                    <div className="flex justify-center">
-                        <img src={logo} alt="logo" className="h-14" />
+            <AuthCard logo={logo} eyebrow="Welcome back" title="HoneyRest 로그인">
+                <form onSubmit={handleLogin} className="space-y-4">
+                    <div>
+                        <Input
+                            label="이메일"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            autoComplete="email"
+                            aria-invalid={submitted && !email.trim() ? true : undefined}
+                        />
+                        {submitted && !email.trim() && (
+                            <p role="alert" className="text-red-500 text-xs font-bold mt-1.5">이메일을 입력해주세요.</p>
+                        )}
                     </div>
 
-                    <h2 className="text-xl font-semibold text-center text-gray-800">
-                        HoneyRest 로그인 🍯
-                    </h2>
+                    <div>
+                        <Input
+                            label="비밀번호"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            autoComplete="current-password"
+                            aria-invalid={submitted && !password.trim() ? true : undefined}
+                        />
+                        {submitted && !password.trim() && (
+                            <p role="alert" className="text-red-500 text-xs font-bold mt-1.5">비밀번호를 입력해주세요.</p>
+                        )}
+                    </div>
 
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <div>
-                            <label className="block text-sm text-gray-600 mb-1">이메일</label>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@example.com"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                            />
-                            {submitted && !email.trim() && (
-                                <p className="text-red-500 text-sm mt-1">이메일을 입력해주세요.</p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label className="block text-sm text-gray-600 mb-1">비밀번호</label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                            />
-                            {submitted && !password.trim() && (
-                                <p className="text-red-500 text-sm mt-1">비밀번호를 입력해주세요.</p>
-                            )}
-                        </div>
-
-                        <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <div className="flex items-center justify-between gap-2">
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-500 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={autoLogin}
                                 onChange={(e) => setAutoLogin(e.target.checked)}
+                                className="w-4 h-4 accent-honey-yellow-dark"
                             />
                             자동 로그인
                         </label>
-
-                        <button
-                            type="submit"
-                            disabled={isLoading('login')}
-                            className={`w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-2 rounded-lg transition flex items-center justify-center gap-2 ${isLoading('login') ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        <Link
+                            to="/reset-password"
+                            className="text-xs font-bold text-gray-400 hover:text-leaf-green-dark transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf-green/40"
                         >
-                            <FaLock />
-                            {isLoading('login') ? '로그인 중...' : '로그인'}
-                        </button>
-                    </form>
-
-                    <div className="my-4 flex items-center">
-                        <hr className="flex-grow border-gray-300" />
-                        <span className="mx-3 text-sm text-gray-500">또는</span>
-                        <hr className="flex-grow border-gray-300" />
+                            비밀번호를 잊으셨나요?
+                        </Link>
                     </div>
 
-                    <div className="space-y-3">
-                        <KakaoLoginButton onClick={() => window.location.href = KAKAO_AUTH_URL} />
-                        <GoogleLoginButton onClick={() => window.location.href = GOOGLE_AUTH_URL} />
-                    </div>
+                    <Button type="submit" disabled={isLoading('login')} size="lg" fullWidth>
+                        <FaLock />
+                        {isLoading('login') ? '로그인 중...' : '로그인'}
+                    </Button>
+                </form>
 
-                    <p className="text-sm text-center text-gray-600">
-                        계정이 없으신가요?{" "}
-                        <span
-                            className="text-yellow-600 hover:underline cursor-pointer"
-                            onClick={() => navigate("/signup")}
-                        >
-        회원가입
-    </span>
-                    </p>
-
-                    <p className="text-sm text-center text-gray-500 mt-2">
-    <span
-        className="text-blue-600 hover:underline cursor-pointer"
-        onClick={() => navigate("/reset-password")}
-    >
-        비밀번호를 잊으셨나요?
-    </span>
-                    </p>
+                <div className="my-6 flex items-center">
+                    <hr className="flex-grow border-gray-100" />
+                    <span className="mx-3 text-[10px] font-bold text-gray-300 uppercase tracking-widest">또는</span>
+                    <hr className="flex-grow border-gray-100" />
                 </div>
-            </div>
+
+                <div className="space-y-3">
+                    <KakaoLoginButton onClick={() => window.location.href = KAKAO_AUTH_URL} />
+                    <GoogleLoginButton onClick={() => window.location.href = GOOGLE_AUTH_URL} />
+                </div>
+
+                <p className="mt-8 text-sm text-center text-gray-400">
+                    계정이 없으신가요?{" "}
+                    <Link
+                        to="/signup"
+                        className="font-black text-honey-yellow-dark hover:underline underline-offset-4 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-honey-yellow/40"
+                    >
+                        회원가입
+                    </Link>
+                </p>
+            </AuthCard>
         </>
     );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
 import useApiRequest from "@/api/useApiRequest";
+import { toast } from "react-toastify";
 
 function InquiryModal({ onClose, accommodationId, userId }) {
     const { request, isLoading } = useApiRequest();
@@ -15,7 +16,7 @@ function InquiryModal({ onClose, accommodationId, userId }) {
 
     const handleSubmit = async () => {
         if (!userId) {
-            alert("문의 등록은 로그인 후에 가능합니다.");
+            toast.info("문의 등록은 로그인 후에 가능합니다.");
             return;
         }
         if (
@@ -24,7 +25,7 @@ function InquiryModal({ onClose, accommodationId, userId }) {
             content.trim() ===
             "[문의 내용 작성 예시]\n1. 예약자 이름:\n2. 예약 날짜:\n3. 문의 내용:"
         ) {
-            alert("제목과 내용을 모두 입력해주세요!");
+            toast.error("제목과 내용을 모두 입력해주세요!");
             return;
         }
 

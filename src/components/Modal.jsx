@@ -1,24 +1,19 @@
-import { motion } from 'framer-motion';
+import { HiInformationCircle } from 'react-icons/hi';
+import Dialog from '@/components/ui/Dialog.jsx';
+import Button from '@/components/ui/Button.jsx';
 
+// 단순 안내 메시지 모달 (배경 오버레이는 호출하는 쪽에서 렌더링)
 function Modal({ message, onClose }) {
     return (
-        <motion.div
-            className="fixed inset-0 flex items-center justify-center z-50"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-        >
-            <div className="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
-                <p className="text-gray-800 text-lg mb-4">{message}</p>
-                <button
-                    onClick={onClose}
-                    className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-md"
-                >
-                    확인
-                </button>
+        <Dialog onClose={onClose} className="max-w-sm text-center" showBackdrop={false} showClose={false} closeOnBackdrop>
+            <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-honey-yellow/10 text-honey-yellow-dark flex items-center justify-center text-2xl">
+                <HiInformationCircle />
             </div>
-        </motion.div>
+            <p className="text-deep-gray text-base font-bold mb-6 break-keep whitespace-pre-line">{message}</p>
+            <Button onClick={onClose} fullWidth>
+                확인
+            </Button>
+        </Dialog>
     );
 }
 

@@ -6,6 +6,7 @@ import {
     FaMoneyCheckAlt
 } from "react-icons/fa";
 import SafeImage from "@/components/SafeImage.jsx";
+import { toast } from "react-toastify";
 
 export default function ReserveGuestForm() {
     const navigate = useNavigate();
@@ -100,7 +101,7 @@ export default function ReserveGuestForm() {
 
     const handleSubmit = () => {
         if (!isFormValid) {
-            alert("필수 정보를 모두 입력하고 약관에 동의해주세요.");
+            toast.error("필수 정보를 모두 입력하고 약관에 동의해주세요.");
             return;
         }
 

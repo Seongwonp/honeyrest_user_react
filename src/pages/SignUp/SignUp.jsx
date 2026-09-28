@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import api from "@/api/axios";
 import logo from '/images/logo-Photoroom.png';
 import Header from "../../components/Header.jsx";
 import { FaUserPlus } from 'react-icons/fa';
 import { FiChevronDown } from 'react-icons/fi';
+import Input from '@/components/ui/Input.jsx';
+import Button from '@/components/ui/Button.jsx';
+import AuthCard from '@/components/ui/AuthCard.jsx';
+import { inputClass, labelClass } from '@/components/ui/styles';
 
 const getPasswordStrength = (password) => {
     let score = 0;
@@ -183,194 +187,201 @@ function Signup() {
         }
     };
 
+    // 비밀번호 강도 (0 ~ 4)
+    const strength = getPasswordStrength(form.password);
+    const required = <span className="text-red-400 ml-0.5" aria-hidden="true">*</span>;
+
     return (
         <>
             <Header />
-            <div className="bg-white min-h-screen flex flex-col">
-                <div className="flex-grow flex items-start justify-center pt-20 px-4">
-                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8 w-full max-w-md md:max-w-xl lg:max-w-2xl overflow-hidden" data-aos="zoom-in">
-                        <div className="flex justify-center mb-6">
-                            <img src={logo} alt="logo" className="h-16" />
-                        </div>
+            <AuthCard
+                logo={logo}
+                eyebrow="Join HoneyRest"
+                title="HoneyRest 회원가입"
+                description="달콤한 휴식을 위한 첫 걸음을 시작해 보세요."
+                maxWidth="max-w-md md:max-w-xl"
+            >
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* 기본 정보 입력 */}
+                    <Input label={<>이름{required}</>} name="name" placeholder="이름" value={form.name} onChange={handleChange} autoComplete="name" />
 
-                        <h2 className="text-xl font-medium text-gray-800 mb-6 text-center">
-                            HoneyRest 회원가입 ✨
-                        </h2>
+                    <Input label={<>이메일{required}</>} name="email" type="email" placeholder="이메일" value={form.email} onChange={handleChange} autoComplete="email" />
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            {/* 기본 정보 입력 */}
-                            <label className="block text-sm font-medium text-gray-700">이름<span className="text-red-500">*</span></label>
-                            <input name="name" placeholder="이름" value={form.name} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-
-                            <label className="block text-sm font-medium text-gray-700">이메일<span className="text-red-500">*</span></label>
-                            <input name="email" type="email" placeholder="이메일" value={form.email} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-
-                            <label className="block text-sm font-medium text-gray-700">비밀번호<span className="text-red-500">*</span></label>
-                            <input name="password" type="password" placeholder="비밀번호" value={form.password} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-                            {/* Password requirements */}
-                            <div className="mt-2 mb-1 text-xs text-gray-500">
-                              <ul className="list-disc pl-5 space-y-0.5">
-                                <li>8자 이상 20자 이하로 입력해주세요.</li>
-                                <li>영문 대소문자, 숫자, 특수문자 중 2가지 이상 조합이 권장됩니다.</li>
-                                <li>보안을 위해 가능한 한 긴 비밀번호를 사용하는 것이 좋습니다.</li>
-                              </ul>
-                            </div>
-                            <br/>
-                            {form.password && (
-                                <div className="space-y-1 text-sm text-gray-600 mt-2">
-                                    <div>
-                                        비밀번호 강도:{' '}
-                                        <span className={
-                                            getPasswordStrength(form.password) === 4 ? 'text-green-600' :
-                                            getPasswordStrength(form.password) === 3 ? 'text-lime-500' :
-                                            getPasswordStrength(form.password) === 2 ? 'text-yellow-500' :
-                                            getPasswordStrength(form.password) === 1 ? 'text-orange-500' :
-                                            'text-red-500'
-                                        }>
-                                            {strengthLabels[getPasswordStrength(form.password)]}
-                                        </span>
-                                    </div>
-                                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div
-                                            className={`h-full transition-all duration-300 ${
-                                                getPasswordStrength(form.password) === 1
-                                                    ? 'bg-red-500 w-1/5'
-                                                    : getPasswordStrength(form.password) === 2
-                                                        ? 'bg-orange-500 w-2/5'
-                                                        : getPasswordStrength(form.password) === 3
-                                                            ? 'bg-yellow-500 w-3/5'
-                                                            : getPasswordStrength(form.password) === 4
-                                                                ? 'bg-lime-500 w-full'
-                                                                : getPasswordStrength(form.password) === 5
-                                                                    ? 'bg-green-500 w-full'
-                                                                    : 'w-0'
-                                            }`}
-                                        />
-                                    </div>
-                                    <p className="text-xs text-gray-400">
-                                        {getPasswordStrength(form.password) === 0 ? '' :
-                                         getPasswordStrength(form.password) === 1 ? '비밀번호가 너무 짧습니다.' :
-                                         getPasswordStrength(form.password) === 2 ? '최소 기준은 충족했지만 보안에 취약할 수 있습니다.' :
-                                         getPasswordStrength(form.password) === 3 ? '일반적인 보안 수준입니다.' :
-                                         getPasswordStrength(form.password) === 4 ? '안전한 비밀번호입니다.' :
-                                         '매우 안전한 비밀번호입니다.'}
-                                    </p>
+                    <div>
+                        <Input label={<>비밀번호{required}</>} name="password" type="password" placeholder="비밀번호" value={form.password} onChange={handleChange} autoComplete="new-password" />
+                        {/* Password requirements */}
+                        <ul className="mt-2 list-disc pl-5 space-y-0.5 text-xs text-gray-400">
+                            <li>8자 이상 20자 이하로 입력해주세요.</li>
+                            <li>영문 대소문자, 숫자, 특수문자 중 2가지 이상 조합이 권장됩니다.</li>
+                            <li>보안을 위해 가능한 한 긴 비밀번호를 사용하는 것이 좋습니다.</li>
+                        </ul>
+                        {form.password && (
+                            <div className="space-y-1.5 text-xs text-gray-500 mt-3" aria-live="polite">
+                                <div className="font-bold">
+                                    비밀번호 강도:{' '}
+                                    <span className={
+                                        strength >= 3 ? 'text-leaf-green-dark' :
+                                        strength === 2 ? 'text-honey-yellow-dark' :
+                                        'text-red-500'
+                                    }>
+                                        {strengthLabels[strength]}
+                                    </span>
                                 </div>
-                            )}
+                                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full rounded-full transition-all duration-300 ${
+                                            strength === 1
+                                                ? 'bg-red-400 w-1/5'
+                                                : strength === 2
+                                                    ? 'bg-honey-yellow w-2/5'
+                                                    : strength === 3
+                                                        ? 'bg-leaf-green w-3/5'
+                                                        : strength === 4
+                                                            ? 'bg-leaf-green-dark w-full'
+                                                            : 'w-0'
+                                        }`}
+                                    />
+                                </div>
+                                <p className="text-gray-400">
+                                    {strength === 0 ? '' :
+                                     strength === 1 ? '비밀번호가 너무 짧습니다.' :
+                                     strength === 2 ? '최소 기준은 충족했지만 보안에 취약할 수 있습니다.' :
+                                     strength === 3 ? '일반적인 보안 수준입니다.' :
+                                     '안전한 비밀번호입니다.'}
+                                </p>
+                            </div>
+                        )}
+                    </div>
 
-                            <label className="block text-sm font-medium text-gray-700">비밀번호 확인<span className="text-red-500">*</span></label>
-                            <input name="confirmPassword" type="password" placeholder="비밀번호 확인" value={form.confirmPassword} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-md" />
+                    <Input label={<>비밀번호 확인{required}</>} name="confirmPassword" type="password" placeholder="비밀번호 확인" value={form.confirmPassword} onChange={handleChange} autoComplete="new-password" />
 
-                            <label className="block text-sm font-medium text-gray-700">전화번호<span className="text-red-500">*</span></label>
-                            <input name="phone" placeholder="전화번호" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-md" />
+                    <Input label={<>전화번호{required}</>} name="phone" placeholder="전화번호" value={form.phone} onChange={handleChange} autoComplete="tel" />
 
-                            <label className="block text-sm font-medium text-gray-700">생년월일<span className="text-red-500">*</span></label>
-                            <input
-                              name="birthDate"
-                              type="date"
-                              value={form.birthDate}
-                              onChange={handleChange}
-                              min={minBirthDate.toISOString().split("T")[0]}
-                              max={maxBirthDate.toISOString().split("T")[0]}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                            />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Input
+                            label={<>생년월일{required}</>}
+                            name="birthDate"
+                            type="date"
+                            value={form.birthDate}
+                            onChange={handleChange}
+                            min={minBirthDate.toISOString().split("T")[0]}
+                            max={maxBirthDate.toISOString().split("T")[0]}
+                        />
 
-                            <label className="block text-sm font-medium text-gray-700">성별<span className="text-red-500">*</span></label>
-                            <select name="gender" value={form.gender} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-md">
+                        <div className="min-w-0">
+                            <label htmlFor="signup-gender" className={labelClass}>성별{required}</label>
+                            <select id="signup-gender" name="gender" value={form.gender} onChange={handleChange} className={inputClass}>
                                 <option value="">성별 선택</option>
                                 <option value="MALE">남성</option>
                                 <option value="FEMALE">여성</option>
                             </select>
-
-                            {/* 프로필 이미지 */}
-                            <label className="block text-sm font-medium text-gray-700">프로필 사진</label>
-                            <input type="file" accept="image/*" onChange={handleImageSelect} className="w-full px-4 py-2 border border-gray-300 rounded-md" />
-                            {preview && <img src={preview} alt="미리보기" className="mt-2 h-24 w-24 rounded-full object-cover mx-auto" />}
-
-                            {/* 약관 동의 (modernized) */}
-                            <div className="mt-6">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-semibold text-gray-900">약관 동의</h3>
-                                    <label className="flex items-center gap-2 text-sm text-gray-700">
-                                        <input
-                                            type="checkbox"
-                                            checked={allChecked}
-                                            onChange={toggleAllTerms}
-                                        />
-                                        전체 동의
-                                    </label>
-                                </div>
-
-                                <div className="mt-3 rounded-xl bg-gray-50 p-2">
-                                    {termsList.map((term) => (
-                                        <div key={term.key} className="rounded-lg p-3 hover:bg-white transition">
-                                            <div className="flex items-start gap-3">
-                                                <input
-                                                    type="checkbox"
-                                                    name={term.key}
-                                                    checked={form[term.key]}
-                                                    onChange={handleChange}
-                                                    className="mt-0.5"
-                                                />
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-sm font-medium text-gray-900">{term.label}</span>
-                                                        <span
-                                                            className={`text-[10px] px-2 py-0.5 rounded-full ${
-                                                                term.required
-                                                                    ? "bg-red-50 text-red-600 border border-red-200"
-                                                                    : "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                                                            }`}
-                                                        >
-                                                            {term.required ? "필수" : "선택"}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    aria-label="약관 상세 보기"
-                                                    aria-expanded={!!expanded[term.key]}
-                                                    onClick={() => toggleDetail(term.key)}
-                                                    className="ml-2 p-1 rounded-md hover:bg-gray-100"
-                                                >
-                                                    <FiChevronDown
-                                                        className={`h-5 w-5 transition-transform ${
-                                                            expanded[term.key] ? "rotate-180" : ""
-                                                        }`}
-                                                    />
-                                                </button>
-                                            </div>
-
-                                            {expanded[term.key] && (
-                                                <div className="pl-8 pr-3 pt-2 text-xs text-gray-600 leading-relaxed whitespace-pre-line">
-                                                    {term.detail}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* 에러 메시지 */}
-                            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-
-                            {/* 제출 버튼 */}
-                            <button type="submit" className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-2 rounded-lg flex items-center justify-center gap-2 mt-4">
-                                <FaUserPlus />
-                                회원가입
-                            </button>
-                        </form>
-
-                        {/* 로그인 안내 */}
-                        <p className="mt-6 text-sm text-center text-gray-600">
-                            이미 계정이 있으신가요?{" "}
-                            <span className="text-yellow-600 hover:underline cursor-pointer" onClick={() => navigate("/login")}>
-                로그인
-              </span>
-                        </p>
+                        </div>
                     </div>
-                </div>
-            </div>
+
+                    {/* 프로필 이미지 */}
+                    <div>
+                        <label htmlFor="signup-profile" className={labelClass}>프로필 사진</label>
+                        <div className="flex items-center gap-4">
+                            {preview && <img src={preview} alt="미리보기" className="h-16 w-16 shrink-0 rounded-full object-cover ring-4 ring-honey-yellow/20" />}
+                            <input
+                                id="signup-profile"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageSelect}
+                                className="block w-full min-w-0 text-sm text-gray-500 file:mr-3 file:rounded-xl file:border-0 file:bg-honey-yellow/10 file:px-4 file:py-2 file:text-sm file:font-bold file:text-honey-yellow-dark hover:file:bg-honey-yellow/20"
+                            />
+                        </div>
+                    </div>
+
+                    {/* 약관 동의 */}
+                    <div className="pt-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-black text-deep-gray">약관 동의</h3>
+                            <label className="flex items-center gap-2 text-sm font-bold text-gray-500 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={allChecked}
+                                    onChange={toggleAllTerms}
+                                    className="w-4 h-4 accent-leaf-green"
+                                />
+                                전체 동의
+                            </label>
+                        </div>
+
+                        <div className="mt-3 rounded-3xl bg-off-white p-2">
+                            {termsList.map((term) => (
+                                <div key={term.key} className="rounded-2xl p-3 hover:bg-white transition-colors">
+                                    <div className="flex items-start gap-3">
+                                        <input
+                                            id={`signup-term-${term.key}`}
+                                            type="checkbox"
+                                            name={term.key}
+                                            checked={form[term.key]}
+                                            onChange={handleChange}
+                                            className="mt-0.5 w-4 h-4 shrink-0 accent-leaf-green"
+                                        />
+                                        <label htmlFor={`signup-term-${term.key}`} className="flex-1 min-w-0 flex flex-wrap items-center gap-2 cursor-pointer">
+                                            <span className="text-sm font-medium text-deep-gray break-keep">{term.label}</span>
+                                            <span
+                                                className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                                                    term.required
+                                                        ? "bg-red-50 text-red-500"
+                                                        : "bg-honey-yellow/15 text-honey-yellow-dark"
+                                                }`}
+                                            >
+                                                {term.required ? "필수" : "선택"}
+                                            </span>
+                                        </label>
+                                        <button
+                                            type="button"
+                                            aria-label={`${term.label} 상세 보기`}
+                                            aria-expanded={!!expanded[term.key]}
+                                            onClick={() => toggleDetail(term.key)}
+                                            className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-deep-gray focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-honey-yellow/40"
+                                        >
+                                            <FiChevronDown
+                                                className={`h-5 w-5 transition-transform ${
+                                                    expanded[term.key] ? "rotate-180" : ""
+                                                }`}
+                                            />
+                                        </button>
+                                    </div>
+
+                                    {expanded[term.key] && (
+                                        <div className="pl-7 pr-3 pt-2 text-xs text-gray-500 leading-relaxed whitespace-pre-line break-words">
+                                            {term.detail}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 에러 메시지 */}
+                    {error && (
+                        <div role="alert" className="text-sm font-bold text-red-500 bg-red-50 rounded-2xl px-4 py-3">
+                            {error}
+                        </div>
+                    )}
+
+                    {/* 제출 버튼 */}
+                    <Button type="submit" size="lg" fullWidth className="mt-2">
+                        <FaUserPlus />
+                        회원가입
+                    </Button>
+                </form>
+
+                {/* 로그인 안내 */}
+                <p className="mt-8 text-sm text-center text-gray-400">
+                    이미 계정이 있으신가요?{" "}
+                    <Link
+                        to="/login"
+                        className="font-black text-honey-yellow-dark hover:underline underline-offset-4 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-honey-yellow/40"
+                    >
+                        로그인
+                    </Link>
+                </p>
+            </AuthCard>
         </>
     );
 }

@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { FaTimes } from 'react-icons/fa';
 import useApiRequest from '@/api/useApiRequest';
+import Dialog from '@/components/ui/Dialog.jsx';
+import Input from '@/components/ui/Input.jsx';
+import Button from '@/components/ui/Button.jsx';
+import { inputClass, labelClass } from '@/components/ui/styles';
 
 function InquiryEditModal({ inquiry, onClose, onUpdate }) {
     const { request, isLoading } = useApiRequest();
@@ -35,7 +38,7 @@ function InquiryEditModal({ inquiry, onClose, onUpdate }) {
                 },
                 { successMessage: '문의가 정상적으로 수정되었습니다!' }
             );
-            onUpdate(); // 상위 컴포넌트 갱신
+            onUpdate({ ...inquiry, title, category, content }); // 상위 컴포넌트 갱신
             onClose();
         } catch (err) {
             console.error(err);
@@ -43,64 +46,63 @@ function InquiryEditModal({ inquiry, onClose, onUpdate }) {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white rounded-lg w-11/12 max-w-lg p-6 relative">
-                <button
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                    onClick={onClose}
-                >
-                    <FaTimes size={18} />
-                </button>
-                <h2 className="text-xl font-bold mb-4">문의 수정</h2>
+        <Dialog onClose={onClose} title="문의 수정" closeOnBackdrop>
+            {!isEditable && (
+                <p role="alert" className="text-sm font-bold text-red-500 bg-red-50 rounded-2xl px-4 py-3 mb-4">
+                    답변이 등록된 문의는 수정할 수 없습니다.
+                </p>
+            )}
 
-                {!isEditable && (
-                    <p className="text-red-500 mb-2">
-                        답변이 등록된 문의는 수정할 수 없습니다.
-                    </p>
-                )}
-
-                <input
+            <div className="space-y-4">
+                <Input
+                    label="제목"
                     type="text"
-                    className="w-full border rounded px-3 py-2 mb-3"
                     placeholder="제목"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     disabled={!isEditable}
                 />
 
-                <select
-                    className="w-full border rounded px-3 py-2 mb-3"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    disabled={!isEditable}
-                >
-                    <option value="">카테고리 선택</option>
-                    <option value="예약">예약</option>
-                    <option value="결제">결제</option>
-                    <option value="기타">기타</option>
-                </select>
+                <div>
+                    <label htmlFor="inquiry-edit-category" className={labelClass}>카테고리</label>
+                    <select
+                        id="inquiry-edit-category"
+                        className={inputClass}
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        disabled={!isEditable}
+                    >
+                        <option value="">카테고리 선택</option>
+                        <option value="예약">예약</option>
+                        <option value="결제">결제</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
 
-                <textarea
-                    className="w-full border rounded px-3 py-2 mb-3 h-32 resize-none"
-                    placeholder="내용"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    disabled={!isEditable}
-                />
+                <div>
+                    <label htmlFor="inquiry-edit-content" className={labelClass}>내용</label>
+                    <textarea
+                        id="inquiry-edit-content"
+                        className={`${inputClass} h-32 resize-none`}
+                        placeholder="내용"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        disabled={!isEditable}
+                    />
+                </div>
 
                 {isEditable && (
-                    <button
-                        className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded ${
-                            isLoading() ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
+                    <Button
                         onClick={handleSubmit}
                         disabled={isLoading()}
+                        size="lg"
+                        fullWidth
                     >
                         {isLoading() ? '수정 중...' : '수정 완료'}
-                    </button>
+                    </Button>
                 )}
             </div>
-        </div>
+        </Dialog>
     );
 }
 

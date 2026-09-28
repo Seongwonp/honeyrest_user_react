@@ -13,20 +13,26 @@ function MyPageNav() {
     ];
 
     return (
-        <nav className="flex gap-4 border-b pb-2">
-            {navItems.map((item) => (
-                <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={({ isActive }) =>
-                        `text-sm font-medium px-3 py-1 rounded ${
-                            isActive ? "bg-yellow-400 text-white" : "text-gray-600 hover:text-yellow-500"
-                        }`
-                    }
-                >
-                    {item.label}
-                </NavLink>
-            ))}
+        <nav aria-label="마이페이지 메뉴" className="glass-card rounded-3xl p-2">
+            {/* 모바일에서는 가로 스크롤, 페이지 자체는 넘치지 않도록 내부에서만 스크롤 */}
+            <ul className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {navItems.map((item) => (
+                    <li key={item.path} className="shrink-0">
+                        <NavLink
+                            to={item.path}
+                            className={({ isActive }) =>
+                                `block whitespace-nowrap text-sm font-bold px-4 py-2.5 rounded-2xl transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/30 ${
+                                    isActive
+                                        ? "bg-honey-yellow text-white shadow-lg shadow-honey-yellow/20"
+                                        : "text-gray-500 hover:bg-honey-yellow/10 hover:text-honey-yellow-dark"
+                                }`
+                            }
+                        >
+                            {item.label}
+                        </NavLink>
+                    </li>
+                ))}
+            </ul>
         </nav>
     );
 }

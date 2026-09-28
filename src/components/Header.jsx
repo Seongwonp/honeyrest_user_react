@@ -26,6 +26,16 @@ function Header() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // 모바일 메뉴가 열려 있을 때 Escape 로 닫기
+    useEffect(() => {
+        if (!menuOpen) return;
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') setMenuOpen(false);
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [menuOpen]);
+
     const navItems = isLoggedIn
         ? [
             { label: '마이페이지', path: '/user/mypage/profile', icon: <FaUserCircle /> },
@@ -111,7 +121,11 @@ function Header() {
 
                 {/* 모바일 메뉴 버튼 */}
                 <button
+                    type="button"
                     onClick={() => setMenuOpen(true)}
+                    aria-label="메뉴 열기"
+                    aria-expanded={menuOpen}
+                    aria-controls="mobile-menu"
                     className="md:hidden p-2 rounded-xl bg-gray-50 text-deep-gray hover:bg-honey-yellow/20 transition-colors"
                 >
                     <FaBars size={20} />
@@ -127,6 +141,7 @@ function Header() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setMenuOpen(false)}
+                            aria-hidden="true"
                             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] md:hidden"
                         />
                         <motion.div
@@ -134,12 +149,18 @@ function Header() {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed top-0 right-0 h-full w-[280px] bg-white z-[120] shadow-2xl md:hidden flex flex-col"
+                            id="mobile-menu"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-label="모바일 메뉴"
+                            className="fixed top-0 right-0 h-full w-[280px] max-w-[85vw] bg-white z-[120] shadow-2xl md:hidden flex flex-col"
                         >
                             <div className="p-6 flex justify-between items-center border-b border-gray-50">
                                 <span className="font-bold text-xl text-deep-gray">Menu</span>
                                 <button
+                                    type="button"
                                     onClick={() => setMenuOpen(false)}
+                                    aria-label="메뉴 닫기"
                                     className="p-2 rounded-full hover:bg-gray-100 transition-colors"
                                 >
                                     <FaTimes size={20} />

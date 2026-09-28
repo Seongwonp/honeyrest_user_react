@@ -2,8 +2,9 @@
 function KakaoLoginButton({ onClick }) {
     return (
         <button
+            type="button"
             onClick={onClick}
-            className="w-full flex items-center justify-center gap-2 bg-[#FEE500] hover:bg-[#FFD600] text-black font-bold py-2 rounded-lg transition"
+            className="w-full flex items-center justify-center gap-2 bg-[#FEE500] hover:bg-[#FFD600] text-black font-black text-sm py-3 rounded-2xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-honey-yellow/40"
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
