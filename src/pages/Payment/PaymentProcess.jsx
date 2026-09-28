@@ -1,5 +1,5 @@
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -9,6 +9,9 @@ export default function PaymentProcess() {
     const [widgets, setWidgets] = useState(null);
     const [ready, setReady] = useState(false);
     const { user } = useAuth();
+    // 결제하기 중복 클릭 방지 (ref: 즉시 차단, state: 버튼 비활성화 표시)
+    const payingRef = useRef(false);
+    const [paying, setPaying] = useState(false);
 
     // 예약자 이메일: 입력된 이메일 → 로그인 사용자 이메일 순으로 사용 (임의의 더미 이메일은 보내지 않음)
     const guestEmail = state?.guestEmail || user?.email || "";
@@ -67,7 +70,9 @@ export default function PaymentProcess() {
     }, [widgets]);
 
     const handlePayment = async () => {
-        if (!state) return;
+        if (!state || !widgets || payingRef.current) return;
+        payingRef.current = true;
+        setPaying(true);
 
         const baseCode = "HR-" + crypto.randomUUID().slice(0, 8).toUpperCase();
         // 주문번호에는 비밀번호/개인정보를 절대 포함하지 않는다.
@@ -110,6 +115,10 @@ export default function PaymentProcess() {
             });
         } catch (error) {
             console.error("❌ 결제 요청 실패:", error);
+            // 결제창을 닫거나 요청이 실패한 경우에만 다시 누를 수 있게 한다.
+            // (성공 시에는 successUrl로 페이지가 이동한다)
+            payingRef.current = false;
+            setPaying(false);
         }
     };
 
@@ -155,11 +164,11 @@ export default function PaymentProcess() {
 
             <button
                 id="payment-button"
-                className="mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded w-full transition"
-                disabled={!ready}
+                className="mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded w-full transition disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={!ready || paying}
                 onClick={handlePayment}
             >
-                결제하기
+                {paying ? "결제 진행 중..." : "결제하기"}
             </button>
         </div>
     );

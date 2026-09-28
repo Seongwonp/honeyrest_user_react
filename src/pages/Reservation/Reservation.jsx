@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {
     FaUserAlt,
@@ -57,7 +57,6 @@ export default function Reservation() {
         checkIn,
         checkOut,
         guests,
-        originalPrice = 0,
         userId,
         userName,
         userPhone,
@@ -69,6 +68,14 @@ export default function Reservation() {
         availableCoupons = [],
         availablePoints = 0
     } = state ?? {};
+
+    // 결제 기준 금액은 서버(/api/reserve/form-info)가 계산한 originalPrice(객실가 + 추가 인원 요금)를 그대로 사용한다.
+    // 클라이언트에서 다시 계산하지 않으며, 서버 값이 없을 때만 상세 페이지의 totalPrice로 대체한다.
+    const originalPrice = Number(state?.originalPrice ?? state?.totalPrice ?? 0) || 0;
+
+    // 결제 버튼 중복 클릭 방지
+    const submittingRef = useRef(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const [form, setForm] = useState({
         guestName: userName || "",
@@ -125,6 +132,7 @@ export default function Reservation() {
     };
 
     const handlePayment = () => {
+        if (submittingRef.current) return;
         if (!form.guestName.trim() || !form.guestPhone.trim()) {
             alert("예약자 이름과 전화번호는 필수입니다.");
             return;
@@ -156,6 +164,8 @@ export default function Reservation() {
             roomName
         };
 
+        submittingRef.current = true;
+        setSubmitting(true);
         navigate("/payment/process", { state: payload });
     };
 
@@ -539,10 +549,11 @@ export default function Reservation() {
                                 !form.guestName.trim() ||
                                 !form.guestPhone.trim() ||
                                 !paymentMethod ||
-                                !agree
+                                !agree ||
+                                submitting
                             }
                             className={`w-full font-bold py-3 rounded transition ${
-                                !form.guestName.trim() || !form.guestPhone.trim() || !paymentMethod || !agree
+                                !form.guestName.trim() || !form.guestPhone.trim() || !paymentMethod || !agree || submitting
                                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     : "bg-yellow-400 hover:bg-yellow-500 text-white"
                             }`}

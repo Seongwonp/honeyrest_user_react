@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     FaArrowLeft, FaListUl, FaUserFriends, FaCalendarAlt, FaBan,
     FaMapMarkerAlt, FaClock
@@ -22,6 +22,9 @@ export default function RoomDetail() {
     const checkOut = searchParams.get("checkOut");
     const guests = Number(searchParams.get("guests")) || 2;
     const [roomDetail, setRoomDetail] = useState(null);
+    // 예약하기 중복 클릭 방지
+    const reservingRef = useRef(false);
+    const [reserving, setReserving] = useState(false);
 
     useEffect(() => {
         api.get(`/api/room/${roomId}`, {
@@ -185,6 +188,9 @@ export default function RoomDetail() {
                             type="button"
                             onClick={async (e) => {
                                 e.preventDefault();
+                                if (reservingRef.current) return;
+                                reservingRef.current = true;
+                                setReserving(true);
 
                                 const isLoggedIn = !!userId;
 
@@ -214,9 +220,13 @@ export default function RoomDetail() {
                                 } catch (err) {
                                     console.error("예약 정보 불러오기 실패:", err);
                                     alert("예약 정보를 불러오는 데 문제가 발생했습니다. 다시 시도해주세요.");
+                                    // 실패한 경우에만 다시 누를 수 있게 한다 (성공 시에는 페이지 이동)
+                                    reservingRef.current = false;
+                                    setReserving(false);
                                 }
                             }}
-                            className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-lg px-6 py-3 transition focus:outline-none focus:ring-4 focus:ring-yellow-300"
+                            disabled={reserving}
+                            className="disabled:opacity-60 disabled:cursor-not-allowed bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-lg px-6 py-3 transition focus:outline-none focus:ring-4 focus:ring-yellow-300"
                         >
                             예약하기
                         </button>
