@@ -125,6 +125,15 @@ flowchart LR
 
 ---
 
+## 배포
+
+- **라이브**: `https://<IP>.sslip.io` _(배포 후 실제 주소로 교체)_
+- 사용자 API 저장소의 `deploy/caddy/Dockerfile` 이 이 저장소를 Node 20 으로 빌드해 Caddy 이미지(`/srv`)에 넣습니다. API 와 같은 Origin 이므로 `VITE_BACKEND_URL` 은 비워 두고(axios 가 상대 경로 `/api` 사용), `VITE_ADMIN_URL`·`VITE_OAUTH_REDIRECT_URI` 등은 빌드 인자로 받습니다 → [`.env.production.example`](.env.production.example)
+- `VITE_E2E` 는 운영 빌드에 넣지 않으며, E2E 전용 결제 버튼 코드가 번들에 남으면 이미지 빌드가 실패합니다.
+- 상세 절차: [honeyRest_user · docs/DEPLOY.md](https://github.com/Seongwonp/honeyRest_user/blob/main/docs/DEPLOY.md)
+
+---
+
 ## 실행 방법
 
 ```bash

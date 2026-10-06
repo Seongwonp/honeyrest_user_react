@@ -1,0 +1,26 @@
+# 운영 이미지(honeyRest_user 저장소 deploy/caddy/Dockerfile 의 추가 컨텍스트 "spa") 빌드 시 제외할 파일
+# node_modules 는 이미지 안에서 npm ci 로 새로 설치한다 (호스트의 다른 OS/아키텍처 바이너리가 섞이면 안 됨).
+
+.git
+.github
+.vscode
+.idea
+**/.DS_Store
+
+node_modules
+dist
+dist-ssr
+
+# 환경변수 파일: 운영 값은 빌드 인자(VITE_*)로만 받는다. 특히 VITE_E2E 가 섞여 들어오면 안 된다.
+.env
+.env.*
+
+# 테스트·문서 (번들에 불필요)
+e2e
+playwright.config.js
+playwright-report
+test-results
+blob-report
+docs
+*.md
+*.log
