@@ -42,7 +42,8 @@ npm run test:e2e # Playwright 사용자 여정 E2E (API e2e 프로필 + 개발 �
 - 앱 코드에서는 `import.meta.env.VITE_*` 패턴
 - Firebase SDK는 제거됨 (이미지 URL은 백엔드 응답 사용, `SafeImage`로 폴백)
 - `VITE_E2E` — **E2E 전용 플래그.** `'true'` 일 때만 `src/pages/Payment/PaymentProcess.jsx` 가 토스 위젯 대신 "테스트 결제" 버튼(`data-testid="e2e-test-payment"`)을 렌더링해 가짜 paymentKey 로 `/payment/success` 에 진입한다(승인은 API e2e 프로필의 토스 스텁). Playwright `webServer` 만 설정하며 `.env`·운영 빌드에 넣지 말 것. 빌드 시 상수 치환이라 미설정 번들에는 버튼 코드가 남지 않는다
-- 운영 빌드 — `honeyRest_user` 저장소의 `deploy/caddy/Dockerfile` 이 이 저장소를 빌드해 Caddy 가 서빙한다(API 와 같은 Origin). `VITE_BACKEND_URL` 은 비움(상대 경로 `/api`), 나머지 `VITE_*` 는 빌드 인자. 예시: `.env.production.example`. `.dockerignore` 가 `.env*`·`node_modules` 를 제외하고, 번들에 E2E 버튼 코드가 있으면 이미지 빌드가 실패한다
+- `VITE_DEMO` — **Render 무료 데모 전용 플래그.** `'true'` 일 때만(`src/config/demo.js` 의 `IS_DEMO`) 상단 데모 배너(`DemoBanner`, `data-testid="demo-banner"`), 로그인 화면의 데모 계정 박스(`data-testid="demo-login"`, "데모 계정으로 로그인"), 결제 화면의 "테스트 결제(데모)" 버튼(E2E 와 같은 `e2e-test-payment` 경로, 토스 위젯·결제하기 버튼은 숨김)이 나온다. 데모 계정은 API `db/demo-seed.sql` 과 같아야 한다. honeyRest_user 의 `Dockerfile.render` 만 설정하며 `.env`·운영 빌드에 넣지 말 것
+- 운영 빌드 — `honeyRest_user` 저장소의 `deploy/caddy/Dockerfile` 이 이 저장소를 빌드해 Caddy 가 서빙한다(API 와 같은 Origin). `VITE_BACKEND_URL` 은 비움(상대 경로 `/api`), 나머지 `VITE_*` 는 빌드 인자. 예시: `.env.production.example`. `.dockerignore` 가 `.env*`·`node_modules` 를 제외하고, 번들에 E2E 버튼·데모 코드가 있으면 이미지 빌드가 실패한다
 
 ### E2E (Playwright)
 - `playwright.config.js` — `webServer` 로 사용자 API(`E2E_API_DIR`, 기본 `../honeyRest_user`, `bootRun --spring.profiles.active=e2e`, 8080)와 `npm run dev`(5173, `VITE_E2E=true`)를 함께 띄운다. 포트는 백엔드 CORS 때문에 고정

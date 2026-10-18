@@ -7,13 +7,15 @@ import SectionTitle from "@/components/ui/SectionTitle.jsx";
 import Card from "@/components/ui/Card.jsx";
 import Button from "@/components/ui/Button.jsx";
 import { eyebrowClass } from "@/components/ui/styles";
+import { IS_DEMO } from "@/config/demo";
 
-// E2E 전용 결제 경로 (VITE_E2E=true 일 때만).
-// 헤드리스 브라우저에서는 토스 결제 위젯을 띄울 수 없으므로, e2e 모드에서는 위젯 대신 "테스트 결제" 버튼이
-// 가짜 paymentKey 로 결제 성공 라우트(/payment/success)에 바로 진입한다. 승인은 백엔드 e2e 프로필의
-// 토스 스텁(E2eTossClient)이 처리하고, 금액·재고 검증은 실제와 동일하게 서버가 수행한다.
-// 빌드 시 상수로 치환되므로 VITE_E2E 가 없는 개발/운영 번들에는 이 버튼이 렌더링되지 않는다.
+// 테스트 결제 경로 (VITE_E2E=true 또는 VITE_DEMO=true 일 때만).
+// 헤드리스 브라우저(E2E)나 공개 데모에서는 토스 결제 위젯을 띄우지 않고, 위젯 대신 "테스트 결제" 버튼이
+// 가짜 paymentKey 로 결제 성공 라우트(/payment/success)에 바로 진입한다. 승인은 백엔드 e2e·demo 프로필의
+// 토스 스텁(E2eTossClient)이 처리하고, 금액·재고 검증은 실제와 동일하게 서버가 수행한다. 실제 청구는 없다.
+// 빌드 시 상수로 치환되므로 두 값이 모두 없는 개발/운영 번들에는 이 버튼이 렌더링되지 않는다.
 const IS_E2E_PAYMENT = import.meta.env.VITE_E2E === "true";
+const IS_TEST_PAYMENT = IS_E2E_PAYMENT || IS_DEMO;
 
 // 주문번호: 비밀번호/개인정보를 절대 포함하지 않는다.
 const createOrderId = () => "HR-" + crypto.randomUUID().slice(0, 8).toUpperCase();
@@ -55,7 +57,7 @@ export default function PaymentProcess() {
             setWidgets(widgetsInstance);
         }
 
-        if (state?.paymentMethod === "TOSS" && !IS_E2E_PAYMENT) {
+        if (state?.paymentMethod === "TOSS" && !IS_TEST_PAYMENT) {
             initWidgets();
         }
     }, [state]);
@@ -113,16 +115,16 @@ export default function PaymentProcess() {
         }));
     };
 
-    // e2e 전용: 토스 결제창 대신 가짜 paymentKey 로 성공 라우트에 진입 (IS_E2E_PAYMENT 참고)
+    // e2e·데모 전용: 토스 결제창 대신 가짜 paymentKey 로 성공 라우트에 진입 (IS_TEST_PAYMENT 참고)
     const handleTestPayment = () => {
-        if (!IS_E2E_PAYMENT || !state || payingRef.current) return;
+        if (!IS_TEST_PAYMENT || !state || payingRef.current) return;
         payingRef.current = true;
         setPaying(true);
 
         const orderId = createOrderId();
         saveReservationDraft(orderId);
         const params = new URLSearchParams({
-            paymentKey: `e2e_${crypto.randomUUID()}`,
+            paymentKey: `${IS_DEMO ? "demo" : "e2e"}_${crypto.randomUUID()}`,
             orderId,
             amount: String(finalPrice),
         });
@@ -206,40 +208,47 @@ export default function PaymentProcess() {
                 </div>
             </Card>
 
-            {/* 토스 결제 위젯 렌더링 영역 */}
-            <Card padding="p-2 sm:p-4" className="overflow-hidden">
-                <div id="payment-method" />
-                <div id="agreement" />
-            </Card>
+            {/* 토스 결제 위젯 렌더링 영역 (데모에서는 위젯을 띄우지 않으므로 숨김) */}
+            {!IS_DEMO && (
+                <Card padding="p-2 sm:p-4" className="overflow-hidden">
+                    <div id="payment-method" />
+                    <div id="agreement" />
+                </Card>
+            )}
 
-            {IS_E2E_PAYMENT && (
+            {IS_TEST_PAYMENT && (
                 <Card className="space-y-3 border-2 border-dashed border-honey-yellow">
                     <p className="text-sm font-bold text-deep-gray">
-                        E2E 테스트 모드: 토스 결제창 없이 테스트 결제로 진행합니다.
+                        {IS_DEMO
+                            ? "데모 환경: 토스 결제창 없이 테스트 결제로 진행합니다. 실제로 청구되지 않습니다."
+                            : "E2E 테스트 모드: 토스 결제창 없이 테스트 결제로 진행합니다."}
                     </p>
                     <Button
                         type="button"
-                        variant="secondary"
+                        variant={IS_DEMO ? "primary" : "secondary"}
+                        size={IS_DEMO ? "lg" : "md"}
                         fullWidth
                         disabled={paying}
                         onClick={handleTestPayment}
                         data-testid="e2e-test-payment"
                     >
-                        테스트 결제
+                        {IS_DEMO ? (paying ? "결제 진행 중..." : "테스트 결제(데모)") : "테스트 결제"}
                     </Button>
                 </Card>
             )}
 
-            <Button
-                id="payment-button"
-                size="lg"
-                fullWidth
-                disabled={!ready || paying}
-                onClick={handlePayment}
-            >
-                <HiCreditCard />
-                {paying ? "결제 진행 중..." : "결제하기"}
-            </Button>
+            {!IS_DEMO && (
+                <Button
+                    id="payment-button"
+                    size="lg"
+                    fullWidth
+                    disabled={!ready || paying}
+                    onClick={handlePayment}
+                >
+                    <HiCreditCard />
+                    {paying ? "결제 진행 중..." : "결제하기"}
+                </Button>
+            )}
         </div>
     );
 }

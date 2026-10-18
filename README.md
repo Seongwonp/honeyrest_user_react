@@ -17,6 +17,21 @@
 
 ---
 
+## 라이브 데모
+
+> Render 무료 플랜의 **보여주기용 데모**입니다. 15분 동안 접속이 없으면 잠들어 **첫 접속에 1~3분** 걸리고(콜드 스타트), 깨어날 때마다 데이터가 초기화됩니다.
+> 결제는 **"테스트 결제(데모)"** 로 진행되어 실제로 청구되지 않습니다. 주소에 접미사가 붙었다면 아래 링크를 실제 주소로 바꿔 주세요.
+
+| 사이트 | 주소 | 데모 계정 (공개용) |
+|--------|------|-------------------|
+| 사용자 | https://honeyrest.onrender.com | `demo@honeyrest.app` / `Demo1234!` — 로그인 화면의 "데모 계정으로 로그인" |
+| 관리자 | https://honeyrest-admin.onrender.com | 업체 관리자 `contact@honeyrest.com` / `Demo1234!` · 최고 관리자 `admin@honeyrest.com` / `Demo1234!` |
+
+- 두 사이트는 데모에서 **DB 가 분리**되어 있어(각자 H2 인메모리) 관리자에서 바꾼 내용이 사용자 사이트에 보이지 않습니다.
+- 구성·배포 절차: [honeyRest_user · docs/DEPLOY_RENDER.md](https://github.com/Seongwonp/honeyRest_user/blob/main/docs/DEPLOY_RENDER.md)
+
+---
+
 ## 역할
 
 **팀 프로젝트 (2025.08.04 ~ 2025.09.04, 4주, 3명)**
@@ -129,7 +144,8 @@ flowchart LR
 
 - **라이브**: `https://<IP>.sslip.io` _(배포 후 실제 주소로 교체)_
 - 사용자 API 저장소의 `deploy/caddy/Dockerfile` 이 이 저장소를 Node 20 으로 빌드해 Caddy 이미지(`/srv`)에 넣습니다. API 와 같은 Origin 이므로 `VITE_BACKEND_URL` 은 비워 두고(axios 가 상대 경로 `/api` 사용), `VITE_ADMIN_URL`·`VITE_OAUTH_REDIRECT_URI` 등은 빌드 인자로 받습니다 → [`.env.production.example`](.env.production.example)
-- `VITE_E2E` 는 운영 빌드에 넣지 않으며, E2E 전용 결제 버튼 코드가 번들에 남으면 이미지 빌드가 실패합니다.
+- `VITE_E2E`·`VITE_DEMO` 는 운영 빌드에 넣지 않으며, E2E/데모 전용 코드(테스트 결제 버튼·데모 배너·데모 로그인)가 번들에 남으면 이미지 빌드가 실패합니다.
+- **무료 데모(Render)**: honeyRest_user 의 `Dockerfile.render` 가 이 저장소를 `VITE_DEMO=true` 로 빌드해 API 와 한 컨테이너에서 서빙합니다. `VITE_DEMO` 는 데모 안내 배너, 로그인 화면의 "데모 계정으로 로그인", 결제 화면의 "테스트 결제(데모)"(E2E 와 같은 스텁 결제 경로)를 켭니다 → [`src/config/demo.js`](src/config/demo.js)
 - 상세 절차: [honeyRest_user · docs/DEPLOY.md](https://github.com/Seongwonp/honeyRest_user/blob/main/docs/DEPLOY.md)
 
 ---

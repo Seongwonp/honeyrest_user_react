@@ -10,6 +10,8 @@ import { refreshAccessToken } from '@/api/axios';
 import { getAccessToken } from '@/auth/authStorage';
 import { AuthProvider } from '@/context/AuthContext.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
+import DemoBanner from './components/DemoBanner.jsx';
+import { IS_DEMO } from '@/config/demo';
 
 function GlobalGuard() {
     const location = useLocation();
@@ -82,6 +84,8 @@ function GlobalGuard() {
     return (
         <>
             <ScrollToTop />
+            {/* 데모 빌드(VITE_DEMO=true)에서만: 상단 안내 띠 배너 */}
+            {IS_DEMO && <DemoBanner />}
             <AppWrapper />
         </>
     );

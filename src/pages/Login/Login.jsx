@@ -14,6 +14,7 @@ import { getOAuthRedirectBase } from "@/config/urls";
 import Input from '@/components/ui/Input.jsx';
 import Button from '@/components/ui/Button.jsx';
 import AuthCard from '@/components/ui/AuthCard.jsx';
+import { IS_DEMO, DEMO_ACCOUNT } from '@/config/demo';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -28,17 +29,29 @@ function Login() {
     const redirectTo = location.state?.redirectTo || "/";
     const reservationInfo = location.state?.reservationInfo;
 
-    const handleLogin = async (e) => {
+    const handleLogin = (e) => {
         e.preventDefault();
         setSubmitted(true);
         if (!email.trim() || !password.trim()) return;
+        submitLogin(email, password);
+    };
 
+    // 데모 빌드 전용: 데모 계정을 입력란에 채우고 바로 로그인한다 (src/config/demo.js)
+    const handleDemoLogin = () => {
+        if (!IS_DEMO) return;
+        setEmail(DEMO_ACCOUNT.email);
+        setPassword(DEMO_ACCOUNT.password);
+        setSubmitted(true);
+        submitLogin(DEMO_ACCOUNT.email, DEMO_ACCOUNT.password);
+    };
+
+    const submitLogin = async (loginEmail, loginPassword) => {
         try {
             await request(
                 {
                     method: 'POST',
                     url: '/api/auth/login',
-                    data: { email, password },
+                    data: { email: loginEmail, password: loginPassword },
                     skipRedirect: true,
                 },
                 {
@@ -94,6 +107,28 @@ function Login() {
         <>
             <Header />
             <AuthCard logo={logo} eyebrow="Welcome back" title="HoneyRest 로그인">
+                {IS_DEMO && (
+                    <div
+                        data-testid="demo-login"
+                        className="mb-6 rounded-2xl border-2 border-dashed border-honey-yellow bg-honey-yellow/10 p-4 space-y-3"
+                    >
+                        <div className="text-sm">
+                            <p className="font-black text-deep-gray">데모 계정</p>
+                            <p className="mt-1 text-gray-500 break-all">
+                                {DEMO_ACCOUNT.email} / {DEMO_ACCOUNT.password}
+                            </p>
+                        </div>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            fullWidth
+                            disabled={isLoading('login')}
+                            onClick={handleDemoLogin}
+                        >
+                            데모 계정으로 로그인
+                        </Button>
+                    </div>
+                )}
                 <form onSubmit={handleLogin} className="space-y-4">
                     <div>
                         <Input
@@ -155,10 +190,15 @@ function Login() {
                     <hr className="flex-grow border-gray-100" />
                 </div>
 
-                <div className="space-y-3">
-                    <KakaoLoginButton onClick={() => window.location.href = KAKAO_AUTH_URL} />
-                    <GoogleLoginButton onClick={() => window.location.href = GOOGLE_AUTH_URL} />
-                </div>
+                {IS_DEMO ? (
+                    // 데모 빌드는 소셜 로그인 키를 넣지 않으므로 버튼 대신 안내만 보여 준다
+                    <p className="text-xs text-center text-gray-400">데모 환경에서는 소셜 로그인을 사용할 수 없습니다.</p>
+                ) : (
+                    <div className="space-y-3">
+                        <KakaoLoginButton onClick={() => window.location.href = KAKAO_AUTH_URL} />
+                        <GoogleLoginButton onClick={() => window.location.href = GOOGLE_AUTH_URL} />
+                    </div>
+                )}
 
                 <p className="mt-8 text-sm text-center text-gray-400">
                     계정이 없으신가요?{" "}
