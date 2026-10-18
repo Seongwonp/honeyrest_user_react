@@ -14,14 +14,17 @@ function PlaceList() {
     const [itemsPerPage] = useState(6);
 
     useEffect(() => {
-        api.get("/api/accommodations/categories").then((res) => {
+        // 장식용 요청: 실패하면 "전체"만 보여 준다
+        api.get("/api/accommodations/categories", { skipRedirect: true }).then((res) => {
             const allCategory = {
                 categoryId: 0,
                 name: "전체",
-                iconUrl: "https://cdn-icons-png.flaticon.com/512/5110/5110754.png",
                 sortOrder: 0,
             };
-            setCategories([allCategory, ...res.data]);
+            setCategories([allCategory, ...(Array.isArray(res.data) ? res.data : [])]);
+        }).catch((err) => {
+            console.error("카테고리 불러오기 실패:", err);
+            setCategories([{ categoryId: 0, name: "전체", sortOrder: 0 }]);
         });
     }, []);
 

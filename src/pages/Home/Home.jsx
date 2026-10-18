@@ -55,11 +55,15 @@ function Home() {
 
     useEffect(() => {
         // 장식용 요청: 실패해도 에러 페이지로 보내지 않고 조용히 넘어간다
+        // 배너가 없거나 실패하면 빈 객체로 바꿔 로딩 표시(펄스)를 끝내고 기본 배경을 보여 준다
         api.get("/api/banner/random", { skipRedirect: true })
             .then(({ data }) => {
-                if (data?.success && data.data) setRandomBanner(data.data);
+                setRandomBanner(data?.success && data.data ? data.data : {});
             })
-            .catch((err) => console.error("배너 불러오기 실패:", err));
+            .catch((err) => {
+                console.error("배너 불러오기 실패:", err);
+                setRandomBanner({});
+            });
     }, []);
 
     useEffect(() => {
@@ -149,7 +153,7 @@ function Home() {
             />
 
             {/* 2. Main Content Grid */}
-            <main className="max-w-7xl mx-auto px-6 pt-24 pb-12 space-y-24">
+            <main className="max-w-7xl mx-auto px-6 pt-12 md:pt-24 pb-12 space-y-24">
                 
                 {/* 비디오 & 트렌드 & 날씨 섹션 */}
                 <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

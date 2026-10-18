@@ -1,15 +1,17 @@
 import { Suspense } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import PageLoader from "@/components/PageLoader.jsx";
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import MyPageNav from "./MyPageNav.jsx";
-import MyPageEasterEgg from "./MyPageEasterEgg.jsx"; // 이스터에그 컴포넌트
 
 function MyPageMain() {
     const { user } = useAuth();
     const location = useLocation();
 
     const isRoot = location.pathname === "/user/mypage" || location.pathname === "/user/mypage/";
+
+    // /user/mypage 자체에는 보여 줄 내용이 없으므로 예약 내역으로 보낸다 (헤더의 "마이페이지" 링크 진입점)
+    if (isRoot) return <Navigate to="/user/mypage/reservations" replace />;
 
     return (
         <div className="min-h-screen bg-off-white">
@@ -30,7 +32,6 @@ function MyPageMain() {
                     <Suspense fallback={<PageLoader />}>
                         <Outlet context={{ user }} />
                     </Suspense>
-                    {isRoot && <MyPageEasterEgg />}
                 </div>
             </div>
         </div>

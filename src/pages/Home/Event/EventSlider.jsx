@@ -3,6 +3,7 @@ import { MdCelebration } from "react-icons/md";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion } from "framer-motion";
 import SafeImage from "@/components/SafeImage.jsx";
+import { useViewportWidth, pickByWidth } from "@/hooks/useViewportWidth";
 
 function PrevArrow(props) {
     const { onClick } = props;
@@ -29,22 +30,24 @@ function NextArrow(props) {
 }
 
 function EventSlider({ events }) {
+    const width = useViewportWidth();
+    // 이벤트 수보다 많은 칸을 잡으면 카드가 좁게 찌그러지므로 보여 줄 수를 이벤트 수로 제한한다.
+    // (react-slick 의 responsive 옵션은 처음 열 때 적용되지 않아 너비별 값을 직접 계산한다)
+    const perView = Math.max(1, Math.min(events.length, pickByWidth(width, [[639, 1], [1023, 2]], 3)));
+    const sliding = events.length > perView;
     const sliderSettings = {
-        dots: true,
-        infinite: events.length > 4,
+        dots: sliding,
+        infinite: sliding,
         speed: 800,
-        slidesToShow: 4,
+        slidesToShow: perView,
         slidesToScroll: 1,
-        autoplay: true,
-        arrows: true,
+        autoplay: sliding,
+        arrows: sliding && width >= 640,
         prevArrow: <PrevArrow />,
         nextArrow: <NextArrow />,
-        responsive: [
-            { breakpoint: 1280, settings: { slidesToShow: 3 } },
-            { breakpoint: 1024, settings: { slidesToShow: 2 } },
-            { breakpoint: 640, settings: { slidesToShow: 1.1, arrows: false } },
-        ],
     };
+
+    if (events.length === 0) return null;
 
     return (
         <section className="space-y-8">
@@ -60,7 +63,8 @@ function EventSlider({ events }) {
                 </button>
             </div>
 
-            <Slider {...sliderSettings} className="event-slider">
+            {/* key: 한 화면 슬라이드 수가 바뀌면 슬라이더를 새로 만들어 트랙 폭을 다시 계산한다 */}
+            <Slider key={perView} {...sliderSettings} className="event-slider">
                 {events.map((event) => (
                     <a
                         key={event.eventId}
@@ -73,11 +77,13 @@ function EventSlider({ events }) {
                             whileHover={{ y: -8 }}
                             className="bg-white rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
                         >
-                            <div className="h-[300px] overflow-hidden">
+                            {/* 이벤트 이미지는 글자가 들어간 디자인 배너라 잘리면 안 된다 → object-contain + 배경색 */}
+                            <div className="aspect-[16/9] overflow-hidden bg-honey-yellow/10">
                                 <SafeImage
+                                    kind="event"
                                     src={event.imageUrl}
                                     alt={event.title}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-contain"
                                 />
                             </div>
                             <div className="p-5">

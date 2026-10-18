@@ -19,7 +19,7 @@ function SidebarNav({ activeSection, onScrollTo }) {
                 <button
                     key={id}
                     onClick={() => onScrollTo(id)}
-                    className={`flex items-center w-full text-left px-6 py-2 rounded-lg transition transform ${
+                    className={`flex items-center w-full text-left px-4 py-2 rounded-lg whitespace-nowrap transition transform ${
                         activeSection === id
                             ? "bg-yellow-100 text-yellow-600 font-bold shadow-inner"
                             : "hover:bg-yellow-50 hover:scale-105"

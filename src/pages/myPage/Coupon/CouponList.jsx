@@ -61,8 +61,11 @@ function CouponList() {
                             {/* 쿠폰 좌측 할인 영역 */}
                             <div className={`w-24 sm:w-28 shrink-0 flex flex-col items-center justify-center gap-1 border-r-2 border-dashed border-gray-100 ${coupon.used ? 'bg-gray-50 text-gray-400' : 'bg-honey-yellow/10 text-honey-yellow-dark'}`}>
                                 <FaTicketAlt className="text-xl" />
-                                <span className="text-lg font-black">
-                                    {coupon.discountType === 'FIXED' ? `${coupon.discountValue}원` : `${coupon.discountValue}%`}
+                                {/* 서버 값은 BigDecimal(예: 5000.00) → 소수점 없이 천 단위 구분 */}
+                                <span className="text-base sm:text-lg font-black whitespace-nowrap">
+                                    {coupon.discountType === 'FIXED'
+                                        ? `${(Number(coupon.discountValue) || 0).toLocaleString('ko-KR')}원`
+                                        : `${Number(coupon.discountValue) || 0}%`}
                                 </span>
                             </div>
                             <div className="flex-1 min-w-0 p-4 sm:p-5 space-y-1">

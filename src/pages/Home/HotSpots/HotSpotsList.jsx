@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import SafeImage from "@/components/SafeImage.jsx";
 import api from "@/api/axios";
 import { todayLocal, addDays } from "@/utils/date";
+import { useViewportWidth, pickByWidth } from "@/hooks/useViewportWidth";
 
 function HotSpatsList({ userInfo, navigate }) {
     const [popularCities, setPopularCities] = useState([]);
@@ -56,34 +57,27 @@ function HotSpatsList({ userInfo, navigate }) {
         </button>
     );
 
+    // react-slick 의 responsive 옵션은 처음 열 때 적용되지 않아(휴대폰에서 4장이 찌그러짐) 너비별 값을 직접 계산한다
+    const width = useViewportWidth();
+    const perView = Math.max(1, Math.min(popularCities.length || 1, pickByWidth(width, [[639, 1], [1023, 2], [1279, 3]], 4)));
+    const sliding = popularCities.length > perView;
     const sliderSettings = {
         dots: false,
-        infinite: true,
+        infinite: sliding,
         speed: 800,
-        slidesToShow: 4,
+        slidesToShow: perView,
         slidesToScroll: 1,
-        arrows: true,
+        arrows: sliding && width >= 640,
         prevArrow: <CustomPrevArrow />,
         nextArrow: <CustomNextArrow />,
-        responsive: [
-            {
-                breakpoint: 1280,
-                settings: { slidesToShow: 3 },
-            },
-            {
-                breakpoint: 1024,
-                settings: { slidesToShow: 2 },
-            },
-            {
-                breakpoint: 640,
-                settings: { slidesToShow: 1.2, arrows: false },
-            },
-        ],
+        // 모바일은 화살표 대신 다음 카드가 살짝 보이게 해 넘길 수 있음을 알린다
+        centerMode: width < 640 && sliding,
+        centerPadding: "28px",
     };
 
     return (
         <div className="relative" data-aos="fade-up">
-            <Slider {...sliderSettings}>
+            <Slider key={perView} {...sliderSettings}>
                 {popularCities.map((city, idx) => (
                     <button
                         type="button"
