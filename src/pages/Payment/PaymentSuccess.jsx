@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { HiXCircle } from "react-icons/hi";
-import api, { getAccessToken } from "@/api/axios";
+import api from "@/api/axios";
+import { getAccessToken } from "@/auth/authStorage";
 import StatusPanel from "@/components/ui/StatusPanel.jsx";
 import Button from "@/components/ui/Button.jsx";
 
@@ -37,7 +38,7 @@ const readReservationDraft = () => {
     }
 };
 
-// 토큰 조회는 axios.js 의 getAccessToken() 으로 일원화
+// 토큰 조회는 authStorage 의 getAccessToken() 으로 일원화
 const hasAccessToken = () => !!getAccessToken();
 
 // 서버 에러 응답(ApiResponse: { success, message, data })에서 사용자에게 보여줄 메시지를 꺼낸다.

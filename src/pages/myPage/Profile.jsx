@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "react-toastify";
 import useApiRequest from "@/api/useApiRequest";
 import PasswordVerifyModal from "@/components/PasswordVerifyModal";
 import PasswordChangeModal from "@/pages/myPage/PasswordChangeModal.jsx";
@@ -15,12 +14,15 @@ import SectionTitle from "@/components/ui/SectionTitle.jsx";
 import Card from "@/components/ui/Card.jsx";
 import Button from "@/components/ui/Button.jsx";
 import { inputClass, badgeClass, eyebrowClass } from "@/components/ui/styles";
+import { isSocialUser, getProviderLabel } from "@/auth/provider";
 
 export default function Profile() {
-    const { user, syncUserFromServer } = useAuth();
+    const { user, syncUserFromServer, logout } = useAuth();
     const { request, isLoading } = useApiRequest();
 
-    const isSocialLogin = user?.provider === "KAKAO" || user?.provider === "GOOGLE";
+    const isSocialLogin = isSocialUser(user);
+
+    // 아래 request 들은 실패 시 useApiRequest 가 오류 토스트를 띄우므로 catch 에서는 로그만 남긴다
 
     const [isEditing, setIsEditing] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -50,7 +52,6 @@ export default function Profile() {
                 }
             } catch (err) {
                 console.error("유저 정보 불러오기 실패:", err);
-                toast.error("유저 정보를 불러오는 중 오류가 발생했습니다.");
             }
         };
         fetchUserInfo();
@@ -87,7 +88,6 @@ export default function Profile() {
             );
         } catch (err) {
             console.error("프로필 수정 실패:", err);
-            toast.error("회원 정보 수정 중 오류가 발생했습니다.");
         }
     };
 
@@ -109,20 +109,18 @@ export default function Profile() {
             );
         } catch (err) {
             console.error("프로필 이미지 업로드 실패:", err);
-            toast.error("이미지 업로드에 실패했습니다.");
         }
     };
 
     const handleAccountDeletion = async () => {
         try {
             await request({ method: "DELETE", url: "/api/user/delete-account" }, { label: "accountDeletion" });
-            localStorage.clear();
-            sessionStorage.clear();
             await Swal.fire({ ...SWAL_CONFIRM_OPTIONS, title: "탈퇴 완료", text: "회원 탈퇴가 정상적으로 처리되었습니다.", icon: "success" });
+            // 인증 키만 삭제 (예전 localStorage.clear() 는 결제 진행 정보 등 무관한 키까지 지웠음)
+            logout();
             window.location.href = "/login";
         } catch (err) {
             console.error("회원 탈퇴 실패:", err);
-            toast.error("회원 탈퇴 중 오류가 발생했습니다.");
         }
     };
 
@@ -199,7 +197,7 @@ export default function Profile() {
                     <h3 className="mt-4 text-xl font-black text-deep-gray break-keep">{form.name || user?.name}</h3>
                     <p className="text-gray-400 mt-1 text-sm break-all">{form.email || user?.email}</p>
                     <span className={`${badgeClass} mt-3 bg-gray-50 text-gray-500`}>
-                        {user?.provider === "local" ? "일반 회원" : user?.provider?.toUpperCase() || "알 수 없음"}
+                        {getProviderLabel(user)}
                     </span>
                 </div>
 
@@ -299,10 +297,7 @@ export default function Profile() {
                 <PasswordChangeModal
                     isOpen={showPasswordChange}
                     onClose={() => setShowPasswordChange(false)}
-                    onSuccess={() => {
-                        toast.success("비밀번호가 변경되었습니다!");
-                        setShowPasswordChange(false);
-                    }}
+                    onSuccess={() => setShowPasswordChange(false)}
                 />
             )}
         </section>

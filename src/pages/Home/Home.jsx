@@ -17,6 +17,7 @@ import BannerSection from "@/pages/Home/BannerSection.jsx";
 import IntroModal from "@/components/IntroModal.jsx";
 import LazyVideo from "@/components/LazyVideo.jsx";
 import { useAuth } from "@/hooks/useAuth";
+import api from "@/api/axios";
 
 function Home() {
     const navigate = useNavigate();
@@ -55,17 +56,18 @@ function Home() {
     }, []);
 
     useEffect(() => {
-        fetch("/api/banner/random")
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.success && data.data) setRandomBanner(data.data);
-            });
+        // 장식용 요청: 실패해도 에러 페이지로 보내지 않고 조용히 넘어간다
+        api.get("/api/banner/random", { skipRedirect: true })
+            .then(({ data }) => {
+                if (data?.success && data.data) setRandomBanner(data.data);
+            })
+            .catch((err) => console.error("배너 불러오기 실패:", err));
     }, []);
 
     useEffect(() => {
-        fetch("/api/event/activeList")
-            .then((res) => res.json())
-            .then((data) => setEvents(data));
+        api.get("/api/event/activeList", { skipRedirect: true })
+            .then(({ data }) => setEvents(Array.isArray(data) ? data : []))
+            .catch((err) => console.error("이벤트 목록 불러오기 실패:", err));
     }, []);
 
     useEffect(() => {

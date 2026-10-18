@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { notifyAuthChange } from '@/context/authContextValue';
+import { getAccessToken, setAccessToken, clearSession } from '@/auth/authStorage';
 
 const baseURL = import.meta.env.VITE_BACKEND_URL; // 백엔드 주소
 
@@ -33,14 +33,15 @@ const api = axios.create({
  *        · 같으면 → refreshAccessToken() 호출 (진행 중이면 그 Promise 를 그대로 기다림).
  *    - 요청마다 _retry 플래그로 한 번만 재시도하므로 무한 루프가 생기지 않는다.
  *
- * 4) 재발급 실패 시 저장소의 인증 정보를 지우고 AUTH_CHANGE_EVENT 를 발생시켜
- *    AuthProvider 가 같은 탭에서도 즉시 로그아웃 상태로 바뀌게 한다.
+ * 4) 재발급 실패 시 authStorage.clearSession() 으로 인증 정보를 지운다. clearSession 이
+ *    AUTH_CHANGE_EVENT 를 발생시키므로 AuthProvider 가 같은 탭에서도 즉시 로그아웃 상태로 바뀐다.
+ *
+ * 토큰 읽기/쓰기는 모두 src/auth/authStorage.js 를 거친다(이 파일은 저장소를 직접 만지지 않음).
  *    세션 만료 토스트는 toastId 로 중복 표시를 막는다.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
 const REFRESH_URL = '/api/auth/refresh';
-const AUTH_KEYS = ['accessToken', 'userInfo'];
 
 // 재발급 전용 인스턴스 (인터셉터 없음)
 const refreshClient = axios.create({
@@ -50,22 +51,6 @@ const refreshClient = axios.create({
 
 let responseInterceptorId = null;
 let refreshPromise = null;
-
-// 🔧 토큰 저장소 결정 (자동 로그인이면 localStorage, 아니면 sessionStorage)
-const getStorage = () =>
-    localStorage.getItem('accessToken') ? localStorage : sessionStorage;
-
-// 현재 저장된 액세스 토큰 (없으면 null)
-export const getAccessToken = () =>
-    localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-
-const clearAuthStorage = () => {
-    AUTH_KEYS.forEach(key => {
-        localStorage.removeItem(key);
-        sessionStorage.removeItem(key);
-    });
-    notifyAuthChange();
-};
 
 /**
  * 액세스 토큰 재발급 (single-flight)
@@ -78,11 +63,11 @@ export const refreshAccessToken = () => {
         refreshPromise = refreshClient.post(REFRESH_URL)
             .then(res => {
                 const newAccessToken = res.data;
-                getStorage().setItem('accessToken', newAccessToken);
+                setAccessToken(newAccessToken);
                 return newAccessToken;
             })
             .catch(err => {
-                clearAuthStorage();
+                clearSession();
                 throw err;
             })
             .finally(() => {
@@ -101,7 +86,7 @@ const getSentToken = (config) => {
 };
 
 const handleLogout = (navigate) => {
-    clearAuthStorage();
+    clearSession();
     toast.error('세션이 만료되었습니다. 다시 로그인해주세요.', { toastId: 'session-expired' });
     navigate('/login');
 };

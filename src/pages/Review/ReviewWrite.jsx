@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/api/axios";
 import { toast } from "react-toastify";
@@ -7,6 +7,7 @@ import SectionTitle from "@/components/ui/SectionTitle.jsx";
 import Card from "@/components/ui/Card.jsx";
 import Button from "@/components/ui/Button.jsx";
 import { inputClass, labelClass } from "@/components/ui/styles";
+import { calcAverageRating } from "@/utils/rating";
 
 export default function ReviewWrite() {
     const { reservationId } = useParams();
@@ -20,17 +21,8 @@ export default function ReviewWrite() {
     const [serviceRating, setServiceRating] = useState(0);
     const [facilitiesRating, setFacilitiesRating] = useState(0);
     const [locationRating, setLocationRating] = useState(0);
-    const [rating, setRating] = useState(0); // 종합 평점 (자동 계산)
-
-    useEffect(() => {
-        const scores = [cleanlinessRating, serviceRating, facilitiesRating, locationRating].filter((v) => v > 0);
-        if (scores.length > 0) {
-            const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-            setRating(parseFloat(avg.toFixed(1)));
-        } else {
-            setRating(0);
-        }
-    }, [cleanlinessRating, serviceRating, facilitiesRating, locationRating]);
+    // 종합 평점: 세부 평점에서 파생되는 값이라 state 로 두지 않고 렌더마다 계산
+    const rating = calcAverageRating([cleanlinessRating, serviceRating, facilitiesRating, locationRating]);
 
     const handleImageUpload = async (e) => {
         const files = Array.from(e.target.files);

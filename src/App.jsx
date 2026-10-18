@@ -6,7 +6,8 @@ import 'react-date-range/dist/theme/default.css';
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-toastify';
-import { getAccessToken, refreshAccessToken } from '@/api/axios';
+import { refreshAccessToken } from '@/api/axios';
+import { getAccessToken } from '@/auth/authStorage';
 import { AuthProvider } from '@/context/AuthContext.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 

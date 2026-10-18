@@ -3,7 +3,7 @@ import { AuthContext } from '@/context/authContextValue';
 
 /**
  * 인증 상태 훅 — AuthProvider(src/context/AuthContext.jsx) 의 공유 값을 반환한다.
- * 반환값: { user, isLoggedIn, isLoadingUser, loadUser, syncUserFromServer, logout }
+ * 반환값: { user, isLoggedIn, isLoadingUser, loadUser, login, syncUserFromServer, logout }
  */
 export const useAuth = () => {
     const ctx = useContext(AuthContext);

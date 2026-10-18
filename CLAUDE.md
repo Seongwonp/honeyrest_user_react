@@ -24,14 +24,18 @@ npm run test:e2e # Playwright 사용자 여정 E2E (API e2e 프로필 + 개발 �
 
 ### 인증 흐름
 - `src/context/AuthContext.jsx` — 앱 전체 단일 `AuthProvider` (App.jsx 에서 GlobalGuard/라우트 위에 마운트). 다른 탭은 `storage` 이벤트, 같은 탭의 React 밖 변경은 `honeyrest:auth-change` 이벤트(`notifyAuthChange()`)로 동기화
-- `src/hooks/useAuth.js` — `useContext(AuthContext)` 래퍼 (API: `user, isLoggedIn, isLoadingUser, loadUser, syncUserFromServer, logout`). 컴포넌트에서 storage 의 `userInfo` 를 직접 읽지 말 것
-- `src/api/axios.js` — JWT 자동 주입 + 401 시 토큰 재발급 인터셉터. `refreshAccessToken()` 은 single-flight(진행 중 Promise 공유), 재발급 요청은 Bearer 없이 전용 인스턴스로 전송, 늦은 401 은 이미 갱신된 토큰으로 재시도. 토큰 조회는 `getAccessToken()`
+- `src/auth/authStorage.js` — 인증 키(`accessToken`, `userInfo`)를 읽고 쓰는 **유일한** 모듈 (`getAccessToken, setAccessToken, getUser, setSession({token,user,autoLogin}), updateUser, clearSession`). 자동 로그인이면 localStorage, 아니면 sessionStorage. 사용자·세션이 바뀌는 쓰기 뒤에 `notifyAuthChange()` 를 호출한다. 다른 파일에서 `localStorage`/`sessionStorage` 의 인증 키를 직접 다루거나 `storage.clear()` 를 쓰지 말 것
+- `src/auth/provider.js` — 로그인 제공자 표기. 저장 시 대문자 정규형(`LOCAL`/`KAKAO`/`GOOGLE`, 서버 UserInfoDTO 와 동일)으로 맞추며, 비교는 `isKakaoUser(user)`·`isSocialUser(user)`·`getProviderLabel(user)` 로만 한다(문자열 직접 비교 금지)
+- `src/hooks/useAuth.js` — `useContext(AuthContext)` 래퍼 (API: `user, isLoggedIn, isLoadingUser, loadUser, login, syncUserFromServer, logout`). 로그인 성공 시 `login({token,user,autoLogin})` 을 호출하고(저장 + 상태 반영), 컴포넌트에서 storage 의 `userInfo` 를 직접 읽지 말 것
+- `src/api/axios.js` — JWT 자동 주입 + 401 시 토큰 재발급 인터셉터. `refreshAccessToken()` 은 single-flight(진행 중 Promise 공유), 재발급 요청은 Bearer 없이 전용 인스턴스로 전송, 늦은 401 은 이미 갱신된 토큰으로 재시도. 토큰 조회는 `authStorage.getAccessToken()`
 - `src/App.jsx` (GlobalGuard) — 앱 마운트 시 1회 `refreshAccessToken()` + 새 토큰 기준 JWT 만료 타이머
 - `src/routes/PrivateRoute.jsx` / `PublicRoute.jsx` — 라우트 가드. PrivateRoute 는 비로그인 시 `/login` 으로 보내며 `state.redirectTo` 로 원래 경로를 넘긴다(로그인 후 복귀)
 
 ### API 통신
 - `src/api/axios.js` — baseURL은 `VITE_BACKEND_URL`, 프록시는 vite.config.js에서 `/api` 경로 설정
-- `src/api/useApiRequest.js` — 공통 요청 훅: 로딩 상태, 재시도, AbortController 지원
+- `src/api/useApiRequest.js` — 공통 요청 훅: 로딩 상태, 재시도, AbortController 지원. **실패 시 훅이 `toast.error` 를 띄운 뒤 rethrow** 하므로 호출부 catch 에서 토스트를 또 띄우지 말 것(직접 알림하려면 `silent: true`)
+- API 호출은 공용 `api` 인스턴스(또는 `useApiRequest`)만 사용하고 raw `fetch('/api/...')` 는 쓰지 않는다. 실패해도 화면이 성립하는 장식용 요청은 `{ skipRedirect: true }` + `.catch` 로 조용히 처리(인터셉터의 에러 페이지 이동 방지)
+- 확인 대화상자는 `src/config/swal.js` 의 `confirmSwal()` 사용 (예외: Header 로그아웃 확인은 E2E 가 네이티브 dialog 에 의존)
 
 ### 환경변수
 - Vite 내장 `loadEnv` 사용 (dotenv 미사용)
@@ -65,6 +69,7 @@ npm run test:e2e # Playwright 사용자 여정 E2E (API e2e 프로필 + 개발 �
 |------|------|
 | Axios 설정 / 인터셉터 | `src/api/axios.js` |
 | 인증 Provider / 훅 | `src/context/AuthContext.jsx`, `src/hooks/useAuth.js` |
+| 인증 저장소 / 제공자 도우미 | `src/auth/authStorage.js`, `src/auth/provider.js` |
 | 전역 가드 / 자동 로그인 | `src/App.jsx` |
 | 전체 라우트 | `src/AppWrapper.jsx` |
 | Tailwind 커스텀 테마 | `src/index.css` |

@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button.jsx';
 import ErrorState from '@/components/ui/ErrorState.jsx';
 import PageLoader from '@/components/PageLoader.jsx';
 import { badgeClass, eyebrowClass } from '@/components/ui/styles';
+import { confirmSwal } from '@/config/swal';
 
 function Inquiry() {
     const { request } = useApiRequest();
@@ -42,13 +43,13 @@ function Inquiry() {
     }, [inquiryId, request, reloadKey]);
 
     const handleDelete = async () => {
-        if (!window.confirm('정말 삭제하시겠습니까?')) return;
+        if (!(await confirmSwal({ title: '정말 삭제하시겠습니까?', confirmButtonText: '삭제' }))) return;
         try {
             await request({ url: `/api/user/inquiries/delete/${inquiryId}`, method: 'DELETE' }, { successMessage: '문의가 삭제되었습니다.' });
             navigate(-1);
         } catch (err) {
+            // 오류 토스트는 useApiRequest 가 표시함
             console.error(err);
-            toast.error('삭제에 실패했습니다.');
         }
     };
 

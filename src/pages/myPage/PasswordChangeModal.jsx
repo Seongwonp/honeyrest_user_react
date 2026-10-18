@@ -58,7 +58,7 @@ export default function PasswordChangeModal({ isOpen, onClose, onSuccess }) {
                 },
                 {
                     label: 'passwordChange',
-                    successMessage: '비밀번호가 성공적으로 변경되었습니다!',
+                    // 성공 안내는 아래 토스트 하나로만 표시 (successMessage 와 중복 방지)
                     errorMessage: '현재 비밀번호가 올바르지 않습니다.'
                 }
             );

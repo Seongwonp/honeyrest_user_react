@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiChevronRight } from "react-icons/hi";
+import api from "@/api/axios";
 
 function DomesticSpotsList({ userInfo, navigate }) {
     const [allRegions, setAllRegions] = useState([]);
@@ -13,10 +14,10 @@ function DomesticSpotsList({ userInfo, navigate }) {
             return;
         }
 
-        fetch("/api/region/all")
-            .then((res) => res.json())
-            .then((data) => {
-                const list = Array.isArray(data) ? data : data.data;
+        // 장식용 요청: 실패 시 목록만 비워 두고 조용히 넘어간다
+        api.get("/api/region/all", { skipRedirect: true })
+            .then(({ data }) => {
+                const list = Array.isArray(data) ? data : data?.data;
                 setAllRegions(list || []);
                 setRegionCache(list || []);
             })

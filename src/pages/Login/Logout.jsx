@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-toastify';
 import api from '@/api/axios';
 import { getOAuthRedirectBase } from '@/config/urls';
+import { isKakaoUser } from '@/auth/provider';
 
 function Logout() {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ function Logout() {
             hasLoggedOut.current = true;
 
             // logout() 이전에 공유 인증 상태에서 로그인 제공자를 확보
-            const provider = user?.provider;
+            const wasKakaoUser = isKakaoUser(user);
 
             try {
                 await api.post('/api/auth/logout');
@@ -40,7 +41,7 @@ function Logout() {
                 draggable: false,
             });
 
-            if (provider === 'kakao') {
+            if (wasKakaoUser) {
                 const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
                 const LOGOUT_REDIRECT_URI = encodeURIComponent(`${getOAuthRedirectBase()}/login`);
                 window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;

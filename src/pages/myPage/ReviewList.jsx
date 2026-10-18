@@ -12,6 +12,8 @@ import Pagination from "@/components/ui/Pagination.jsx";
 import Button from "@/components/ui/Button.jsx";
 import Dialog from "@/components/ui/Dialog.jsx";
 import { cardClass, inputClass, labelClass } from "@/components/ui/styles";
+import { confirmSwal } from "@/config/swal";
+import { calcAverageRating } from "@/utils/rating";
 
 // 세부 평점 항목
 const RATING_FIELDS = [
@@ -49,7 +51,11 @@ export default function ReviewList() {
     };
 
     const handleDelete = async (reviewId) => {
-        const confirmed = window.confirm("정말 삭제하시겠습니까?\n삭제하면 되돌릴 수 없습니다.");
+        const confirmed = await confirmSwal({
+            title: "정말 삭제하시겠습니까?",
+            text: "삭제하면 되돌릴 수 없습니다.",
+            confirmButtonText: "삭제",
+        });
         if (!confirmed) return;
         try {
             await api.delete(`/api/user/reviews/${reviewId}`);
@@ -68,15 +74,7 @@ export default function ReviewList() {
     // 세부 평점 변경 시 종합 평점(평균) 재계산
     const handleRatingChange = (key, i) => {
         const updated = { ...editingReview, [key]: i };
-        const ratings = [
-            updated.cleanlinessRating,
-            updated.serviceRating,
-            updated.facilitiesRating,
-            updated.locationRating,
-        ].filter((r) => typeof r === "number" && !isNaN(r));
-        const avg = ratings.length > 0
-            ? parseFloat((ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1))
-            : 0.0;
+        const avg = calcAverageRating(RATING_FIELDS.map(({ key: k }) => updated[k]));
         setEditingReview({ ...updated, rating: avg });
     };
 

@@ -9,6 +9,7 @@ import KakaoLoginButton from "./kakao/KaKaoLoginButton.jsx";
 import GoogleLoginButton from "./google/GoogleLoginButton.jsx";
 import useApiRequest from '../../api/useApiRequest';
 import { useAuth } from '@/hooks/useAuth';
+import { PROVIDERS } from '@/auth/provider';
 import { getOAuthRedirectBase } from "@/config/urls";
 import Input from '@/components/ui/Input.jsx';
 import Button from '@/components/ui/Button.jsx';
@@ -21,7 +22,7 @@ function Login() {
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
     const { request, isLoading } = useApiRequest();
-    const { syncUserFromServer } = useAuth();
+    const { login, syncUserFromServer } = useAuth();
 
     const location = useLocation();
     const redirectTo = location.state?.redirectTo || "/";
@@ -59,12 +60,11 @@ function Login() {
                             profileImage: user.profileImage,
                             role: user.role,
                             isVerified: user.isVerified,
-                            provider: 'local'
+                            provider: PROVIDERS.LOCAL
                         };
 
-                        const storage = autoLogin ? localStorage : sessionStorage;
-                        storage.setItem('accessToken', accessToken);
-                        storage.setItem('userInfo', JSON.stringify(userWithProvider));
+                        // 세션 저장 + 공유 상태 반영은 AuthContext.login, 이후 서버 정보로 보강
+                        login({ token: accessToken, user: userWithProvider, autoLogin });
                         syncUserFromServer();
 
                         Swal.fire({
@@ -82,6 +82,7 @@ function Login() {
                 }
             );
         } catch (err) {
+            // 오류 토스트는 useApiRequest 가 표시함
             console.error("로그인 처리 중 오류:", err);
         }
     };

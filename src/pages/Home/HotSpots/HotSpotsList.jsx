@@ -3,15 +3,16 @@ import { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion } from "framer-motion";
 import SafeImage from "@/components/SafeImage.jsx";
+import api from "@/api/axios";
 
 function HotSpatsList({ userInfo, navigate }) {
     const [popularCities, setPopularCities] = useState([]);
 
     useEffect(() => {
-        fetch("/api/region/popular")
-            .then(res => res.json())
-            .then(data => {
-                const cities = data.filter(r => r.level === 2);
+        // 장식용 요청: 실패 시 목록만 비워 두고 조용히 넘어간다
+        api.get("/api/region/popular", { skipRedirect: true })
+            .then(({ data }) => {
+                const cities = (Array.isArray(data) ? data : []).filter(r => r.level === 2);
                 setPopularCities(cities);
             })
             .catch(err => console.error("❌ 인기 여행지 불러오기 실패:", err));

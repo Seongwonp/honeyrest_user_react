@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import api from "@/api/axios";
 
 function WeatherInfo({ city, displayName, coords }) {
     const [weather, setWeather] = useState(null);
@@ -38,24 +39,15 @@ function WeatherInfo({ city, displayName, coords }) {
             return;
         }
 
-        fetch(url)
-            .then((res) => {
-                if (!res.ok) {
-                    return res.json().then((data) => {
-                        throw new Error(data.message || "날씨 정보를 가져올 수 없습니다.");
-                    }).catch(() => {
-                        throw new Error("서버 응답을 처리할 수 없습니다.");
-                    });
-                }
-                return res.json();
-            })
-            .then((data) => {
+        // 장식용 요청: 실패해도 에러 페이지로 보내지 않고 위젯만 대기 문구를 유지
+        api.get(url, { skipRedirect: true })
+            .then(({ data }) => {
                 setWeather(data);
                 setError(null);
             })
             .catch((err) => {
                 console.error("날씨 정보 오류:", err);
-                setError(err.message);
+                setError(err.response?.data?.message || err.message || "날씨 정보를 가져올 수 없습니다.");
                 setWeather(null);
             });
     }, [city, coords]);

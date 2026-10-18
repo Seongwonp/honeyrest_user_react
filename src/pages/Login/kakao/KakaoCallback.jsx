@@ -4,13 +4,14 @@ import Swal from "sweetalert2";
 import { SWAL_CONFIRM_OPTIONS } from "@/config/swal";
 import useApiRequest from "/src/api/useApiRequest";
 import { useAuth } from "@/hooks/useAuth";
+import { PROVIDERS } from "@/auth/provider";
 
 function KakaoCallback() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const calledRef = useRef(false);
     const { request, isLoading } = useApiRequest();
-    const { loadUser } = useAuth();
+    const { login } = useAuth();
 
     useEffect(() => {
         const code = searchParams.get("code");
@@ -26,16 +27,12 @@ function KakaoCallback() {
             },
             {
                 label: 'kakao',
-                errorMessage: '카카오 로그인 실패!',
+                // 실패 안내는 아래 onError 의 Swal 로 하므로 공통 토스트는 끈다
+                silent: true,
                 onSuccess: (res) => {
                     const { accessToken, user } = res;
-                    const userWithProvider = { ...user, provider: 'kakao' };
-                    const storage = autoLogin ? localStorage : sessionStorage;
-
-                    storage.setItem("accessToken", accessToken);
-                    storage.setItem("userInfo", JSON.stringify(userWithProvider));
-                    // 같은 탭의 Header 등에 로그인 상태를 즉시 반영
-                    loadUser();
+                    // 저장(자동 로그인 여부에 따른 저장소 선택)과 공유 상태 반영은 AuthContext.login 이 담당
+                    login({ token: accessToken, user: { ...user, provider: PROVIDERS.KAKAO }, autoLogin });
 
                     Swal.fire({
                         title: `${user.name}님 환영합니다!`,
@@ -52,8 +49,10 @@ function KakaoCallback() {
                     navigate("/login");
                 },
             }
-        );
-    }, [searchParams, navigate, request, loadUser]);
+        ).catch(() => {
+            // 실패 처리는 onError 에서 완료됨
+        });
+    }, [searchParams, navigate, request, login]);
 
     return (
         <div className="text-center mt-20 text-gray-600">

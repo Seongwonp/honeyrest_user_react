@@ -3,6 +3,7 @@ import { MdAttachMoney, MdRefresh } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTagIcon } from "@/utils/tagIcons";
+import api from "@/api/axios";
 
 function FilterSidebar({ onFilterChange, openMapSearch }) {
     const [categories, setCategories] = useState([]);
@@ -17,12 +18,14 @@ function FilterSidebar({ onFilterChange, openMapSearch }) {
     const [expandedGroups, setExpandedGroups] = useState({});
 
     useEffect(() => {
+        // 필터 옵션은 보조 정보라 실패해도 에러 페이지로 보내지 않는다 (기본값 유지)
+        const opts = { skipRedirect: true };
         Promise.all([
-            fetch("/api/accommodations/categories").then(res => res.json()),
-            fetch("/api/accommodations/price-range").then(res => res.json()),
-            fetch("/api/accommodations/tags").then(res => res.json()),
+            api.get("/api/accommodations/categories", opts),
+            api.get("/api/accommodations/price-range", opts),
+            api.get("/api/accommodations/tags", opts),
         ])
-            .then(([cats, price, tagList]) => {
+            .then(([{ data: cats }, { data: price }, { data: tagList }]) => {
                 setCategories(cats);
                 setPriceRange(price);
                 setSelectedPrice(price.max);
