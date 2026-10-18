@@ -1,6 +1,7 @@
 # HoneyRest – 숙소 예약 플랫폼 · 사용자 프론트엔드
 
 [![CI](https://github.com/Seongwonp/honeyrest_user_react/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Seongwonp/honeyrest_user_react/actions/workflows/ci.yml)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-%EC%82%AC%EC%9A%A9%EC%9E%90%20%EC%82%AC%EC%9D%B4%ED%8A%B8-FFC107?logo=render&logoColor=white)](https://honeyrest.onrender.com) [![Admin Demo](https://img.shields.io/badge/Live%20Demo-%EA%B4%80%EB%A6%AC%EC%9E%90%20%EC%82%AC%EC%9D%B4%ED%8A%B8-374151?logo=render&logoColor=white)](https://honeyrest-admin.onrender.com)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB)
 ![Vite 7](https://img.shields.io/badge/Vite-7-646CFF)
 ![Tailwind CSS 4](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4)
