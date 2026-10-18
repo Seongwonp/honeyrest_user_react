@@ -1,6 +1,7 @@
 import { HiOutlineSearch } from "react-icons/hi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
+import { todayLocal, addDays } from "@/utils/date";
 
 function ListSearchBox() {
     const [searchParams] = useSearchParams();
@@ -38,9 +39,7 @@ function ListSearchBox() {
                     value={checkIn}
                     onChange={(e) => {
                         setCheckIn(e.target.value);
-                        const nextDay = new Date(e.target.value);
-                        nextDay.setDate(nextDay.getDate() + 1);
-                        setCheckOut(nextDay.toISOString().split("T")[0]);
+                        setCheckOut(addDays(e.target.value, 1));
                     }}
                     min={getToday()}
                     className="border px-3 py-2 rounded-md text-sm w-full"
@@ -49,7 +48,7 @@ function ListSearchBox() {
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
-                    min={checkIn}
+                    min={checkIn ? addDays(checkIn, 1) : getToday()}
                     className="border px-3 py-2 rounded-md text-sm w-full"
                 />
                 <select
@@ -77,14 +76,13 @@ function ListSearchBox() {
     );
 }
 
+// 로컬(KST) 기준 날짜. toISOString() 은 UTC 라 새벽 시간대에 "어제"가 된다.
 function getToday() {
-    return new Date().toISOString().split("T")[0];
+    return todayLocal();
 }
 
 function getTomorrow(checkInDate) {
-    const date = new Date(checkInDate);
-    date.setDate(date.getDate() + 1);
-    return date.toISOString().split("T")[0];
+    return addDays(checkInDate, 1);
 }
 
 export default ListSearchBox;

@@ -27,12 +27,15 @@ export default function ReservationList() {
     }, [pageInfo.size]);
 
     // setState·ref만 사용하므로 참조 고정
-    const fetchReservations = useCallback(async (page) => {
+    // signal: 페이지를 빠르게 넘기면 이전 페이지 응답이 늦게 도착해 목록을 덮어쓰지 않도록 취소에 사용
+    const fetchReservations = useCallback(async (page, signal) => {
         setStatus("loading");
         try {
             const res = await api.get("/api/user/reservations", {
                 params: { page, size: pageSizeRef.current },
+                signal,
             });
+            if (signal?.aborted) return;
 
             setReservations(res.data.content);
             setPageInfo({
@@ -42,13 +45,17 @@ export default function ReservationList() {
             });
             setStatus("ready");
         } catch (err) {
+            if (signal?.aborted) return;
             console.error("❌ 예약 내역 조회 실패:", err);
             setStatus("error");
         }
     }, []);
 
     useEffect(() => {
-        if (user?.userId) fetchReservations(pageInfo.page);
+        if (!user?.userId) return;
+        const controller = new AbortController();
+        fetchReservations(pageInfo.page, controller.signal);
+        return () => controller.abort();
     }, [user, pageInfo.page, fetchReservations]);
 
     const handlePageChange = (nextPage) => {

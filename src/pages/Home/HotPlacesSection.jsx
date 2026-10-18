@@ -3,6 +3,7 @@ import api from "@/api/axios";
 import Slider from "react-slick";
 import { FaChevronDown, FaChevronUp, FaFire } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { todayLocal, addDays } from "@/utils/date";
 
 function HotPlacesSection({ isDropdownOpen, setIsDropdownOpen, verticalSliderSettings, navigate, userInfo }) {
     const [hotList, setHotList] = useState([]);
@@ -18,8 +19,8 @@ function HotPlacesSection({ isDropdownOpen, setIsDropdownOpen, verticalSliderSet
     }, []);
 
     const handlePlaceClick = (placeName) => {
-        const today = new Date().toISOString().split("T")[0];
-        const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+        const today = todayLocal();
+        const tomorrow = addDays(today, 1);
 
         const params = new URLSearchParams({
             location: placeName,

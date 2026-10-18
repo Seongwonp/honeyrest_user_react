@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ListSearchBox from "./ListSearchBox.jsx";
 import { useAuth } from "@/hooks/useAuth";
 import { HiOutlineSortAscending, HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import { todayLocal, addDays } from "@/utils/date";
 
 function AccommodationListPage() {
     const [searchParams] = useSearchParams();
@@ -48,6 +49,10 @@ function AccommodationListPage() {
     useEffect(() => {
         if (!checkIn || !checkOut) return;
 
+        // 조건이 빠르게 바뀌면 이전 요청이 늦게 도착해 최신 결과를 덮어쓸 수 있다.
+        // 정리(cleanup) 시 이전 요청을 취소하고, 취소된 요청의 결과/로딩 상태는 반영하지 않는다.
+        const controller = new AbortController();
+
         const fetchData = async () => {
             const currentUserId = userIdRef.current;
             setLoading(true);
@@ -65,21 +70,25 @@ function AccommodationListPage() {
                         selectedTags,
                         maxPrice,
                     },
-                    paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" })
+                    paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" }),
+                    signal: controller.signal,
                 });
+                if (controller.signal.aborted) return;
 
                 const data = res.data;
                 setResults(data.content || []);
                 setTotalElements(data.totalElements ?? data.content?.length ?? 0);
                 setTotalPages(data.totalPages || 1);
             } catch (err) {
+                if (controller.signal.aborted) return;
                 console.error("❌ 숙소 검색 실패:", err);
             } finally {
-                setLoading(false);
+                if (!controller.signal.aborted) setLoading(false);
             }
         };
 
         fetchData();
+        return () => controller.abort();
     }, [
         location,
         checkIn,
@@ -217,14 +226,13 @@ function AccommodationListPage() {
     );
 }
 
+// 로컬(KST) 기준 날짜. toISOString() 은 UTC 라 새벽 시간대에 "어제"가 된다.
 function getToday() {
-    return new Date().toISOString().split("T")[0];
+    return todayLocal();
 }
 
 function getTomorrow(dateStr) {
-    const d = new Date(dateStr);
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().split("T")[0];
+    return addDays(dateStr, 1);
 }
 
 export default AccommodationListPage;

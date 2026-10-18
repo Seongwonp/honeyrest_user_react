@@ -10,6 +10,7 @@ import AuthCard from '@/components/ui/AuthCard.jsx';
 import { inputClass, labelClass } from '@/components/ui/styles';
 import PasswordStrengthMeter from './sections/PasswordStrengthMeter.jsx';
 import TermsAgreement from './sections/TermsAgreement.jsx';
+import { formatLocalDate } from '@/utils/date';
 import { termsList } from './sections/signupTerms';
 
 function Signup() {
@@ -171,8 +172,8 @@ function Signup() {
                             type="date"
                             value={form.birthDate}
                             onChange={handleChange}
-                            min={minBirthDate.toISOString().split("T")[0]}
-                            max={maxBirthDate.toISOString().split("T")[0]}
+                            min={formatLocalDate(minBirthDate)}
+                            max={formatLocalDate(maxBirthDate)}
                         />
 
                         <div className="min-w-0">

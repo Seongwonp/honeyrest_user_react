@@ -115,7 +115,7 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
         await proceedFromRoomToPayment(page, {
             roomName: OCEAN_HOTEL.singleRoom.name,
             beforeSubmit: async () => {
-                await expect(page.locator('#reservation-couponId')).toContainText(SEED_COUPON_NAME);
+                await expect(page.locator('#reservation-userCouponId')).toContainText(SEED_COUPON_NAME);
             },
         });
         await expect(page.getByText('200,000원').first()).toBeVisible();

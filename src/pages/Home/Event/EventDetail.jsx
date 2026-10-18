@@ -9,9 +9,16 @@ function EventDetail() {
     const [event, setEvent] = useState(null);
 
     useEffect(() => {
-        api.get(`/api/event/${id}`)
-            .then(res => setEvent(res.data))
-            .catch(err => console.error('이벤트 조회 실패:', err));
+        // 다른 이벤트로 이동하면 이전 요청을 취소해 늦게 온 응답이 화면을 덮어쓰지 않게 한다
+        const controller = new AbortController();
+        api.get(`/api/event/${id}`, { signal: controller.signal })
+            .then(res => {
+                if (!controller.signal.aborted) setEvent(res.data);
+            })
+            .catch(err => {
+                if (!controller.signal.aborted) console.error('이벤트 조회 실패:', err);
+            });
+        return () => controller.abort();
     }, [id]);
 
     if (!event) return <div>로딩 중...</div>;

@@ -11,6 +11,7 @@ import PaymentMethodSection from "./sections/PaymentMethodSection.jsx";
 import StaySummaryCard from "./sections/StaySummaryCard.jsx";
 import AgreementSection from "./sections/AgreementSection.jsx";
 import PaymentSummary from "./sections/PaymentSummary.jsx";
+import { calcCouponDiscount, getUserCouponId } from "@/utils/coupon";
 
 // 예약 정보 입력 및 결제 페이지
 // - 폼/할인/동의/결제수단 상태는 모두 이 컴포넌트가 소유하고, 구역별 마크업은 ./sections/* 로 분리
@@ -78,7 +79,8 @@ export default function Reservation() {
         guestName: userName || "",
         guestPhone: userPhone || "",
         specialRequest: "",
-        couponId: "",
+        // 선택한 사용자 보유 쿠폰 ID(user_coupon). 쿠폰 마스터 ID(couponId)와 혼동하지 말 것
+        userCouponId: "",
         usedPoint:0
     });
 
@@ -89,29 +91,20 @@ export default function Reservation() {
     const [finalPrice, setFinalPrice] = useState(originalPrice);
 
     useEffect(() => {
-        let discount = 0;
-        if (form.couponId) {
-            const coupon = availableCoupons.find(c => String(c.couponId) === String(form.couponId));
-            if (coupon) {
-                setSelectedCoupon(coupon);
-                if (coupon.discountType === "PERCENT") {
-                    discount = originalPrice * (coupon.discountValue / 100);
-                    if (coupon.maxOrderAmount && discount > coupon.maxOrderAmount) {
-                        discount = coupon.maxOrderAmount;
-                    }
-                } else {
-                    discount = coupon.discountValue;
-                }
-            }
-        }
+        const coupon = form.userCouponId
+            ? availableCoupons.find(c => String(getUserCouponId(c)) === String(form.userCouponId)) ?? null
+            : null;
+        // 서버 규칙과 동일: 정률은 금액 × 할인율 / 100 을 원 단위 내림, 서버 계산값이 있으면 우선
+        const discount = calcCouponDiscount(coupon, originalPrice);
 
         const pointDiscount = Math.min(form.usedPoint || 0, availablePoints);
-        const totalDiscount = Math.floor(discount) + pointDiscount;
-        const final = Math.max(originalPrice - totalDiscount, 0);
+        const final = Math.max(originalPrice - discount - pointDiscount, 0);
 
-        setDiscountAmount(Math.floor(discount));
+        // 선택 해제 시 이전 쿠폰이 요약에 남지 않도록 항상 갱신한다
+        setSelectedCoupon(coupon);
+        setDiscountAmount(discount);
         setFinalPrice(final);
-    }, [form.couponId, form.usedPoint, originalPrice, availableCoupons, availablePoints]);
+    }, [form.userCouponId, form.usedPoint, originalPrice, availableCoupons, availablePoints]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -153,7 +146,7 @@ export default function Reservation() {
             originalPrice: originalPrice,       // 추가
             discountAmount: discountAmount,     // 추가
             couponName: selectedCoupon?.name || null, // 추가
-            couponId: form.couponId || null,
+            userCouponId: form.userCouponId ? Number(form.userCouponId) : null,
             usedPoint: form.usedPoint || 0,
             userId,
             isEmailSend: agreements.email,

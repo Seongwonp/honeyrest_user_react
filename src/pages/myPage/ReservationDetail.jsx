@@ -28,18 +28,23 @@ export default function ReservationDetail() {
         if (!reservationId) return;
 
         // 예약 상세 조회 (effect 내부에 정의해 reservationId 변경 시에만 실행)
+        // 다른 예약으로 이동·재시도 시 이전 요청을 취소해 늦게 온 응답이 최신 상세를 덮어쓰지 않게 한다
+        const controller = new AbortController();
         const fetchReservationDetail = async () => {
             setLoadError(false);
             try {
-                const res = await api.get(`/api/user/reservations/${reservationId}`);
+                const res = await api.get(`/api/user/reservations/${reservationId}`, { signal: controller.signal });
+                if (controller.signal.aborted) return;
                 setReservation(res.data);
             } catch (err) {
+                if (controller.signal.aborted) return;
                 console.error("❌ 예약 상세 조회 실패:", err);
                 setLoadError(true);
             }
         };
 
         fetchReservationDetail();
+        return () => controller.abort();
     }, [reservationId, reloadKey]);
 
     if (!reservation) {

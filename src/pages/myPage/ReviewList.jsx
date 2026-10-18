@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import api from "@/api/axios";
@@ -30,23 +30,29 @@ export default function ReviewList() {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(false);
     const [editingReview, setEditingReview] = useState(null);
+    // 마지막으로 보낸 조회 요청 번호: 페이지를 빠르게 넘기면 늦게 온 이전 응답이 목록을 덮어쓰지 않도록 최신 요청만 반영
+    const fetchSeqRef = useRef(0);
 
     useEffect(() => {
         fetchReviews(page);
     }, [page]);
 
     const fetchReviews = async (pageNum) => {
+        const seq = ++fetchSeqRef.current;
+        const isLatest = () => seq === fetchSeqRef.current;
         setLoading(true);
         setLoadError(false);
         try {
             const res = await api.get(`/api/user/reviews?page=${pageNum}&size=5`);
+            if (!isLatest()) return;
             setReviews(res.data.content);
             setTotalPages(res.data.totalPages);
         } catch (err) {
+            if (!isLatest()) return;
             console.error("❌ 리뷰 목록 불러오기 실패:", err);
             setLoadError(true);
         } finally {
-            setLoading(false);
+            if (isLatest()) setLoading(false);
         }
     };
 

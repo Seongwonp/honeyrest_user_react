@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useApiRequest from '@/api/useApiRequest';
 import { motion } from 'framer-motion';
@@ -19,17 +19,24 @@ const InquiryList = () => {
     const [totalPages, setTotalPages] = useState(0);
 
     // request가 고정 참조이므로 fetchInquiries도 한 번만 생성됨
+    // 마지막으로 보낸 조회 요청 번호: 페이지를 빠르게 넘기면 늦게 온 이전 응답이 목록을 덮어쓰지 않도록 최신 요청만 반영
+    const fetchSeqRef = useRef(0);
+
     const fetchInquiries = useCallback(async (pageNum = 0) => {
+        const seq = ++fetchSeqRef.current;
+        const isLatest = () => seq === fetchSeqRef.current;
         setStatus('loading');
         try {
             const data = await request(
                 { url: `/api/user/inquiries/List?page=${pageNum}&size=5`, method: 'GET' }
             );
+            if (!isLatest()) return;
             setInquiries(data.content);
             setPage(data.page);
             setTotalPages(data.totalPages);
             setStatus('ready');
         } catch (err) {
+            if (!isLatest()) return;
             console.error(err);
             setStatus('error');
         }

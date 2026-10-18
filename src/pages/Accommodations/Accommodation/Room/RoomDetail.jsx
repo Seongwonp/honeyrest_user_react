@@ -28,13 +28,19 @@ export default function RoomDetail() {
     const [reserving, setReserving] = useState(false);
 
     useEffect(() => {
+        // 조건이 바뀌면 이전 요청을 취소해 늦게 온 응답이 최신 객실 정보를 덮어쓰지 않게 한다
+        const controller = new AbortController();
         api.get(`/api/room/${roomId}`, {
-            params: { checkIn, checkOut, guests }
+            params: { checkIn, checkOut, guests },
+            signal: controller.signal,
         }).then(res => {
+            if (controller.signal.aborted) return;
             setRoomDetail(res.data);
         }).catch(err => {
+            if (controller.signal.aborted) return;
             console.error("객실 상세 조회 실패:", err);
         });
+        return () => controller.abort();
     }, [roomId, checkIn, checkOut, guests]);
 
     if (!roomDetail) {

@@ -18,6 +18,7 @@ import IntroModal from "@/components/IntroModal.jsx";
 import LazyVideo from "@/components/LazyVideo.jsx";
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/api/axios";
+import { todayLocal, addDays } from "@/utils/date";
 
 function Home() {
     const navigate = useNavigate();
@@ -36,12 +37,9 @@ function Home() {
 
     const [randomBanner, setRandomBanner] = useState(null);
     const [events, setEvents] = useState([]);
-    const today = new Date().toISOString().split("T")[0];
-    const getTomorrow = (dateStr) => {
-        const date = new Date(dateStr);
-        date.setDate(date.getDate() + 1);
-        return date.toISOString().split("T")[0];
-    };
+    // 로컬(KST) 기준 날짜. toISOString() 은 UTC 라 새벽 시간대에 "어제"가 된다.
+    const today = todayLocal();
+    const getTomorrow = (dateStr) => addDays(dateStr, 1);
 
     const [coords, setCoords] = useState(null);
     const [locationError, setLocationError] = useState(false);

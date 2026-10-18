@@ -25,6 +25,8 @@ function Inquiry() {
     useEffect(() => {
         if (!inquiryId) return;
 
+        // 다른 문의로 이동·재시도 시 늦게 온 이전 응답은 반영하지 않는다
+        let ignore = false;
         const fetchInquiry = async () => {
             setLoadError(false);
             try {
@@ -32,14 +34,17 @@ function Inquiry() {
                     { url: `/api/user/inquiries/${inquiryId}`, method: 'GET' },
                     { silent: true }
                 );
+                if (ignore) return;
                 setInquiry(data);
             } catch (err) {
+                if (ignore) return;
                 console.error(err);
                 toast.error('문의 정보를 불러오는 데 실패했습니다.');
                 setLoadError(true);
             }
         };
         fetchInquiry();
+        return () => { ignore = true; };
     }, [inquiryId, request, reloadKey]);
 
     const handleDelete = async () => {

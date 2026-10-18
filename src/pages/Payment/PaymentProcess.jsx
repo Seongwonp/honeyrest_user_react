@@ -99,7 +99,7 @@ export default function PaymentProcess() {
             checkIn: state.checkIn,
             checkOut: state.checkOut,
             guests: state.guests,
-            couponId: state.couponId,
+            userCouponId: state.userCouponId ?? null,
             couponName: state.couponName,
             discountAmount: state.discountAmount,
             originalPrice: state.originalPrice,
@@ -184,7 +184,7 @@ export default function PaymentProcess() {
                 </dl>
 
                 <dl className="divide-y divide-gray-50 border-t border-gray-50 pt-2">
-                    <Row label="쿠폰 적용" value={state?.couponId ? "사용됨" : "미사용"} />
+                    <Row label="쿠폰 적용" value={state?.userCouponId ? "사용됨" : "미사용"} />
                     <Row label="원가" value={state?.originalPrice ? `${state.originalPrice.toLocaleString()}원` : "-"} />
                     <Row label="할인 금액" value={state?.discountAmount ? `-${state.discountAmount.toLocaleString()}원` : "0원"} />
                     <Row label="사용한 포인트" value={state?.usedPoint ? `-${state.usedPoint.toLocaleString()}P` : "0P"} />

@@ -27,7 +27,12 @@ function PointHistory() {
         sizeRef.current = size;
     }, [size]);
 
+    // 마지막으로 보낸 조회 요청 번호: 페이지를 빠르게 넘기면 늦게 온 이전 응답이 화면을 덮어쓰지 않도록 최신 요청만 반영
+    const fetchSeqRef = useRef(0);
+
     const fetchPointHistory = useCallback((pageNumber = 0) => {
+        const seq = ++fetchSeqRef.current;
+        const isLatest = () => seq === fetchSeqRef.current;
         setStatus("loading");
         request(
             {
@@ -37,6 +42,7 @@ function PointHistory() {
             },
             {
                 onSuccess: (data) => {
+                    if (!isLatest()) return;
                     setCurrentPoint(data.currentPoint);
                     setHistory(data.history);
                     setTotalPages(data.totalPages);
@@ -46,7 +52,9 @@ function PointHistory() {
                 },
                 onError: (err) => console.error("포인트 히스토리 조회 실패:", err),
             }
-        ).catch(() => setStatus("error"));
+        ).catch(() => {
+            if (isLatest()) setStatus("error");
+        });
     }, [request]);
 
     useEffect(() => {

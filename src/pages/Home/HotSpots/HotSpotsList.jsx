@@ -4,6 +4,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion } from "framer-motion";
 import SafeImage from "@/components/SafeImage.jsx";
 import api from "@/api/axios";
+import { todayLocal, addDays } from "@/utils/date";
 
 function HotSpatsList({ userInfo, navigate }) {
     const [popularCities, setPopularCities] = useState([]);
@@ -19,8 +20,8 @@ function HotSpatsList({ userInfo, navigate }) {
     }, []);
 
     const handleClick = (regionName) => {
-        const today = new Date().toISOString().split("T")[0];
-        const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+        const today = todayLocal();
+        const tomorrow = addDays(today, 1);
 
         const params = new URLSearchParams({
             location: regionName,

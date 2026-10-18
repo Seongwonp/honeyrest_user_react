@@ -28,9 +28,17 @@ function PlaceList() {
     useEffect(() => {
         setCurrentPage(1);
         const params = selectedCategory === "전체" ? {} : { category: selectedCategory };
+        // 카테고리를 빠르게 바꾸면 이전 카테고리 응답이 늦게 도착해 목록을 덮어쓸 수 있으므로 취소한다
+        const controller = new AbortController();
         api
-            .get("/api/accommodations/popular", { params })
-            .then((res) => setPlaces(res.data));
+            .get("/api/accommodations/popular", { params, signal: controller.signal })
+            .then((res) => {
+                if (!controller.signal.aborted) setPlaces(res.data);
+            })
+            .catch((err) => {
+                if (!controller.signal.aborted) console.error("추천 숙소 불러오기 실패:", err);
+            });
+        return () => controller.abort();
     }, [selectedCategory]);
 
     const indexOfLastItem = currentPage * itemsPerPage;

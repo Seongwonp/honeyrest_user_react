@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiChevronRight } from "react-icons/hi";
 import api from "@/api/axios";
+import { todayLocal, addDays } from "@/utils/date";
 
 function DomesticSpotsList({ userInfo, navigate }) {
     const [allRegions, setAllRegions] = useState([]);
@@ -25,8 +26,8 @@ function DomesticSpotsList({ userInfo, navigate }) {
     }, [regionCache]);
 
     const handleClick = (regionName) => {
-        const today = new Date().toISOString().split("T")[0];
-        const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+        const today = todayLocal();
+        const tomorrow = addDays(today, 1);
 
         const params = new URLSearchParams({
             location: regionName,

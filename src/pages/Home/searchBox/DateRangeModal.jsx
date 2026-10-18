@@ -52,6 +52,9 @@ function DateRangeModal({ isOpen, onClose, onSelect }) {
             current.setMonth(current.getMonth() + 1);
         }
 
+        // 선택 범위가 빠르게 바뀌면 이전 달의 응답이 늦게 도착해 최신 공휴일 목록을 덮어쓸 수 있다.
+        let ignore = false;
+
         const fetchHolidays = async () => {
             try {
                 const baseUrl = "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getHoliDeInfo";
@@ -81,15 +84,16 @@ function DateRangeModal({ isOpen, onClose, onSelect }) {
                         }));
                 });
 
-
-                setHolidays(merged);
+                if (!ignore) setHolidays(merged);
             } catch (err) {
+                if (ignore) return;
                 console.error("❌ 공휴일 병합 요청 실패:", err);
                 setHolidays([]);
             }
         };
 
         fetchHolidays();
+        return () => { ignore = true; };
     }, [selection.startDate, selection.endDate, serviceKey]);
 
     const handleSelect = ({ selection: newSelection }) => {

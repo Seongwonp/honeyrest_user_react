@@ -14,6 +14,7 @@ import CompanySection from "./sections/CompanySection.jsx";
 import ReviewSection from "./sections/ReviewSection.jsx";
 import BookingSidebar from "./sections/BookingSidebar.jsx";
 import StayChangeModal from "./sections/StayChangeModal.jsx";
+import { todayLocal, addDays } from "@/utils/date";
 
 /**
  * 숙소 상세 페이지
@@ -27,19 +28,9 @@ function Accommodation({ accommodationId, sectionRefs }) {
     const { user } = useAuth();
     const userId = user?.userId;
 
-    function formatDate(date) {
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, "0");
-        const dd = String(date.getDate()).padStart(2, "0");
-        return `${yyyy}-${mm}-${dd}`;
-    }
-
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-
-    const defaultCheckIn = searchParams.get("checkIn") || formatDate(today);
-    const defaultCheckOut = searchParams.get("checkOut") || formatDate(tomorrow);
+    const today = todayLocal();
+    const defaultCheckIn = searchParams.get("checkIn") || today;
+    const defaultCheckOut = searchParams.get("checkOut") || addDays(today, 1);
     const defaultGuests = searchParams.get("guests") || 2;
 
     const [checkIn, setCheckIn] = useState(defaultCheckIn);
@@ -67,12 +58,20 @@ function Accommodation({ accommodationId, sectionRefs }) {
         const params = { checkIn, checkOut, guests };
         if (userId) params.userId = userId;
 
-        api.get(`/api/accommodations/${accommodationId}`, { params })
+        // 일정·인원을 연달아 바꾸면 이전 조건의 응답이 늦게 도착해 최신 상세를 덮어쓸 수 있으므로
+        // 정리(cleanup) 시 이전 요청을 취소한다.
+        const controller = new AbortController();
+        api.get(`/api/accommodations/${accommodationId}`, { params, signal: controller.signal })
             .then((res) => {
+                if (controller.signal.aborted) return;
                 setData(res.data);
                 setIsWished(res.data.wished);
             })
-            .catch((err) => console.error("숙소 상세 불러오기 실패:", err));
+            .catch((err) => {
+                if (controller.signal.aborted) return;
+                console.error("숙소 상세 불러오기 실패:", err);
+            });
+        return () => controller.abort();
     }, [accommodationId, checkIn, checkOut, guests, userId]);
 
     useEffect(() => {

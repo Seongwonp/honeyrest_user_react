@@ -1,5 +1,6 @@
 import { FaTicketAlt, FaCoins } from "react-icons/fa";
 import { cardClass, inputClass } from "@/components/ui/styles";
+import { isPercentCoupon, getUserCouponId } from "@/utils/coupon";
 
 // 할인 적용 (쿠폰 선택 + 포인트 사용)
 function DiscountSection({ form, onChange, availableCoupons, availablePoints }) {
@@ -7,23 +8,24 @@ function DiscountSection({ form, onChange, availableCoupons, availablePoints }) 
         <>
             {/* 쿠폰 선택 */}
             <div className={`${cardClass} p-6`}>
-                <label htmlFor="reservation-couponId" className="text-sm font-black text-deep-gray mb-3 flex items-center gap-2">
+                <label htmlFor="reservation-userCouponId" className="text-sm font-black text-deep-gray mb-3 flex items-center gap-2">
                     <FaTicketAlt className="text-honey-yellow-dark" /> 쿠폰 선택 <span className="text-gray-300 font-bold text-xs">(선택)</span>
                 </label>
                 {availableCoupons.length > 0 ? (
                     <select
-                        id="reservation-couponId"
-                        name="couponId"
-                        value={form.couponId}
+                        id="reservation-userCouponId"
+                        name="userCouponId"
+                        value={form.userCouponId}
                         onChange={onChange}
                         className={inputClass}
                     >
                         <option value="">쿠폰을 선택하세요</option>
+                        {/* 같은 쿠폰을 여러 장 보유할 수 있으므로 값·key 는 사용자 보유 쿠폰 ID(userCouponId) */}
                         {availableCoupons.map((coupon) => (
-                            <option key={coupon.couponId} value={coupon.couponId}>
-                                {coupon.name} - {coupon.discountType === "PERCENT"
-                                ? `${coupon.discountValue}% 할인`
-                                : `${coupon.discountValue.toLocaleString()}원 할인`}
+                            <option key={getUserCouponId(coupon)} value={getUserCouponId(coupon) ?? ""}>
+                                {coupon.name} - {isPercentCoupon(coupon)
+                                ? `${Number(coupon.discountValue)}% 할인`
+                                : `${Number(coupon.discountValue).toLocaleString()}원 할인`}
                             </option>
                         ))}
                     </select>

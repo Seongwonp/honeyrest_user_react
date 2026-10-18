@@ -114,6 +114,12 @@ export const attachErrorInterceptor = (navigate) => {
     responseInterceptorId = api.interceptors.response.use(
         res => res,
         async err => {
+            // AbortController 로 취소된 요청(화면 이탈·새 검색으로 대체)은 오류가 아니므로
+            // 에러 페이지로 보내거나 재발급을 시도하지 않고 호출부에 그대로 넘긴다.
+            if (axios.isCancel(err)) {
+                return Promise.reject(err);
+            }
+
             const status = err.response?.status;
             const skipRedirect = err.config?.skipRedirect;
             const isRefreshRequest = err.config?.url?.includes(REFRESH_URL);
