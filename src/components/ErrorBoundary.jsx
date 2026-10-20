@@ -2,8 +2,7 @@ import { Component } from "react";
 import { HiExclamationCircle } from "react-icons/hi";
 import Button from "@/components/ui/Button.jsx";
 
-// 렌더링 중 처리되지 않은 예외가 발생하면(예: location.state 누락, 예기치 못한 undefined 접근)
-// 앱 전체가 백지 화면으로 남는 문제(P0-1)를 막기 위한 최후의 안전망.
+// 렌더링 중 예외로 앱 전체가 백지 화면이 되는 것을 막는다
 export default class ErrorBoundary extends Component {
     constructor(props) {
         super(props);

@@ -55,7 +55,6 @@ function AgreementSection({ agreements, setAgreements, expanded, toggleDetail, c
                                             {policy.detail}<br />
                                             <span className="text-gray-500">
                                                 {
-                                                    // 정책별 상세 설명 추가
                                                     policy.policyName.includes("무료 취소") ? (
                                                         <>
                                                             무료 취소 가능 기간 내에는 별도의 수수료 없이 예약을 취소하실 수 있습니다. 해당 기간이 경과하면 취소 수수료가 발생할 수 있으니, 반드시 기간을 확인해 주세요.

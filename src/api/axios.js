@@ -10,35 +10,10 @@ const api = axios.create({
 });
 
 /*
- * ─────────────────────────────────────────────────────────────────────────────
- * 액세스 토큰 재발급 흐름 (refresh single-flight)
- * ─────────────────────────────────────────────────────────────────────────────
- * 1) 재발급 요청은 전용 인스턴스(refreshClient)로 보낸다.
- *    - api 의 요청 인터셉터를 거치지 않으므로 만료된 Bearer 헤더가 붙지 않는다.
- *      (재발급은 HttpOnly 리프레시 쿠키만으로 인증)
- *    - api 의 응답 인터셉터도 거치지 않으므로 재발급 실패가 다시 401 처리/에러 페이지
- *      리다이렉트로 재귀하지 않는다.
- *
- * 2) refreshAccessToken() 은 진행 중인 재발급 Promise 를 모듈 변수 하나로 공유한다.
- *    - 앱 마운트 시 GlobalGuard(App.jsx) 의 자동 로그인과 응답 인터셉터의 401 처리가
- *      같은 함수를 쓰므로, 동시에 호출돼도 서버에는 재발급 요청이 한 번만 나간다.
- *    - Promise 가 정착(성공/실패)할 때 단 한 번 해제한다. 개별 대기자가 해제하지 않는다.
- *
- * 3) "늦게 도착한 401" 처리
- *    - 재발급 전에 이전 토큰으로 보낸 요청이 재발급이 끝난 뒤에 401 로 돌아올 수 있다.
- *      이때 in-flight Promise 는 이미 해제되어 있으므로, 그대로 재발급하면 불필요한
- *      두 번째 재발급이 일어난다(리프레시 토큰 회전 시 세션이 끊길 수도 있음).
- *    - 그래서 401 을 받으면 "그 요청이 실제로 보낸 토큰"과 "현재 저장된 토큰"을 비교한다.
- *        · 다르면 → 이미 다른 경로에서 재발급이 끝난 것이므로 현재 토큰으로 재시도만 한다.
- *        · 같으면 → refreshAccessToken() 호출 (진행 중이면 그 Promise 를 그대로 기다림).
- *    - 요청마다 _retry 플래그로 한 번만 재시도하므로 무한 루프가 생기지 않는다.
- *
- * 4) 재발급 실패 시 authStorage.clearSession() 으로 인증 정보를 지운다. clearSession 이
- *    AUTH_CHANGE_EVENT 를 발생시키므로 AuthProvider 가 같은 탭에서도 즉시 로그아웃 상태로 바뀐다.
- *
- * 토큰 읽기/쓰기는 모두 src/auth/authStorage.js 를 거친다(이 파일은 저장소를 직접 만지지 않음).
- *    세션 만료 토스트는 toastId 로 중복 표시를 막는다.
- * ─────────────────────────────────────────────────────────────────────────────
+ * 토큰 재발급
+ * - 재발급은 인터셉터 없는 refreshClient 로 보낸다(만료 토큰이 안 붙고, 실패해도 401 처리로 재귀하지 않음).
+ * - refreshAccessToken() 은 진행 중인 Promise 를 공유해서 동시에 불려도 요청은 한 번만 나간다.
+ * - 재발급이 끝난 뒤 도착한 401 은 보낸 토큰과 현재 토큰을 비교해, 다르면 재발급 없이 재시도만 한다.
  */
 
 const REFRESH_URL = '/api/auth/refresh';
@@ -52,12 +27,6 @@ const refreshClient = axios.create({
 let responseInterceptorId = null;
 let refreshPromise = null;
 
-/**
- * 액세스 토큰 재발급 (single-flight)
- * - 진행 중인 재발급이 있으면 같은 Promise 를 반환
- * - 성공 시 새 토큰을 기존 저장소에 저장하고 토큰 문자열로 resolve
- * - 실패 시 인증 저장소를 비우고 reject
- */
 export const refreshAccessToken = () => {
     if (!refreshPromise) {
         refreshPromise = refreshClient.post(REFRESH_URL)
@@ -71,7 +40,7 @@ export const refreshAccessToken = () => {
                 throw err;
             })
             .finally(() => {
-                // 정착 시점에 한 번만 해제 → 이후의 늦은 401 은 토큰 비교(3번)로 처리
+                // 늦게 온 401 은 토큰 비교로 처리하므로 여기서 해제
                 refreshPromise = null;
             });
     }
@@ -114,8 +83,7 @@ export const attachErrorInterceptor = (navigate) => {
     responseInterceptorId = api.interceptors.response.use(
         res => res,
         async err => {
-            // AbortController 로 취소된 요청(화면 이탈·새 검색으로 대체)은 오류가 아니므로
-            // 에러 페이지로 보내거나 재발급을 시도하지 않고 호출부에 그대로 넘긴다.
+            // 취소된 요청은 에러 페이지/재발급 없이 호출부로 넘긴다
             if (axios.isCancel(err)) {
                 return Promise.reject(err);
             }
@@ -124,7 +92,7 @@ export const attachErrorInterceptor = (navigate) => {
             const skipRedirect = err.config?.skipRedirect;
             const isRefreshRequest = err.config?.url?.includes(REFRESH_URL);
 
-            // 누군가 api 인스턴스로 직접 재발급을 호출한 경우의 안전장치
+            // api 인스턴스로 재발급을 직접 호출한 경우
             if (status === 401 && isRefreshRequest) {
                 handleLogout(navigate);
                 return Promise.reject(err);

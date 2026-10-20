@@ -23,13 +23,11 @@ export default defineConfig([
       },
     },
     rules: {
-      // Framer Motion is referenced as a lowercase JSX namespace (motion.div),
-      // which the core rule does not recognize as a variable use.
+      // motion.div 같은 소문자 JSX 네임스페이스를 사용으로 인식하지 못해서
       'no-unused-vars': ['error', { varsIgnorePattern: '^(motion|[A-Z_])' }],
     },
   },
-  // Playwright E2E (Node 에서 실행): React 규칙 대신 Node 전역을 쓴다.
-  // 픽스처 인자 구조 분해({})와 fixture 의 use() 호출이 React 규칙에 걸리지 않도록 끈다.
+  // E2E 는 Node 에서 실행. fixture 의 use() 가 React 규칙에 걸리지 않게 끈다
   {
     files: ['e2e/**/*.js', 'playwright.config.js'],
     languageOptions: {

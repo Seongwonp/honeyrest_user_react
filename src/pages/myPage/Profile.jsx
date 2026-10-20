@@ -22,7 +22,7 @@ export default function Profile() {
 
     const isSocialLogin = isSocialUser(user);
 
-    // 아래 request 들은 실패 시 useApiRequest 가 오류 토스트를 띄우므로 catch 에서는 로그만 남긴다
+    // 오류 토스트는 useApiRequest 가 띄우므로 catch 에서는 로그만
 
     const [isEditing, setIsEditing] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -55,7 +55,7 @@ export default function Profile() {
             }
         };
         fetchUserInfo();
-        // request는 참조가 고정되어 있어 마운트 시 1회만 실행됨
+        // request 는 고정 참조라 마운트 시 1회만 실행
     }, [request]);
 
     const handleChange = (e) => {
@@ -116,7 +116,7 @@ export default function Profile() {
         try {
             await request({ method: "DELETE", url: "/api/user/delete-account" }, { label: "accountDeletion" });
             await Swal.fire({ ...SWAL_CONFIRM_OPTIONS, title: "탈퇴 완료", text: "회원 탈퇴가 정상적으로 처리되었습니다.", icon: "success" });
-            // 인증 키만 삭제 (예전 localStorage.clear() 는 결제 진행 정보 등 무관한 키까지 지웠음)
+            // 인증 키만 삭제 (다른 키는 유지)
             logout();
             window.location.href = "/login";
         } catch (err) {

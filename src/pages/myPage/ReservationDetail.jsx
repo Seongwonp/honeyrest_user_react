@@ -27,8 +27,7 @@ export default function ReservationDetail() {
     useEffect(() => {
         if (!reservationId) return;
 
-        // 예약 상세 조회 (effect 내부에 정의해 reservationId 변경 시에만 실행)
-        // 다른 예약으로 이동·재시도 시 이전 요청을 취소해 늦게 온 응답이 최신 상세를 덮어쓰지 않게 한다
+        // 다른 예약으로 이동·재시도 시 이전 요청 취소 (늦은 응답이 덮어쓰지 않게)
         const controller = new AbortController();
         const fetchReservationDetail = async () => {
             setLoadError(false);
@@ -68,8 +67,7 @@ export default function ReservationDetail() {
     const isStayCompleted = checkOutDate < today;
     const isBeforeCancelDeadline = today < cancelDeadline;
 
-    // 서버는 이용 완료(COMPLETED) 예약에만 리뷰를 허용한다. 체크아웃이 지난 확정 예약도 버튼은 보여 주되,
-    // 아직 완료 처리 전이면 작성 화면에서 서버 안내 메시지(토스트)로 알린다.
+    // 리뷰는 COMPLETED 만 가능. 체크아웃이 지난 확정 예약도 버튼은 보이고, 완료 전이면 서버 메시지로 안내
     const showReviewButton = (isCompleted || (isConfirmed && isStayCompleted)) && !reservation.reviewed;
     const showCancelButton = isConfirmed && isBeforeCancelDeadline;
 

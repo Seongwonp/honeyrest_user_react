@@ -31,8 +31,7 @@ function NextArrow(props) {
 
 function EventSlider({ events }) {
     const width = useViewportWidth();
-    // 이벤트 수보다 많은 칸을 잡으면 카드가 좁게 찌그러지므로 보여 줄 수를 이벤트 수로 제한한다.
-    // (react-slick 의 responsive 옵션은 처음 열 때 적용되지 않아 너비별 값을 직접 계산한다)
+    // 이벤트 수보다 칸이 많으면 카드가 찌그러지므로 이벤트 수로 제한
     const perView = Math.max(1, Math.min(events.length, pickByWidth(width, [[639, 1], [1023, 2]], 3)));
     const sliding = events.length > perView;
     const sliderSettings = {
@@ -63,7 +62,7 @@ function EventSlider({ events }) {
                 </button>
             </div>
 
-            {/* key: 한 화면 슬라이드 수가 바뀌면 슬라이더를 새로 만들어 트랙 폭을 다시 계산한다 */}
+            {/* 슬라이드 수가 바뀌면 다시 마운트해 트랙 폭 재계산 */}
             <Slider key={perView} {...sliderSettings} className="event-slider">
                 {events.map((event) => (
                     <a
@@ -77,7 +76,7 @@ function EventSlider({ events }) {
                             whileHover={{ y: -8 }}
                             className="bg-white rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
                         >
-                            {/* 이벤트 이미지는 글자가 들어간 디자인 배너라 잘리면 안 된다 → object-contain + 배경색 */}
+                            {/* 글자가 있는 배너라 잘리지 않게 object-contain */}
                             <div className="aspect-[16/9] overflow-hidden bg-honey-yellow/10">
                                 <SafeImage
                                     kind="event"

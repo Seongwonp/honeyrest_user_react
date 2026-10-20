@@ -152,7 +152,6 @@ function Signup() {
 
                     <div>
                         <Input label={<>비밀번호{required}</>} name="password" type="password" placeholder="비밀번호" value={form.password} onChange={handleChange} autoComplete="new-password" />
-                        {/* Password requirements */}
                         <ul className="mt-2 list-disc pl-5 space-y-0.5 text-xs text-gray-400">
                             <li>8자 이상 20자 이하로 입력해주세요.</li>
                             <li>영문 대소문자, 숫자, 특수문자 중 2가지 이상 조합이 권장됩니다.</li>
@@ -210,14 +209,12 @@ function Signup() {
                         toggleDetail={toggleDetail}
                     />
 
-                    {/* 에러 메시지 */}
                     {error && (
                         <div role="alert" className="text-sm font-bold text-red-500 bg-red-50 rounded-2xl px-4 py-3">
                             {error}
                         </div>
                     )}
 
-                    {/* 제출 버튼 */}
                     <Button type="submit" size="lg" fullWidth className="mt-2">
                         <FaUserPlus />
                         회원가입

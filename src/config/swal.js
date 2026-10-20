@@ -1,21 +1,16 @@
 import Swal from "sweetalert2";
 
-// SweetAlert2 공통 확인 버튼 설정
-// - 배경색은 브랜드 honey 톤(노랑)을 유지
-// - SweetAlert2 기본 흰 글자는 노란 배경에서 대비가 낮으므로(약 1.5:1)
-//   customClass 로 진한 글자색을 적용한다 (스타일은 src/index.css 의 .swal-honey-confirm)
+// 노란 배경에 흰 글자는 대비가 낮아서 진한 글자색 클래스를 쓴다 (index.css .swal-honey-confirm)
 
-// 확인 버튼 배경색 (단일 상수)
 export const SWAL_CONFIRM_COLOR = "#FDD835";
 
-// Swal.fire 옵션에 펼쳐서 사용: Swal.fire({ ...SWAL_CONFIRM_OPTIONS, title, ... })
+// Swal.fire({ ...SWAL_CONFIRM_OPTIONS, title }) 처럼 사용
 export const SWAL_CONFIRM_OPTIONS = {
     confirmButtonColor: SWAL_CONFIRM_COLOR,
     customClass: { confirmButton: "swal-honey-confirm" },
 };
 
-// 확인/취소 대화상자 (window.confirm 대체) — 확인을 누르면 true
-// 예: if (!(await confirmSwal({ title: "정말 삭제하시겠습니까?" }))) return;
+// window.confirm 대신 사용. 확인이면 true
 export const confirmSwal = async ({
     title,
     text,

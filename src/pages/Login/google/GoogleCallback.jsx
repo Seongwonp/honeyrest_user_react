@@ -27,11 +27,10 @@ function GoogleCallback() {
             },
             {
                 label: 'google',
-                // 실패 안내는 아래 onError 의 Swal 로 하므로 공통 토스트는 끈다
+                // 실패 안내는 onError 의 Swal 로 한다
                 silent: true,
                 onSuccess: (res) => {
                     const { accessToken, user } = res;
-                    // 저장(자동 로그인 여부에 따른 저장소 선택)과 공유 상태 반영은 AuthContext.login 이 담당
                     login({ token: accessToken, user: { ...user, provider: PROVIDERS.GOOGLE }, autoLogin });
 
                     Swal.fire({
@@ -50,7 +49,7 @@ function GoogleCallback() {
                 },
             }
         ).catch(() => {
-            // 실패 처리는 onError 에서 완료됨
+            // onError 에서 처리됨
         });
     }, [searchParams, navigate, request, login]);
 

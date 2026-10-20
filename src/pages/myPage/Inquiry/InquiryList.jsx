@@ -18,8 +18,7 @@ const InquiryList = () => {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
-    // request가 고정 참조이므로 fetchInquiries도 한 번만 생성됨
-    // 마지막으로 보낸 조회 요청 번호: 페이지를 빠르게 넘기면 늦게 온 이전 응답이 목록을 덮어쓰지 않도록 최신 요청만 반영
+    // 최신 요청 번호. 늦게 온 이전 응답은 무시한다
     const fetchSeqRef = useRef(0);
 
     const fetchInquiries = useCallback(async (pageNum = 0) => {
@@ -68,7 +67,6 @@ const InquiryList = () => {
     const repliedCount = inquiries.filter(i => i.isReplied).length;
     const pendingCount = totalCount - repliedCount;
 
-    // 페이지 번호 버튼 이동 (이전/다음 포함)
     const handlePageChange = (next) => {
         if (next === page - 1) return handlePrev();
         if (next === page + 1) return handleNext();

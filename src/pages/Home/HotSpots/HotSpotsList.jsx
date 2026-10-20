@@ -11,7 +11,7 @@ function HotSpatsList({ userInfo, navigate }) {
     const [popularCities, setPopularCities] = useState([]);
 
     useEffect(() => {
-        // 장식용 요청: 실패 시 목록만 비워 두고 조용히 넘어간다
+        // 장식용 요청이라 실패하면 빈 목록
         api.get("/api/region/popular", { skipRedirect: true })
             .then(({ data }) => {
                 const cities = (Array.isArray(data) ? data : []).filter(r => r.level === 2);
@@ -57,7 +57,7 @@ function HotSpatsList({ userInfo, navigate }) {
         </button>
     );
 
-    // react-slick 의 responsive 옵션은 처음 열 때 적용되지 않아(휴대폰에서 4장이 찌그러짐) 너비별 값을 직접 계산한다
+    // react-slick responsive 가 첫 렌더에 적용되지 않아 너비별 값을 직접 계산
     const width = useViewportWidth();
     const perView = Math.max(1, Math.min(popularCities.length || 1, pickByWidth(width, [[639, 1], [1023, 2], [1279, 3]], 4)));
     const sliding = popularCities.length > perView;
@@ -70,7 +70,7 @@ function HotSpatsList({ userInfo, navigate }) {
         arrows: sliding && width >= 640,
         prevArrow: <CustomPrevArrow />,
         nextArrow: <CustomNextArrow />,
-        // 모바일은 화살표 대신 다음 카드가 살짝 보이게 해 넘길 수 있음을 알린다
+        // 모바일은 화살표 대신 다음 카드를 살짝 보여 준다
         centerMode: width < 640 && sliding,
         centerPadding: "28px",
     };

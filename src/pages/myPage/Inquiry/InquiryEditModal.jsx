@@ -38,7 +38,7 @@ function InquiryEditModal({ inquiry, onClose, onUpdate }) {
                 },
                 { successMessage: '문의가 정상적으로 수정되었습니다!' }
             );
-            onUpdate({ ...inquiry, title, category, content }); // 상위 컴포넌트 갱신
+            onUpdate({ ...inquiry, title, category, content });
             onClose();
         } catch (err) {
             console.error(err);

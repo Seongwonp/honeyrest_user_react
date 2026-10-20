@@ -1,5 +1,4 @@
-// 사용자 API e2e 프로필 시드(honeyRest_user/src/main/resources/db/e2e-seed.sql)와 맞춘 상수.
-// 시드를 바꾸면 이 파일도 함께 고친다.
+// honeyRest_user 의 db/e2e-seed.sql 과 맞춘 상수 (시드 변경 시 함께 수정)
 
 export const SEED_USER = {
     email: 'e2e.user@honeyrest.test',

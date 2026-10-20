@@ -20,7 +20,7 @@ function DiscountSection({ form, onChange, availableCoupons, availablePoints }) 
                         className={inputClass}
                     >
                         <option value="">쿠폰을 선택하세요</option>
-                        {/* 같은 쿠폰을 여러 장 보유할 수 있으므로 값·key 는 사용자 보유 쿠폰 ID(userCouponId) */}
+                        {/* 같은 쿠폰을 여러 장 가질 수 있어 userCouponId 를 값·key 로 사용 */}
                         {availableCoupons.map((coupon) => (
                             <option key={getUserCouponId(coupon)} value={getUserCouponId(coupon) ?? ""}>
                                 {coupon.name} - {isPercentCoupon(coupon)

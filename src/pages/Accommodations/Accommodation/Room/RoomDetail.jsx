@@ -28,7 +28,7 @@ export default function RoomDetail() {
     const [reserving, setReserving] = useState(false);
 
     useEffect(() => {
-        // 조건이 바뀌면 이전 요청을 취소해 늦게 온 응답이 최신 객실 정보를 덮어쓰지 않게 한다
+        // 조건이 바뀌면 이전 요청을 취소 (늦게 온 응답이 덮어쓰지 않게)
         const controller = new AbortController();
         api.get(`/api/room/${roomId}`, {
             params: { checkIn, checkOut, guests },
@@ -227,7 +227,7 @@ export default function RoomDetail() {
                                 } catch (err) {
                                     console.error("예약 정보 불러오기 실패:", err);
                                     toast.error("예약 정보를 불러오는 데 문제가 발생했습니다. 다시 시도해주세요.");
-                                    // 실패한 경우에만 다시 누를 수 있게 한다 (성공 시에는 페이지 이동)
+                                    // 성공하면 페이지가 이동하므로 실패 시에만 다시 활성화
                                     reservingRef.current = false;
                                     setReserving(false);
                                 }

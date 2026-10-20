@@ -11,7 +11,7 @@ function EventDetail() {
     const [failed, setFailed] = useState(false);
 
     useEffect(() => {
-        // 다른 이벤트로 이동하면 이전 요청을 취소해 늦게 온 응답이 화면을 덮어쓰지 않게 한다
+        // 다른 이벤트로 이동하면 이전 요청 취소
         const controller = new AbortController();
         api.get(`/api/event/${id}`, { signal: controller.signal, skipRedirect: true })
             .then(res => {
@@ -61,7 +61,7 @@ function EventDetail() {
                 ← 뒤로가기
             </button>
             <h1 className="text-3xl font-extrabold mb-6 text-gray-900">{event.title}</h1>
-            {/* 글자가 들어간 디자인 배너 → 자르지 않고 원본 비율 그대로 보여 준다 */}
+            {/* 글자가 있는 배너라 원본 비율 유지 */}
             <div className="mb-6 rounded-lg overflow-hidden bg-honey-yellow/10 shadow-sm">
                 <SafeImage kind="event" src={event.imageUrl} alt={event.title} className="w-full h-auto max-h-[70vh] object-contain mx-auto" />
             </div>

@@ -20,14 +20,13 @@ export default function ReservationList() {
     // loading | error | ready
     const [status, setStatus] = useState("loading");
 
-    // size는 응답으로 갱신되므로 ref로 최신값만 참조 (size 변경만으로 재조회하지 않도록)
+    // size 변경만으로 재조회하지 않게 ref 로 참조
     const pageSizeRef = useRef(pageInfo.size);
     useEffect(() => {
         pageSizeRef.current = pageInfo.size;
     }, [pageInfo.size]);
 
-    // setState·ref만 사용하므로 참조 고정
-    // signal: 페이지를 빠르게 넘기면 이전 페이지 응답이 늦게 도착해 목록을 덮어쓰지 않도록 취소에 사용
+    // signal: 이전 페이지의 늦은 응답이 덮어쓰지 않게 취소
     const fetchReservations = useCallback(async (page, signal) => {
         setStatus("loading");
         try {

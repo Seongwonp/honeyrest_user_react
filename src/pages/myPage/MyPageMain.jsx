@@ -10,7 +10,7 @@ function MyPageMain() {
 
     const isRoot = location.pathname === "/user/mypage" || location.pathname === "/user/mypage/";
 
-    // /user/mypage 자체에는 보여 줄 내용이 없으므로 예약 내역으로 보낸다 (헤더의 "마이페이지" 링크 진입점)
+    // /user/mypage 는 예약 내역으로 보낸다
     if (isRoot) return <Navigate to="/user/mypage/reservations" replace />;
 
     return (

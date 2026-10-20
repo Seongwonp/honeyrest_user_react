@@ -52,7 +52,6 @@ export default function CancelRequestPage() {
     useEffect(() => {
         if (!reservationId) return;
 
-        // 예약 상세 조회 (effect 내부에 정의해 reservationId 변경 시에만 실행)
         const fetchReservation = async () => {
             try {
                 const res = await api.get(`/api/user/reservations/${reservationId}`);

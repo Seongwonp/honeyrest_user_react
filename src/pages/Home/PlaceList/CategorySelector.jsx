@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { FaThLarge, FaHotel, FaHome, FaUmbrellaBeach, FaTree } from "react-icons/fa";
 import { MdHolidayVillage } from "react-icons/md";
 
-// 카테고리 아이콘: 서버 iconUrl 이 비어 있거나(데모 시드) 외부 이미지가 깨져도 버튼 모양이 유지되도록 아이콘 폰트를 쓴다
+// 서버 iconUrl 이 비거나 깨져도 모양이 유지되도록 아이콘 폰트 사용
 const CATEGORY_ICONS = {
     전체: FaThLarge,
     호텔: FaHotel,

@@ -52,7 +52,7 @@ function DateRangeModal({ isOpen, onClose, onSelect }) {
             current.setMonth(current.getMonth() + 1);
         }
 
-        // 선택 범위가 빠르게 바뀌면 이전 달의 응답이 늦게 도착해 최신 공휴일 목록을 덮어쓸 수 있다.
+        // 이전 달의 늦은 응답이 공휴일 목록을 덮어쓰지 않게 취소
         let ignore = false;
 
         const fetchHolidays = async () => {

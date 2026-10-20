@@ -45,7 +45,7 @@ function IntroModal() {
 
                 {/* 🎥 영상 영역 */}
                 <div className="relative w-full h-[65vh] sm:h-[500px]">
-                    {/* 모달이 열릴 때만 렌더링되므로 다른 경로·쿠키로 숨긴 경우 영상은 요청되지 않음 */}
+                    {/* 모달이 열릴 때만 렌더링되므로 숨긴 경우 영상은 요청되지 않는다 */}
                     <video
                         src="/videos/intro.mp4"
                         poster="/images/video-poster.svg"

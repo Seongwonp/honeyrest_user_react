@@ -14,7 +14,7 @@ function MyPageNav() {
 
     return (
         <nav aria-label="마이페이지 메뉴" className="glass-card rounded-3xl p-2">
-            {/* 모바일에서는 가로 스크롤, 페이지 자체는 넘치지 않도록 내부에서만 스크롤 */}
+            {/* 모바일은 내부 가로 스크롤 */}
             <ul className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {navItems.map((item) => (
                     <li key={item.path} className="shrink-0">

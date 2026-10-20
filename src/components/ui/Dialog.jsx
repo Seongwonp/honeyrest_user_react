@@ -5,10 +5,7 @@ import { HiX } from "react-icons/hi";
 const FOCUSABLE =
     'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// 접근성 대화상자 래퍼
-// - role="dialog" + aria-modal, 제목과 aria-labelledby 연결
-// - Escape 로 닫기, 열릴 때 대화상자에 초기 포커스, 닫힐 때 이전 포커스 복원
-// - Tab 이동을 대화상자 내부로 제한
+// 접근성 대화상자: Escape 닫기, 포커스 이동/복원, Tab 순환
 function Dialog({
     onClose,
     title,

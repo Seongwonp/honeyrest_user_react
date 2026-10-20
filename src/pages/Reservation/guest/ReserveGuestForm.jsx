@@ -273,7 +273,6 @@ export default function ReserveGuestForm() {
                                         </span>
                                     </label>
 
-                                    {/* 자세히보기 버튼 */}
                                     <button
                                         type="button"
                                         onClick={() => setOpen(prev => ({ ...prev, [key]: !prev[key] }))}
@@ -285,7 +284,6 @@ export default function ReserveGuestForm() {
                                     </button>
                                 </div>
 
-                                {/* 내용 펼치기 */}
                                 {open[key] && (
                                     <div className="bg-off-white p-4 mt-2 text-xs text-gray-500 leading-relaxed rounded-2xl whitespace-pre-line break-words">
                                         {content}

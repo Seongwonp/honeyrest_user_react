@@ -15,7 +15,7 @@ function DomesticSpotsList({ userInfo, navigate }) {
             return;
         }
 
-        // 장식용 요청: 실패 시 목록만 비워 두고 조용히 넘어간다
+        // 장식용 요청이라 실패하면 빈 목록
         api.get("/api/region/all", { skipRedirect: true })
             .then(({ data }) => {
                 const list = Array.isArray(data) ? data : data?.data;

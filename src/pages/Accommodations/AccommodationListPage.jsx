@@ -14,7 +14,7 @@ function AccommodationListPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const userId = user?.userId || null;
-    // 검색 요청 시점의 최신 userId만 참조 (userId 변경만으로 재검색하지 않도록 ref 사용)
+    // userId 변경만으로 재검색하지 않게 ref 로 참조
     const userIdRef = useRef(userId);
     useEffect(() => {
         userIdRef.current = userId;
@@ -39,7 +39,7 @@ function AccommodationListPage() {
         { value: "latest", label: "최신순" }
     ];
 
-    // 배열 내용이 같으면 동일 참조를 유지하도록 문자열 키 기준으로 메모이제이션
+    // 내용이 같으면 같은 참조를 유지
     const categoriesKey = JSON.stringify(searchParams.getAll("selectedCategories"));
     const tagsKey = JSON.stringify(searchParams.getAll("selectedTags"));
     const selectedCategories = useMemo(() => JSON.parse(categoriesKey), [categoriesKey]);
@@ -49,8 +49,7 @@ function AccommodationListPage() {
     useEffect(() => {
         if (!checkIn || !checkOut) return;
 
-        // 조건이 빠르게 바뀌면 이전 요청이 늦게 도착해 최신 결과를 덮어쓸 수 있다.
-        // 정리(cleanup) 시 이전 요청을 취소하고, 취소된 요청의 결과/로딩 상태는 반영하지 않는다.
+        // 늦은 응답이 최신 결과를 덮어쓰지 않게 cleanup 에서 취소
         const controller = new AbortController();
 
         const fetchData = async () => {
@@ -226,7 +225,7 @@ function AccommodationListPage() {
     );
 }
 
-// 로컬(KST) 기준 날짜. toISOString() 은 UTC 라 새벽 시간대에 "어제"가 된다.
+// 로컬 날짜 기준 (toISOString 은 UTC)
 function getToday() {
     return todayLocal();
 }

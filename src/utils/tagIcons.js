@@ -17,12 +17,7 @@ import {
     FaWalking, FaWarehouse, FaWater, FaWifi,
 } from "react-icons/fa";
 
-/**
- * 숙소 태그 아이콘 매핑
- * - 서버(accommodation_tag.icon_name)에서 내려오는 아이콘 이름을 컴포넌트로 변환
- * - 전체 아이콘 세트를 import 하지 않도록 실제 사용하는 아이콘만 명시적으로 등록
- * - 새 태그 아이콘이 추가되면 이 목록에도 추가해야 화면에 표시됨
- */
+// accommodation_tag.icon_name → 아이콘 컴포넌트. 번들 크기 때문에 쓰는 것만 등록 (새 아이콘은 여기 추가)
 const TAG_ICONS = {
     FaArrowCircleDown, FaArrowCircleUp, FaBan, FaBath, FaBed, FaBicycle,
     FaBinoculars, FaBolt, FaBone, FaBook, FaBreadSlice, FaBroom,
@@ -42,5 +37,5 @@ const TAG_ICONS = {
     FaWalking, FaWarehouse, FaWater, FaWifi,
 };
 
-// 아이콘 이름으로 컴포넌트 조회 (등록되지 않은 이름이면 null)
+// 등록되지 않은 이름이면 null
 export const getTagIcon = (iconName) => (iconName && TAG_ICONS[iconName]) || null;

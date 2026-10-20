@@ -13,15 +13,13 @@ import AgreementSection from "./sections/AgreementSection.jsx";
 import PaymentSummary from "./sections/PaymentSummary.jsx";
 import { calcCouponDiscount, getUserCouponId } from "@/utils/coupon";
 
-// 예약 정보 입력 및 결제 페이지
-// - 폼/할인/동의/결제수단 상태는 모두 이 컴포넌트가 소유하고, 구역별 마크업은 ./sections/* 로 분리
+// 상태는 이 컴포넌트가 갖고, 구역별 마크업은 ./sections/* 에 둔다
 export default function Reservation() {
     const navigate = useNavigate();
     const {state} = useLocation();
     const [agree, setAgree] = useState(false);
 
-    // 새로고침이나 이 URL로 직접 접근하면 location.state가 없어 이전에는 구조분해 단계에서
-    // 바로 크래시가 났다(백지 화면, P0-1). 안전한 페이지로 되돌려보낸다.
+    // 새로고침·직접 접근이면 location.state 가 없으므로 되돌려보낸다
     useEffect(() => {
         if (!state) {
             navigate("/accommodations", {replace: true});
@@ -67,8 +65,7 @@ export default function Reservation() {
         availablePoints = 0
     } = state ?? {};
 
-    // 결제 기준 금액은 서버(/api/reserve/form-info)가 계산한 originalPrice(객실가 + 추가 인원 요금)를 그대로 사용한다.
-    // 클라이언트에서 다시 계산하지 않으며, 서버 값이 없을 때만 상세 페이지의 totalPrice로 대체한다.
+    // 기준 금액은 서버(form-info)가 계산한 값을 쓰고, 없을 때만 상세 페이지의 totalPrice 사용
     const originalPrice = Number(state?.originalPrice ?? state?.totalPrice ?? 0) || 0;
 
     // 결제 버튼 중복 클릭 방지
@@ -79,7 +76,7 @@ export default function Reservation() {
         guestName: userName || "",
         guestPhone: userPhone || "",
         specialRequest: "",
-        // 선택한 사용자 보유 쿠폰 ID(user_coupon). 쿠폰 마스터 ID(couponId)와 혼동하지 말 것
+        // user_coupon ID (쿠폰 마스터 couponId 아님)
         userCouponId: "",
         usedPoint:0
     });
@@ -94,13 +91,13 @@ export default function Reservation() {
         const coupon = form.userCouponId
             ? availableCoupons.find(c => String(getUserCouponId(c)) === String(form.userCouponId)) ?? null
             : null;
-        // 서버 규칙과 동일: 정률은 금액 × 할인율 / 100 을 원 단위 내림, 서버 계산값이 있으면 우선
+        // 서버와 같은 규칙: 정률은 원 단위 내림, 서버 계산값이 있으면 우선
         const discount = calcCouponDiscount(coupon, originalPrice);
 
         const pointDiscount = Math.min(form.usedPoint || 0, availablePoints);
         const final = Math.max(originalPrice - discount - pointDiscount, 0);
 
-        // 선택 해제 시 이전 쿠폰이 요약에 남지 않도록 항상 갱신한다
+        // 선택 해제 시 이전 쿠폰이 요약에 남지 않게 항상 갱신
         setSelectedCoupon(coupon);
         setDiscountAmount(discount);
         setFinalPrice(final);
@@ -162,7 +159,7 @@ export default function Reservation() {
     };
 
 
-    // 위 useEffect가 리다이렉트를 시작하는 동안 잘못된 값으로 렌더링하지 않는다.
+    // 리다이렉트 중에는 렌더링하지 않는다
     if (!state) {
         return null;
     }

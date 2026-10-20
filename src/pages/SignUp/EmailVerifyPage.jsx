@@ -30,7 +30,7 @@ const EmailVerifyPage = () => {
             setMessage('토큰이 없습니다.');
             setStatus('error');
         }
-        // token은 URL 쿼리값이라 페이지 내에서 고정, hasFetched ref로 중복 요청 방지
+        // hasFetched ref 로 중복 요청 방지
     }, [token]);
 
     // 상태별 아이콘 / 톤 / 라벨

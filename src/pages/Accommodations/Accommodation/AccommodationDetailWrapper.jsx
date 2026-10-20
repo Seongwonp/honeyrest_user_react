@@ -82,7 +82,7 @@ function AccommodationDetailWrapper() {
             <div className="hidden md:flex md:w-40 shrink-0 md:sticky md:top-20">
                 <SidebarNav activeSection={activeSection} onScrollTo={scrollToSection} />
             </div>
-            {/* w-full: 모바일(flex-col + items-start)에서는 폭이 내용 기준이 되어 슬라이더 트랙만큼(1280px) 늘어나므로 폭을 고정한다 */}
+            {/* 모바일에서 슬라이더 트랙 폭만큼 늘어나지 않게 w-full 고정 */}
             <div className="flex-1 w-full min-w-0 mt-4 md:mt-0">
                 <Accommodation accommodationId={id} sectionRefs={sectionRefs} />
             </div>

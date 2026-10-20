@@ -14,7 +14,7 @@ function PlaceList() {
     const [itemsPerPage] = useState(6);
 
     useEffect(() => {
-        // 장식용 요청: 실패하면 "전체"만 보여 준다
+        // 실패하면 "전체"만 보여 준다
         api.get("/api/accommodations/categories", { skipRedirect: true }).then((res) => {
             const allCategory = {
                 categoryId: 0,
@@ -31,7 +31,7 @@ function PlaceList() {
     useEffect(() => {
         setCurrentPage(1);
         const params = selectedCategory === "전체" ? {} : { category: selectedCategory };
-        // 카테고리를 빠르게 바꾸면 이전 카테고리 응답이 늦게 도착해 목록을 덮어쓸 수 있으므로 취소한다
+        // 이전 카테고리의 늦은 응답이 덮어쓰지 않게 취소
         const controller = new AbortController();
         api
             .get("/api/accommodations/popular", { params, signal: controller.signal })

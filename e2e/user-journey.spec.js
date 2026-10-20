@@ -1,15 +1,5 @@
-// 사용자 여정 E2E — 회원가입부터 예약·결제·취소 요청·리뷰·로그아웃까지.
-//
-// 전제: playwright.config.js 의 webServer 가 사용자 API(e2e 프로필, 새 H2 DB + 시드)와
-//       프론트 개발 서버(VITE_E2E=true)를 띄운다. 시드 값은 support/seed.js 참고.
-//
-// 시나리오
-//   (a) 회원가입 → e2e 전용 엔드포인트로 인증 토큰 조회 → 이메일 인증 → 로그인
-//   (b) 지역/날짜 검색 → 숙소 상세 → 객실 선택 → 예약 정보 입력 → 테스트 결제 → 마이페이지 예약 목록
-//   (c) 같은 날짜에 total_rooms=1 객실을 다시 결제 → 409 안내
-//   (d) 예약 상세에서 취소 요청 → 상태 "취소 요청"
-//   (e) 이용 완료 전 리뷰 작성 차단(토스트) → e2e 전용 엔드포인트로 COMPLETED 처리 → 리뷰 작성 → 숙소 상세에 노출
-//   (f) 로그아웃 → 보호 라우트 접근 시 로그인 페이지로 이동
+// 사용자 여정 E2E: 가입 → 검색·예약·결제 → 409 → 취소 요청 → 리뷰 → 로그아웃
+// 테스트끼리 같은 DB 상태를 이어 쓴다. 시드 값은 support/seed.js
 import { test, expect } from '@playwright/test';
 import { SEED_USER, REGION_SEARCH_KEYWORD, OCEAN_HOTEL, JEJU_PENSION, SEED_COUPON_NAME } from './support/seed.js';
 import { daysFromToday } from './support/dates.js';
@@ -62,12 +52,12 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
     let context;
     /** @type {import('@playwright/test').Page} */
     let page;
-    /** (b) 결제 직전까지 진행해 둔 두 번째 탭 — (c) 에서 같은 객실·날짜로 결제한다. */
+    /** (c) 에서 같은 객실·날짜로 결제할 두 번째 탭 */
     let stalePage;
 
-    // (b)(c)(d): 1실 한정 객실, 오늘+7 ~ 오늘+9 (2박). 취소 요청 가능 기한(체크인 전날)보다 충분히 앞선다.
+    // 1실 한정 객실, 오늘+7 ~ +9 (취소 요청 기한보다 충분히 앞선 날짜)
     const oceanStay = { checkIn: daysFromToday(7), checkOut: daysFromToday(9) };
-    // (e): 펜션 패밀리 룸, 오늘+14 ~ 오늘+15 (1박)
+    // 리뷰용: 펜션 패밀리 룸, 오늘+14 ~ +15
     const pensionStay = { checkIn: daysFromToday(14), checkOut: daysFromToday(15) };
     const stayQuery = (stay) => `checkIn=${stay.checkIn.iso}&checkOut=${stay.checkOut.iso}&guests=2`;
 
@@ -76,9 +66,9 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
 
     test.beforeAll(async ({ browser }, testInfo) => {
         const { baseURL, locale, timezoneId, viewport, userAgent, deviceScaleFactor } = testInfo.project.use;
-        // 여러 테스트가 로그인 상태·탭을 이어 쓰므로 컨텍스트를 직접 만든다 (트레이스는 config 의 trace 설정이 자동 적용).
+        // 테스트끼리 로그인 상태·탭을 이어 쓰므로 컨텍스트를 직접 만든다
         context = await browser.newContext({ baseURL, locale, timezoneId, viewport, userAgent, deviceScaleFactor });
-        // 홈 첫 방문 소개 영상 모달("오늘 하루 보지 않기" 쿠키)을 미리 꺼 둔다. 검색창을 가리기 때문.
+        // 검색창을 가리는 소개 영상 모달을 쿠키로 미리 끈다
         await context.addCookies([{ name: 'hideIntroModal', value: 'true', url: baseURL }]);
         page = await context.newPage();
     });
@@ -111,7 +101,7 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
         await page.getByRole('link').filter({ hasText: OCEAN_HOTEL.singleRoom.name }).click();
         await expect(page).toHaveURL(new RegExp(`/room/${OCEAN_HOTEL.singleRoom.id}\\?${stayQuery(oceanStay)}`));
 
-        // 예약 정보 입력 → 결제 페이지 (시드 쿠폰이 선택지에 보이는지만 확인하고 사용하지 않는다)
+        // 예약 정보 입력 → 결제 페이지 (쿠폰은 보이는지만 확인)
         await proceedFromRoomToPayment(page, {
             roomName: OCEAN_HOTEL.singleRoom.name,
             beforeSubmit: async () => {
@@ -120,7 +110,7 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
         });
         await expect(page.getByText('200,000원').first()).toBeVisible();
 
-        // (c) 준비: 다른 탭에서 같은 객실·날짜로 결제 직전까지 진행해 둔다 (아직 재고가 남아 있을 때 연 화면).
+        // (c) 준비: 재고가 남아 있을 때 다른 탭에서 결제 직전까지 진행
         stalePage = await context.newPage();
         await stalePage.goto(`/room/${OCEAN_HOTEL.singleRoom.id}?${stayQuery(oceanStay)}`);
         await proceedFromRoomToPayment(stalePage, { roomName: OCEAN_HOTEL.singleRoom.name });
@@ -149,10 +139,10 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
         await expect(stalePage.getByText('선택하신 날짜에 예약 가능한 객실이 없습니다.')).toBeVisible();
         await expect(stalePage.getByText('오류 코드: 409')).toBeVisible();
 
-        // 재고 사전 검증에서 막혀 결제 승인 자체가 일어나지 않았으므로 보상 취소도 없어야 한다.
+        // 재고 검증에서 막혀 승인 전이므로 보상 취소도 없어야 한다
         expect(await fetchTossCancellations(request)).toEqual([]);
 
-        // 지금 새로 연 객실 상세는 예약 불가로 보인다.
+        // 새로 연 객실 상세는 예약 불가
         await stalePage.goto(`/room/${OCEAN_HOTEL.singleRoom.id}?${stayQuery(oceanStay)}`);
         await expect(stalePage.getByText('예약 불가', { exact: true })).toBeVisible();
         await stalePage.close();
@@ -206,7 +196,7 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
         await expect(card).toContainText('예약 완료');
         pensionReservationId = await reservationIdFromCard(card);
 
-        // 이용 완료 전: 예약 상세에 리뷰 버튼이 없고, 작성 화면에 직접 들어가 제출해도 서버가 거절한다.
+        // 이용 완료 전에는 리뷰 버튼이 없고, 직접 제출해도 서버가 거절한다
         await page.goto(`/user/mypage/reservations/${pensionReservationId}`);
         await expect(page.getByTestId('reservation-status')).toHaveText('예약 완료');
         await expect(page.getByRole('link', { name: '리뷰 작성하기' })).toHaveCount(0);
@@ -215,7 +205,7 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
         await fillReview();
         await page.getByRole('button', { name: '리뷰 등록' }).click();
         await expect(toast(page, '이용이 완료된 예약만 리뷰를 작성할 수 있습니다.')).toBeVisible();
-        // 에러 페이지로 튕기지 않고 작성 화면에 머문다.
+        // 에러 페이지로 가지 않고 작성 화면에 머문다
         await expect(page).toHaveURL(new RegExp(`/reviews/write/${pensionReservationId}$`));
 
         // 호스트 체크아웃 처리 대신 e2e 전용 엔드포인트로 이용 완료 처리
@@ -234,7 +224,7 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
         await page.goto(`/accommodations/${JEJU_PENSION.id}?${stayQuery(pensionStay)}`);
         await expect(page.getByText(reviewContent)).toBeVisible();
 
-        // 같은 예약으로는 다시 작성할 수 없다 (상세에서 버튼 사라짐)
+        // 같은 예약으로는 다시 작성 불가
         await page.goto(`/user/mypage/reservations/${pensionReservationId}`);
         await expect(page.getByRole('link', { name: '리뷰 작성하기' })).toHaveCount(0);
     });
@@ -250,7 +240,7 @@ test.describe.serial('예약 여정 (시드 회원)', () => {
         await expect(page.locator('form').getByRole('button', { name: '로그인', exact: true })).toBeVisible();
         await expect(page.getByRole('button', { name: '로그아웃' })).toHaveCount(0);
 
-        // 다시 로그인하면 원래 가려던 보호 라우트로 돌아간다.
+        // 다시 로그인하면 원래 가려던 경로로 돌아간다
         await page.getByLabel('이메일').fill(SEED_USER.email);
         await page.getByLabel('비밀번호').fill(SEED_USER.password);
         await page.locator('form').getByRole('button', { name: '로그인', exact: true }).click();

@@ -27,7 +27,6 @@ function Home() {
     const [checkIn, setCheckIn] = useState("");
     const [checkOut, setCheckOut] = useState("");
     const [guests, setGuests] = useState(2);
-    // 로그인 사용자 정보는 AuthProvider 공유 상태에서 가져온다
     const { user: userInfo } = useAuth();
 
     const [modalMessage, setModalMessage] = useState("");
@@ -37,7 +36,7 @@ function Home() {
 
     const [randomBanner, setRandomBanner] = useState(null);
     const [events, setEvents] = useState([]);
-    // 로컬(KST) 기준 날짜. toISOString() 은 UTC 라 새벽 시간대에 "어제"가 된다.
+    // 로컬 날짜 기준 (toISOString 은 UTC 라 새벽에 "어제"가 된다)
     const today = todayLocal();
     const getTomorrow = (dateStr) => addDays(dateStr, 1);
 
@@ -54,8 +53,7 @@ function Home() {
     }, []);
 
     useEffect(() => {
-        // 장식용 요청: 실패해도 에러 페이지로 보내지 않고 조용히 넘어간다
-        // 배너가 없거나 실패하면 빈 객체로 바꿔 로딩 표시(펄스)를 끝내고 기본 배경을 보여 준다
+        // 장식용 요청이라 실패하면 기본 배경으로 둔다
         api.get("/api/banner/random", { skipRedirect: true })
             .then(({ data }) => {
                 setRandomBanner(data?.success && data.data ? data.data : {});
@@ -159,7 +157,7 @@ function Home() {
                 <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* 비디오 카드 */}
                     <div className="lg:col-span-8 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-gray-200 h-[400px] md:h-[500px] relative group">
-                        {/* 약 14MB 영상 → 뷰포트에 들어올 때만 로드 (LazyVideo) */}
+                        {/* 약 14MB 영상이라 뷰포트에 들어올 때만 로드 */}
                         <LazyVideo
                             src="/videos/video2.mp4"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

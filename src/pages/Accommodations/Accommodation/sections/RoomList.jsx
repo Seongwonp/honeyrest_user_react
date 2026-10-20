@@ -28,7 +28,6 @@ function RoomList({ rooms, checkIn, checkOut, guests, sectionRefs }) {
                             key={room.roomId ?? i}
                             whileHover={isAvailable ? { y: -5 } : {}}
                             onClick={() => isAvailable && navigate(`/room/${room.roomId}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`)}
-                            // 키보드 접근: Enter / Space 로 객실 상세 이동
                             role="link"
                             tabIndex={isAvailable ? 0 : -1}
                             aria-disabled={!isAvailable || undefined}

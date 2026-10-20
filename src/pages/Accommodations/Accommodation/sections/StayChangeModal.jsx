@@ -4,10 +4,7 @@ import DateRangeModal from "@/pages/Home/searchBox/DateRangeModal.jsx";
 
 const MotionDiv = motion.div;
 
-/**
- * 일정·인원 변경 모달 + 중첩 날짜 선택 모달
- * - 모든 상태(임시 체크인/아웃, 인원, 모달 표시 여부)는 부모(Accommodation)가 소유
- */
+// 일정·인원 변경 모달 (상태는 부모가 가짐)
 function StayChangeModal({
     isOpen,
     onClose,
@@ -24,7 +21,6 @@ function StayChangeModal({
 }) {
     return (
         <>
-            {/* Change Modal */}
             <AnimatePresence>
                 {isOpen && (
                     <>
@@ -69,7 +65,7 @@ function StayChangeModal({
                 )}
             </AnimatePresence>
 
-            {/* Date Range Modal (Nested) */}
+            {/* 날짜 선택 모달 */}
             <AnimatePresence>
                 {isDateRangeOpen && (
                     <div className="fixed inset-0 z-[300] flex items-center justify-center p-6">

@@ -9,15 +9,11 @@ import Button from "@/components/ui/Button.jsx";
 import { eyebrowClass } from "@/components/ui/styles";
 import { IS_DEMO } from "@/config/demo";
 
-// 테스트 결제 경로 (VITE_E2E=true 또는 VITE_DEMO=true 일 때만).
-// 헤드리스 브라우저(E2E)나 공개 데모에서는 토스 결제 위젯을 띄우지 않고, 위젯 대신 "테스트 결제" 버튼이
-// 가짜 paymentKey 로 결제 성공 라우트(/payment/success)에 바로 진입한다. 승인은 백엔드 e2e·demo 프로필의
-// 토스 스텁(E2eTossClient)이 처리하고, 금액·재고 검증은 실제와 동일하게 서버가 수행한다. 실제 청구는 없다.
-// 빌드 시 상수로 치환되므로 두 값이 모두 없는 개발/운영 번들에는 이 버튼이 렌더링되지 않는다.
+// E2E·데모용 테스트 결제 (가짜 paymentKey, 승인은 서버의 토스 스텁). 빌드 시 상수 치환이라 운영 번들엔 없다
 const IS_E2E_PAYMENT = import.meta.env.VITE_E2E === "true";
 const IS_TEST_PAYMENT = IS_E2E_PAYMENT || IS_DEMO;
 
-// 주문번호: 비밀번호/개인정보를 절대 포함하지 않는다.
+// 주문번호에 개인정보를 넣지 않는다
 const createOrderId = () => "HR-" + crypto.randomUUID().slice(0, 8).toUpperCase();
 
 export default function PaymentProcess() {
@@ -26,22 +22,20 @@ export default function PaymentProcess() {
     const [widgets, setWidgets] = useState(null);
     const [ready, setReady] = useState(false);
     const { user } = useAuth();
-    // 결제하기 중복 클릭 방지 (ref: 즉시 차단, state: 버튼 비활성화 표시)
+    // 중복 클릭 방지 (ref: 즉시 차단, state: 버튼 표시)
     const payingRef = useRef(false);
     const [paying, setPaying] = useState(false);
 
-    // 예약자 이메일: 입력된 이메일 → 로그인 사용자 이메일 순으로 사용 (임의의 더미 이메일은 보내지 않음)
+    // 입력 이메일 → 로그인 사용자 이메일 순
     const guestEmail = state?.guestEmail || user?.email || "";
 
-    // 결제 처리 페이지에 새로고침이나 직접 URL 접근으로 들어오면 location.state가 없어
-    // handlePayment 내부에서 state.guestPhone 등을 그대로 참조하다 크래시가 났다(P0-2).
+    // 새로고침·직접 접근이면 location.state 가 없다
     useEffect(() => {
         if (!state) {
             navigate("/accommodations", {replace: true});
         }
     }, [state, navigate]);
 
-    // 매 렌더마다 새 객체가 생성되지 않도록 결제 금액 기준으로 메모이제이션
     const finalPrice = state?.finalPrice || 0;
     const amount = useMemo(() => ({
         currency: "KRW",
@@ -88,7 +82,7 @@ export default function PaymentProcess() {
         renderWidgets();
     }, [widgets, amount]);
 
-    // 결제 성공 페이지(PaymentSuccess)가 승인 요청에 사용할 예약 정보를 저장한다.
+    // PaymentSuccess 가 승인 요청에 쓸 예약 정보
     const saveReservationDraft = (orderId) => {
         sessionStorage.setItem("reservationInfo", JSON.stringify({
             userId: state.userId,
@@ -115,7 +109,7 @@ export default function PaymentProcess() {
         }));
     };
 
-    // e2e·데모 전용: 토스 결제창 대신 가짜 paymentKey 로 성공 라우트에 진입 (IS_TEST_PAYMENT 참고)
+    // E2E·데모 전용 (IS_TEST_PAYMENT 참고)
     const handleTestPayment = () => {
         if (!IS_TEST_PAYMENT || !state || payingRef.current) return;
         payingRef.current = true;
@@ -138,7 +132,6 @@ export default function PaymentProcess() {
 
         const orderId = createOrderId();
 
-        // ✅ 예약 정보 저장
         saveReservationDraft(orderId);
 
         try {
@@ -153,14 +146,13 @@ export default function PaymentProcess() {
             });
         } catch (error) {
             console.error("❌ 결제 요청 실패:", error);
-            // 결제창을 닫거나 요청이 실패한 경우에만 다시 누를 수 있게 한다.
-            // (성공 시에는 successUrl로 페이지가 이동한다)
+            // 성공하면 successUrl 로 이동하므로 실패·취소 시에만 다시 활성화
             payingRef.current = false;
             setPaying(false);
         }
     };
 
-    // 위 useEffect가 리다이렉트를 시작하는 동안 잘못된 값으로 렌더링하지 않는다.
+    // 리다이렉트 중에는 렌더링하지 않는다
     if (!state) {
         return null;
     }
@@ -208,7 +200,7 @@ export default function PaymentProcess() {
                 </div>
             </Card>
 
-            {/* 토스 결제 위젯 렌더링 영역 (데모에서는 위젯을 띄우지 않으므로 숨김) */}
+            {/* 토스 결제 위젯 (테스트 결제 모드에서는 숨김) */}
             {!IS_DEMO && (
                 <Card padding="p-2 sm:p-4" className="overflow-hidden">
                     <div id="payment-method" />

@@ -21,13 +21,13 @@ function PointHistory() {
 
     const { request } = useApiRequest();
 
-    // size는 응답으로 갱신되므로 ref로 최신값만 참조 (size 변경만으로 재조회하지 않도록)
+    // size 변경만으로 재조회하지 않게 ref 로 참조
     const sizeRef = useRef(size);
     useEffect(() => {
         sizeRef.current = size;
     }, [size]);
 
-    // 마지막으로 보낸 조회 요청 번호: 페이지를 빠르게 넘기면 늦게 온 이전 응답이 화면을 덮어쓰지 않도록 최신 요청만 반영
+    // 최신 요청 번호. 늦게 온 이전 응답은 무시한다
     const fetchSeqRef = useRef(0);
 
     const fetchPointHistory = useCallback((pageNumber = 0) => {
@@ -104,7 +104,7 @@ function PointHistory() {
                         <ul className="divide-y divide-gray-50">
                             {history.map((item, idx) => (
                                 <motion.li
-                                    // 내역 항목에 고유 id 가 없어 생성 시각 + 순번으로 키 구성
+                                    // 고유 id 가 없어 생성 시각 + 순번으로 key
                                     key={`${item.createdAt}-${idx}`}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}

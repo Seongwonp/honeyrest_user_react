@@ -17,19 +17,18 @@ function BannerSection({
                            getTomorrow,
                        }) {
     return (
-        // 모바일은 검색창이 세로로 길어 히어로 문구를 덮으므로 검색창을 문구 아래 흐름에 두고, md 이상에서만 배너 하단에 걸친다
+        // 모바일은 검색창이 문구를 덮어서 md 이상에서만 배너 하단에 걸친다
         <section className="relative w-full md:h-[700px]">
             {/* 배경 이미지 & 그라데이션 오버레이 */}
             <div className="absolute inset-0 overflow-hidden">
                 {randomBanner?.imageUrl ? (
-                    // 히어로 배경은 사진(글자 없는 이미지)을 전제로 화면을 꽉 채운다
                     <SafeImage
                         src={randomBanner.imageUrl}
                         alt={randomBanner.title || "Banner"}
                         className="w-full h-full object-cover object-center"
                     />
                 ) : randomBanner ? (
-                    // 배너가 없거나 불러오지 못한 경우: 기본 배경
+                    // 배너가 없으면 기본 배경
                     <div className="w-full h-full bg-gradient-to-br from-honey-yellow/70 via-amber-200 to-leaf-green/40" />
                 ) : (
                     <div className="w-full h-full bg-gray-200 animate-pulse" />

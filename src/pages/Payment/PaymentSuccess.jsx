@@ -6,11 +6,9 @@ import { getAccessToken } from "@/auth/authStorage";
 import StatusPanel from "@/components/ui/StatusPanel.jsx";
 import Button from "@/components/ui/Button.jsx";
 
-// 결제 승인 결과를 저장하는 sessionStorage 키 접두사
 const CONFIRM_KEY_PREFIX = "paymentConfirm:";
 
-// 같은 탭 안에서 컴포넌트가 다시 마운트되더라도(StrictMode 이중 실행 등)
-// 동일 주문에 대해 진행 중인 승인 요청을 공유하기 위한 모듈 단위 캐시
+// 재마운트(StrictMode 등)돼도 같은 주문의 승인 요청을 공유
 const inFlightConfirms = new Map();
 
 const readStored = (key) => {
@@ -26,7 +24,7 @@ const writeStored = (key, value) => {
     try {
         sessionStorage.setItem(key, JSON.stringify(value));
     } catch {
-        // 저장 실패는 무시 (ref 가드로 현재 화면의 중복 요청은 이미 막고 있음)
+        // 무시 (현재 화면 중복 요청은 ref 로 막음)
     }
 };
 
@@ -38,10 +36,8 @@ const readReservationDraft = () => {
     }
 };
 
-// 토큰 조회는 authStorage 의 getAccessToken() 으로 일원화
 const hasAccessToken = () => !!getAccessToken();
 
-// 서버 에러 응답(ApiResponse: { success, message, data })에서 사용자에게 보여줄 메시지를 꺼낸다.
 const extractErrorMessage = (err) => {
     const data = err?.response?.data;
     if (typeof data === "string" && data.trim()) return data;
@@ -50,8 +46,7 @@ const extractErrorMessage = (err) => {
     return "결제 승인 중 문제가 발생했습니다. 고객센터에 문의해주세요.";
 };
 
-// 실제 승인 요청. 서버가 응답한 결과(성공/실패)는 sessionStorage에 저장해
-// 새로고침·뒤로가기로 다시 들어와도 승인 API를 재호출하지 않는다.
+// 서버 응답 결과를 저장해 새로고침·뒤로가기 때 승인 API 를 다시 부르지 않는다
 const confirmOnce = (storageKey, body, isMember) => {
     if (inFlightConfirms.has(storageKey)) {
         return inFlightConfirms.get(storageKey);
@@ -72,7 +67,7 @@ const confirmOnce = (storageKey, body, isMember) => {
             }
             const outcome = { ok: true, isMember, result };
             writeStored(storageKey, outcome);
-            // 승인이 확정된 뒤에만 예약 임시 정보를 지운다.
+            // 승인이 확정된 뒤에만 임시 예약 정보를 지운다
             sessionStorage.removeItem("reservationInfo");
             return outcome;
         })
@@ -84,8 +79,7 @@ const confirmOnce = (storageKey, body, isMember) => {
                 httpStatus: err?.response?.status ?? null,
                 message: extractErrorMessage(err),
             };
-            // 서버가 응답한 경우(409 매진, 5xx 결제 취소 등)만 결과를 저장한다.
-            // 네트워크 오류처럼 응답이 없으면 결과를 알 수 없으므로 저장하지 않는다.
+            // 응답이 있을 때만 저장 (네트워크 오류는 결과를 알 수 없음)
             if (err?.response) {
                 writeStored(storageKey, outcome);
             }
@@ -109,8 +103,7 @@ export default function PaymentSuccess() {
     const orderId = searchParams.get("orderId");
     const amount = searchParams.get("amount");
 
-    // 마운트 여부 추적: StrictMode의 가상 언마운트→재마운트 이후에도 결과를 반영하고,
-    // 사용자가 페이지를 떠난 뒤에는 이동/상태 변경을 하지 않기 위함
+    // 페이지를 떠난 뒤에는 이동/상태 변경을 하지 않기 위한 마운트 여부
     const mountedRef = useRef(false);
     useEffect(() => {
         mountedRef.current = true;
@@ -118,14 +111,13 @@ export default function PaymentSuccess() {
     }, []);
 
     useEffect(() => {
-        // StrictMode 이중 실행 / 재렌더링 시 중복 호출 방지
         if (requestedRef.current) return;
         requestedRef.current = true;
 
         const finish = (next) => {
             if (!mountedRef.current) return;
             if (next.ok) {
-                // 완료 페이지로 교체 이동해 뒤로가기로 이 페이지에 다시 머무르지 않게 한다.
+                // replace 로 이동해 뒤로가기로 돌아오지 않게
                 navigate("/reservation/complete", { state: next.result, replace: true });
                 return;
             }
@@ -139,7 +131,6 @@ export default function PaymentSuccess() {
 
         const storageKey = `${CONFIRM_KEY_PREFIX}${orderId}:${paymentKey}`;
 
-        // 이미 처리된 결과가 있으면 재호출하지 않고 그대로 보여준다.
         const stored = readStored(storageKey);
         if (stored) {
             finish(stored);
@@ -161,7 +152,6 @@ export default function PaymentSuccess() {
         };
 
         confirmOnce(storageKey, body, isMember).then(finish);
-        // 최초 마운트 시 한 번만 실행한다 (ref로 재실행 차단)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

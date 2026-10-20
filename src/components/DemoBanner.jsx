@@ -2,8 +2,7 @@ import { useState } from "react";
 import { HiX } from "react-icons/hi";
 import { ADMIN_URL } from "@/config/urls";
 
-// 데모 환경 안내 띠 배너 (VITE_DEMO=true 빌드에서만 App 이 렌더링한다 → src/config/demo.js)
-// 닫으면 이번 탭(sessionStorage) 동안은 다시 보이지 않는다. 저장소 접근이 막혀 있어도 화면은 정상 동작한다.
+// 데모 안내 배너 (VITE_DEMO 빌드에서만). 닫으면 이번 탭에서는 다시 안 보인다
 const DISMISS_KEY = "honeyrest:demo-banner-dismissed";
 
 const readDismissed = () => {
@@ -23,7 +22,7 @@ export default function DemoBanner() {
         try {
             sessionStorage.setItem(DISMISS_KEY, "1");
         } catch {
-            // 저장 실패는 무시 (이번 렌더에서만 닫힘)
+            // 저장 실패는 무시
         }
         setDismissed(true);
     };

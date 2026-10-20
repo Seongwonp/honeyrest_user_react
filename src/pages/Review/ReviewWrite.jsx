@@ -21,7 +21,7 @@ export default function ReviewWrite() {
     const [serviceRating, setServiceRating] = useState(0);
     const [facilitiesRating, setFacilitiesRating] = useState(0);
     const [locationRating, setLocationRating] = useState(0);
-    // 종합 평점: 세부 평점에서 파생되는 값이라 state 로 두지 않고 렌더마다 계산
+    // 종합 평점은 세부 평점에서 계산
     const rating = calcAverageRating([cleanlinessRating, serviceRating, facilitiesRating, locationRating]);
 
     const handleImageUpload = async (e) => {
@@ -55,7 +55,7 @@ export default function ReviewWrite() {
 
         setLoading(true);
         try {
-            // 작성 불가(이용 완료 전·중복 작성 등)는 에러 페이지로 보내지 않고 서버 안내 메시지를 토스트로 보여 준다.
+            // 작성 불가(이용 완료 전 등)는 에러 페이지 대신 서버 메시지를 토스트로
             await api.post("/api/review/write", {
                 reservationId,
                 rating,
@@ -115,7 +115,6 @@ export default function ReviewWrite() {
                     <span className="font-black text-honey-yellow-dark">{rating}점 <span className="text-xs font-bold text-gray-400">(자동 계산)</span></span>
                 </div>
 
-                {/* 텍스트 */}
                 <div>
                     <label htmlFor="review-write-content" className={labelClass}>후기 내용 (20자 이상)</label>
                     <textarea

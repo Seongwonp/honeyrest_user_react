@@ -9,8 +9,7 @@ import { isKakaoUser } from '@/auth/provider';
 function Logout() {
     const navigate = useNavigate();
     const { user, isLoggedIn, logout } = useAuth();
-    // 진입 시점의 로그인 여부 (비로그인 진입은 기존 PrivateRoute 와 동일하게 401 처리)
-    // logout() 이후 상태가 바뀌어도 안내 메시지·카카오 로그아웃 흐름이 끊기지 않도록 최초 값만 사용
+    // logout() 뒤 상태가 바뀌어도 흐름이 끊기지 않게 진입 시점 값만 쓴다 (비로그인 진입은 401)
     const [loggedInOnEnter] = useState(isLoggedIn);
     const [showMessage, setShowMessage] = useState(true);
     const hasLoggedOut = useRef(false);
@@ -20,7 +19,7 @@ function Logout() {
             if (!loggedInOnEnter || hasLoggedOut.current) return;
             hasLoggedOut.current = true;
 
-            // logout() 이전에 공유 인증 상태에서 로그인 제공자를 확보
+            // logout() 전에 provider 확보
             const wasKakaoUser = isKakaoUser(user);
 
             try {
@@ -55,7 +54,7 @@ function Logout() {
         };
 
         performLogout();
-        // hasLoggedOut ref 로 1회만 실행되므로 user 변경으로 재실행돼도 무방
+        // ref 로 1회만 실행되므로 재실행돼도 무방
     }, [navigate, logout, user, loggedInOnEnter]);
 
     if (!loggedInOnEnter) {

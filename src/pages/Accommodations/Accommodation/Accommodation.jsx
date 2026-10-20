@@ -16,11 +16,7 @@ import BookingSidebar from "./sections/BookingSidebar.jsx";
 import StayChangeModal from "./sections/StayChangeModal.jsx";
 import { todayLocal, addDays } from "@/utils/date";
 
-/**
- * 숙소 상세 페이지
- * - 상태(일정·인원, 상세 데이터, 모달 표시 등)는 이 컴포넌트가 소유하고
- *   화면 구역별 마크업은 ./sections/* 컴포넌트로 분리해 props 로 전달한다.
- */
+// 숙소 상세. 상태는 여기서 갖고 구역별 마크업은 ./sections/*
 function Accommodation({ accommodationId, sectionRefs }) {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -58,8 +54,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
         const params = { checkIn, checkOut, guests };
         if (userId) params.userId = userId;
 
-        // 일정·인원을 연달아 바꾸면 이전 조건의 응답이 늦게 도착해 최신 상세를 덮어쓸 수 있으므로
-        // 정리(cleanup) 시 이전 요청을 취소한다.
+        // 이전 조건의 늦은 응답이 덮어쓰지 않게 cleanup 에서 취소
         const controller = new AbortController();
         api.get(`/api/accommodations/${accommodationId}`, { params, signal: controller.signal })
             .then((res) => {
@@ -87,7 +82,7 @@ function Accommodation({ accommodationId, sectionRefs }) {
         );
         Object.values(sectionRefs.current).forEach((ref) => { if (ref) observer.observe(ref); });
         return () => observer.disconnect();
-        // sectionRefs는 부모의 useRef 객체라 참조가 고정 → 마운트 시 1회만 실행됨
+        // sectionRefs 는 ref 라 마운트 시 1회만 실행
     }, [sectionRefs]);
 
     useEffect(() => {

@@ -76,7 +76,7 @@ function ListSearchBox() {
     );
 }
 
-// 로컬(KST) 기준 날짜. toISOString() 은 UTC 라 새벽 시간대에 "어제"가 된다.
+// 로컬 날짜 기준 (toISOString 은 UTC)
 function getToday() {
     return todayLocal();
 }

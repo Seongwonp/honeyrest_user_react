@@ -1,6 +1,5 @@
 import { cardClass } from "./styles";
 
-// 빈 목록 상태
 function EmptyState({ icon, title, description, action, className = "" }) {
     return (
         <div className={`${cardClass} text-center py-16 px-6 ${className}`}>

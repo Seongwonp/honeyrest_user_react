@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import api from "@/api/axios";
 
-// 응답이 이 시간 안에 오지 않으면 실패로 보고 대체 화면을 보여 준다 (무한 로딩 방지)
+// 무한 로딩 방지용 타임아웃
 const WEATHER_TIMEOUT_MS = 8000;
 
 function WeatherInfo({ city, displayName, coords }) {
     // status: loading | ready | notFound | error
     const [status, setStatus] = useState("loading");
     const [weather, setWeather] = useState(null);
-    // 다시 시도 버튼을 누르면 값이 바뀌어 요청을 새로 보낸다
+    // 다시 시도 시 값을 바꿔 재요청
     const [attempt, setAttempt] = useState(0);
 
     const iconClassMap = {
@@ -45,8 +45,7 @@ function WeatherInfo({ city, displayName, coords }) {
             return;
         }
 
-        // 장식용 요청: 실패해도 에러 페이지로 보내지 않고 위젯 안에서 대체 문구를 보여 준다.
-        // 위치가 바뀌면 이전 위치의 응답이 늦게 와서 덮어쓰지 않도록 취소한다.
+        // 장식용 요청이라 실패해도 위젯 안에서 처리. 위치가 바뀌면 이전 요청 취소
         const controller = new AbortController();
         setStatus("loading");
         api.get(url, { skipRedirect: true, signal: controller.signal, timeout: WEATHER_TIMEOUT_MS })
@@ -109,7 +108,7 @@ function WeatherInfo({ city, displayName, coords }) {
         );
     }
 
-    // 밤(n) 아이콘이 따로 없으면 낮(d) 아이콘으로 대신한다
+    // 밤(n) 아이콘이 없으면 낮(d) 아이콘 사용
     const iconClass = iconClassMap[weather.icon] || iconClassMap[String(weather.icon || "").replace(/n$/, "d")] || "wi-na";
     const iconColor = colorMap[weather.description] || "text-gray-400";
 

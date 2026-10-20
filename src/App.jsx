@@ -20,21 +20,18 @@ function GlobalGuard() {
     const hasRefreshed = useRef(false);
     const isLoggedOut = useRef(false);
 
-    // navigate는 라우트 이동 시 참조가 바뀔 수 있으므로 ref로 최신값을 보관
-    // (최초 1회 effect가 라우트 이동마다 재실행되지 않도록)
+    // navigate 참조가 바뀌어도 최초 1회 effect 가 다시 돌지 않게 ref 로 보관
     const navigateRef = useRef(navigate);
     useEffect(() => {
         navigateRef.current = navigate;
     }, [navigate]);
 
-    // 만료 타이머는 언마운트 시에만 정리 (재발급 결과를 기다리는 동안 effect 재실행과 무관하게 유지)
+    // 만료 타이머는 언마운트 시에만 정리
     const expiryTimerRef = useRef(null);
     useEffect(() => () => clearTimeout(expiryTimerRef.current), []);
 
     // 앱 최초 마운트 시 1회: 토큰 재발급 + 만료 타이머
-    // - 재발급은 axios.js 의 refreshAccessToken() 을 사용 → 응답 인터셉터의 401 처리와
-    //   같은 in-flight Promise 를 공유하므로 서버 재발급 요청은 한 번만 나간다.
-    // - 만료 타이머는 재발급으로 받은 새 토큰의 exp 기준으로 건다.
+    // 재발급은 인터셉터와 같은 Promise 를 공유하고, 타이머는 새 토큰 exp 기준
     useEffect(() => {
         const accessToken = getAccessToken();
 
@@ -69,7 +66,7 @@ function GlobalGuard() {
                 logout();
                 navigateRef.current('/login', { replace: true });
             });
-        // logout·syncUserFromServer는 AuthProvider에서 useCallback으로 고정된 참조 → 마운트 시 1회만 실행
+        // 의존성은 모두 고정 참조라 마운트 시 1회만 실행
     }, [logout, syncUserFromServer]);
 
     // 라우트 이동마다: URL 파라미터 기반 접근 제어
@@ -84,7 +81,6 @@ function GlobalGuard() {
     return (
         <>
             <ScrollToTop />
-            {/* 데모 빌드(VITE_DEMO=true)에서만: 상단 안내 띠 배너 */}
             {IS_DEMO && <DemoBanner />}
             <AppWrapper />
         </>
@@ -95,7 +91,6 @@ function App() {
     return (
         <BrowserRouter>
             <ErrorBoundary>
-                {/* 인증 상태는 앱 전체에서 하나의 Provider 로 공유 */}
                 <AuthProvider>
                     <GlobalGuard />
                 </AuthProvider>

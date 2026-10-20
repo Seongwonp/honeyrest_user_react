@@ -36,7 +36,7 @@ function Login() {
         submitLogin(email, password);
     };
 
-    // 데모 빌드 전용: 데모 계정을 입력란에 채우고 바로 로그인한다 (src/config/demo.js)
+    // 데모 빌드 전용: 데모 계정으로 바로 로그인
     const handleDemoLogin = () => {
         if (!IS_DEMO) return;
         setEmail(DEMO_ACCOUNT.email);
@@ -76,7 +76,6 @@ function Login() {
                             provider: PROVIDERS.LOCAL
                         };
 
-                        // 세션 저장 + 공유 상태 반영은 AuthContext.login, 이후 서버 정보로 보강
                         login({ token: accessToken, user: userWithProvider, autoLogin });
                         syncUserFromServer();
 
@@ -95,7 +94,7 @@ function Login() {
                 }
             );
         } catch (err) {
-            // 오류 토스트는 useApiRequest 가 표시함
+            // 토스트는 useApiRequest 가 띄움
             console.error("로그인 처리 중 오류:", err);
         }
     };
@@ -191,7 +190,7 @@ function Login() {
                 </div>
 
                 {IS_DEMO ? (
-                    // 데모 빌드는 소셜 로그인 키를 넣지 않으므로 버튼 대신 안내만 보여 준다
+                    // 데모 빌드에는 소셜 로그인 키가 없다
                     <p className="text-xs text-center text-gray-400">데모 환경에서는 소셜 로그인을 사용할 수 없습니다.</p>
                 ) : (
                     <div className="space-y-3">

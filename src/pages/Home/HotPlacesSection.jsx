@@ -10,7 +10,7 @@ function HotPlacesSection({ isDropdownOpen, setIsDropdownOpen, verticalSliderSet
     const containerRef = useRef(null);
 
     useEffect(() => {
-        // 장식용 요청: 실패해도 에러 페이지로 보내지 않는다
+        // 장식용 요청이라 실패해도 에러 페이지로 보내지 않음
         api.get("/api/region/hot?topN=8", { skipRedirect: true })
             .then(res => {
                 setHotList(Array.isArray(res.data) ? res.data : []);
@@ -57,8 +57,7 @@ function HotPlacesSection({ isDropdownOpen, setIsDropdownOpen, verticalSliderSet
     };
 
     return (
-        // backdrop-blur 가 쌓임 맥락을 만들어 안쪽 z-index 가 카드 밖(아래 날씨 카드)과 비교되지 않는다.
-        // 카드 자체에 z-index 를 줘서 펼친 목록이 뒤따르는 날씨 카드 위에 겹쳐 보이게 한다.
+        // backdrop-blur 가 쌓임 맥락을 만들어서, 펼친 목록이 날씨 카드 위에 오도록 카드에 z-index 지정
         <div
             ref={containerRef}
             className={`w-full bg-white/80 backdrop-blur-sm rounded-3xl shadow-sm border border-gray-100 p-5 relative ${isDropdownOpen ? "z-40" : "z-10"}`}

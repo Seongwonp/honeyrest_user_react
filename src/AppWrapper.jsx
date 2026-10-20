@@ -17,7 +17,7 @@ import PublicRoute from './routes/PublicRoute.jsx';
 import PrivateRoute from './routes/PrivateRoute.jsx';
 import PageLoader from './components/PageLoader.jsx';
 
-// 라우트 단위 페이지는 지연 로딩하여 초기 번들 크기를 줄인다 (Layout/Header 는 즉시 로딩)
+// 페이지는 지연 로딩 (Layout/Header 는 즉시)
 const Home = lazy(() => import("./pages/Home/Home"));
 const Login = lazy(() => import("./pages/Login/Login"));
 const Signup = lazy(() => import("./pages/SignUp/SignUp.jsx"));
@@ -100,7 +100,7 @@ function AppWrapper() {
                             </PublicRoute>
                         }
                     />
-                    {/* 로그아웃: logout() 직후 PrivateRoute 가 401 로 보내지 않도록 가드는 Logout 내부에서 처리 */}
+                    {/* 로그아웃 직후 PrivateRoute 에 걸리지 않게 가드는 Logout 안에서 처리 */}
                     <Route path="/logout" element={<Logout />} />
                     {/* 인증 관련 */}
                     <Route path="/verify-email" element={<VerifyEmail/>}/>
@@ -135,12 +135,11 @@ function AppWrapper() {
                             <Route path="reviews/write/:reservationId" element={<ReviewWrite />} />
                             <Route path="wishList" element={<MyWishList />}/>
 
-                            {/* 마이페이지 1:1 문의 관련 */}
+                            {/* 1:1 문의 */}
                             <Route path="inquiries" element={<InquiryList />} />
                             <Route path="inquiries/:inquiryId" element={<Inquiry />} />
                             <Route path="inquiries/edit/:inquiryId" element={<InquiryEditModal />} />
 
-                            {/* 쿠폰 페이지 */}
                             <Route path="coupons" element={<CouponList />} />
 
                             <Route path="points" element={<PointHistory/>}/>

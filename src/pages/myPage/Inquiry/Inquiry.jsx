@@ -25,7 +25,7 @@ function Inquiry() {
     useEffect(() => {
         if (!inquiryId) return;
 
-        // 다른 문의로 이동·재시도 시 늦게 온 이전 응답은 반영하지 않는다
+        // 늦게 온 이전 응답은 반영하지 않는다
         let ignore = false;
         const fetchInquiry = async () => {
             setLoadError(false);
@@ -95,13 +95,11 @@ function Inquiry() {
             </div>
 
             <Card>
-                {/* Title */}
                 <div className="space-y-3 border-b border-gray-50 pb-5 mb-6">
                     <span className={`${badgeClass} ${inquiry.isReplied ? 'bg-leaf-green/10 text-leaf-green-dark' : 'bg-honey-yellow/15 text-honey-yellow-dark'}`}>
                         {inquiry.isReplied ? '답변 완료' : '미답변'}
                     </span>
                     <h2 className="text-2xl font-black text-deep-gray break-keep">{inquiry.title}</h2>
-                    {/* Meta Info */}
                     <div className="flex flex-wrap items-center text-xs text-gray-400 gap-x-6 gap-y-1">
                         <span className="flex items-center gap-1">
                             <FaHotel /> <span className="font-bold">숙소</span> {inquiry.accommodationName}
@@ -112,7 +110,7 @@ function Inquiry() {
                     </div>
                 </div>
 
-                {/* Inquiry Content */}
+                {/* 문의 내용 */}
                 <div className="mb-8">
                     <p className={`${eyebrowClass} mb-2 flex items-center gap-1`}>
                         <FaRegCommentDots /> Question · 문의 내용
@@ -122,7 +120,7 @@ function Inquiry() {
                     </div>
                 </div>
 
-                {/* Reply Section */}
+                {/* 답변 */}
                 <div>
                     <p className={`${eyebrowClass} mb-2 flex items-center gap-1`}>
                         <FaReply /> Answer · 답변

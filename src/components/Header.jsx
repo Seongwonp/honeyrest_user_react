@@ -15,7 +15,6 @@ function Header() {
     const [scrolled, setScrolled] = useState(false);
     const navigate = useNavigate();
     const { user, isLoggedIn } = useAuth();
-    // 관리자 URL 이 설정된 경우에만 관리자 버튼 노출
     const isAdmin = isLoggedIn && user.role?.includes('ADMIN') && Boolean(ADMIN_URL);
 
     useEffect(() => {

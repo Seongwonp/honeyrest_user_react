@@ -12,7 +12,6 @@ const strengthLabels = ["매우 약함", "약함", "보통", "강함", "매우 �
 
 // 비밀번호 강도 표시 (입력값이 있을 때만 렌더링)
 function PasswordStrengthMeter({ password }) {
-    // 비밀번호 강도 (0 ~ 4)
     const strength = getPasswordStrength(password);
 
     if (!password) return null;

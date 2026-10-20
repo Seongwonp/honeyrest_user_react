@@ -15,7 +15,6 @@ function CouponList() {
     // loading | error | ready
     const [status, setStatus] = useState('loading');
 
-    // request는 useApiRequest에서 useCallback으로 고정된 참조
     const fetchCoupons = useCallback(() => {
         setStatus('loading');
         request(
@@ -30,7 +29,6 @@ function CouponList() {
         ).catch(() => setStatus('error'));
     }, [request]);
 
-    // 마운트 시 1회 실행
     useEffect(() => {
         fetchCoupons();
     }, [fetchCoupons]);
@@ -61,7 +59,7 @@ function CouponList() {
                             {/* 쿠폰 좌측 할인 영역 */}
                             <div className={`w-24 sm:w-28 shrink-0 flex flex-col items-center justify-center gap-1 border-r-2 border-dashed border-gray-100 ${coupon.used ? 'bg-gray-50 text-gray-400' : 'bg-honey-yellow/10 text-honey-yellow-dark'}`}>
                                 <FaTicketAlt className="text-xl" />
-                                {/* 서버 값은 BigDecimal(예: 5000.00) → 소수점 없이 천 단위 구분 */}
+                                {/* 서버 값이 BigDecimal(5000.00)이라 소수점 없이 표시 */}
                                 <span className="text-base sm:text-lg font-black whitespace-nowrap">
                                     {coupon.discountType === 'FIXED'
                                         ? `${(Number(coupon.discountValue) || 0).toLocaleString('ko-KR')}원`
